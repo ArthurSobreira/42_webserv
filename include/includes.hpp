@@ -34,4 +34,5 @@
 #include "cgi_handler.hpp" // Declarações para o gerenciamento de CGI
 #include "utils.hpp"      // Funções utilitárias e macros
 
+
 #endif // WEBSERV_INCLUDES_HPP
