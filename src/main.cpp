@@ -6,7 +6,7 @@
 /*   By: phenriq2 <phenriq2@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/22 18:29:45 by phenriq2          #+#    #+#             */
-/*   Updated: 2024/08/22 20:08:48 by phenriq2         ###   ########.fr       */
+/*   Updated: 2024/08/23 18:41:25 by phenriq2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,12 +31,12 @@ int main(void)
 
 	struct sockaddr_in server_address;
 	server_address.sin_family = AF_INET;
-	server_address.sin_addr.s_addr = INADDR_ANY; // Vincula a qualquer endereço disponível
-	server_address.sin_port = htons(13000);		 // Porta 8080
+	server_address.sin_addr.s_addr = INADDR_ANY; 
+	server_address.sin_port = htons(13000);		 
 
 	if (bind(server_socket, (struct sockaddr *)&server_address, sizeof(server_address)) < 0)
 	{
-		perror("bind failed");
+		ft_error("Erro ao fazer bind", strerror(errno), __FUNCTION__, __FILE__, __LINE__, errno);
 		close(server_socket);
 		return 1;
 	}
@@ -48,7 +48,9 @@ int main(void)
 		return 1;
 	}
 
-	std::cout << "Servidor escutando na porta 8080..." << std::endl;
+	std::cout << "Servidor escutando na porta 13000..." << std::endl;
+	std::ifstream file("../static/index.html");
+	std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 
 	while (true)
 	{
@@ -65,9 +67,15 @@ int main(void)
 
 		std::cout << "Cliente conectado!" << std::endl;
 
-		const char *response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nHello, Telnet!\n";
-		send(client_socket, response, strlen(response), 0);
-
+		// Construindo a resposta HTTP completa
+		std::ostringstream response;
+		response << "HTTP/1.1 200 OK\r\n";
+		response << "Content-Type: text/html\r\n";
+		response << "Content-Length: " << content.size() << "\r\n";
+		response << "\r\n";
+		response << content;
+		std::string response_str = response.str();
+		send(client_socket, response_str.c_str(), response_str.size(), 0);
 		close(client_socket);
 		std::cout << "Conexão com o cliente fechada." << std::endl;
 	}
