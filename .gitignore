@@ -1,5 +1,5 @@
 *.o
-vscode/
+.vscode/
 .dist/
 *.out
 web
