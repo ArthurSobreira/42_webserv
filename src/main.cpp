@@ -6,7 +6,7 @@
 /*   By: phenriq2 <phenriq2@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/22 18:29:45 by phenriq2          #+#    #+#             */
-/*   Updated: 2024/08/23 18:41:25 by phenriq2         ###   ########.fr       */
+/*   Updated: 2024/08/26 17:13:05 by phenriq2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ void ft_error(const char *message, const char *error_detail, const char *functio
 
 int main(void)
 {
+	std::string ip = "127.0.0.1";
 	int server_socket = socket(AF_INET, SOCK_STREAM, 0);
 	if (server_socket == -1)
 	{
