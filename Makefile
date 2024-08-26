@@ -11,12 +11,12 @@ DEFAULT_GOAL: all
 #------------------------------------------------------------------------------#
 
 CC		=	c++
-CFLAGS	=	-Wall -Werror -Wextra -std=c++98 -I includes/
+CFLAGS	=	-Wall -Werror -Wextra -std=c++98 -g3 -I includes/
 RM		=	rm -rf
 
 NAME	=	webserv
 BUILD	=	./build
-SRCS	=	src/main.cpp
+SRCS	=	src/main.cpp  src/cgi_handler.cpp  src/response.cpp src/server.cpp src/request.cpp   src/utils.cpp
 OBJS	=	$(addprefix $(BUILD)/, $(notdir $(SRCS:.cpp=.o)))
 INC		=	$(wildcard include/*.hpp)
 
@@ -52,3 +52,6 @@ fclean: clean
 	@$(RM) $(NAME)
 
 re: fclean all
+
+run: all
+	./$(NAME)

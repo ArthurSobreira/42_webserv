@@ -5,13 +5,15 @@ bool inetPton(const std::string &ip_str, uint32_t &out_binary_ip)
 	std::istringstream stream(ip_str);
 	std::string segment;
 	std::vector<int> bytes;
+	int byte;
 
 	while (std::getline(stream, segment, '.'))
 	{
 		try
 		{
-			int byte = std::stoi(segment);
-			if (byte < 0 || byte > 255)
+			std::istringstream str(segment);
+			str >> byte;
+			if (byte < 0 || byte > 255 || str.fail())
 				throw std::out_of_range("Byte fora do intervalo.");
 			bytes.push_back(byte);
 		}
