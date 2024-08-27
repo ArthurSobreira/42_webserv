@@ -16,7 +16,7 @@ RM		=	rm -rf
 
 NAME	=	webserv
 BUILD	=	./build
-SRCS	=	src/main.cpp  src/cgi_handler.cpp  src/response.cpp src/server.cpp src/request.cpp   src/utils.cpp
+SRCS	=	src/main.cpp  src/cgi_handler.cpp  src/response.cpp src/server.cpp src/request.cpp   src/utils.cpp src/HttpError.cpp src/Logger.cpp src/getters
 OBJS	=	$(addprefix $(BUILD)/, $(notdir $(SRCS:.cpp=.o)))
 INC		=	$(wildcard include/*.hpp)
 
@@ -54,4 +54,4 @@ fclean: clean
 re: fclean all
 
 run: all
-	./$(NAME)
+	./$(NAME) config/server.conf
