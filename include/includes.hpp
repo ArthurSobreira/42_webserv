@@ -57,5 +57,6 @@
 #include "HttpError.hpp"   // Classe para tratamento de erros HTTP
 #include "Logger.hpp" 	// Classe para gerenciamento de logs
 #include "defines.hpp"	// Definições de constantes e macros
+#include "getters.hpp"	// Funções de acesso a variáveis globais
 
 #endif // WEBSERV_INCLUDES_HPP

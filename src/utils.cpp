@@ -1,4 +1,4 @@
-#include "../include/includes.hpp"
+#include "includes.hpp"
 
 bool inetPton(const std::string &ip_str, uint32_t &out_binary_ip)
 {
@@ -9,21 +9,12 @@ bool inetPton(const std::string &ip_str, uint32_t &out_binary_ip)
 
 	while (std::getline(stream, segment, '.'))
 	{
-		try
-		{
+
 			std::istringstream str(segment);
 			str >> byte;
 			if (byte < 0 || byte > 255 || str.fail())
-			{
-				Logger::log("Erro na conversão: byte inválido");
-			}
+				return getLogger().log("Erro na conversão: byte inválido"), false;
 			bytes.push_back(byte);
-		}
-		catch (std::exception &e)
-		{
-			std::cerr << "Erro na conversão: " << e.what() << std::endl;
-			return std::cout << "Erro na conversão: " << e.what() << std::endl, false;
-		}
 	}
 	if (bytes.size() != 4)
 		return false;
@@ -34,10 +25,8 @@ bool inetPton(const std::string &ip_str, uint32_t &out_binary_ip)
 void ft_error(const char *message, const char *function, const char *file, int line, const std::exception& e)
 {
     std::ostringstream  oss;
-    Logger log("logs/server.log");
-
-    oss << "Erro: " << message << " in function " << function << " at " << file << ":" << line << " Error code: " << " Exception: " << e.what();
-    log.log(oss.str());
+    oss << "Erro: " << message << " in function " << function << " at " << file << ":" << line << " Exception: " << e.what();
+    getLogger().log(oss.str());
     oss << std::endl;
     std::cerr << oss.str();
     throw e; 
