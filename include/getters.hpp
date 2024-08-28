@@ -3,6 +3,7 @@
 
 
 Logger &getLogger();
+HttpError &getError404();
 
 
 
