@@ -54,4 +54,7 @@ fclean: clean
 re: fclean all
 
 run: all
+	@echo $(CYAN)[Running $(NAME) executable...]$(LIMITER)
+	@$(RM) -rf ./logs/server.log
+	@echo $(GREEN)[Server is running...]$(LIMITER)
 	./$(NAME) config/server.conf
