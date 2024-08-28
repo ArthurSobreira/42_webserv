@@ -43,21 +43,7 @@ void HttpError::_initStatusMessages()
 	_status_messages[505] = "HTTP Version Not Supported";
 }
 
-std::string HttpError::getResponse() const
-{
-	std::ostringstream oss, size;
-	oss << _status_code;
-	size << _getBody().size();
-    std::string status_message = _status_messages.at(_status_code);
-    std::string response = "HTTP/1.1 " + oss.str() + " " + status_message + "\r\n";
-    response += "Content-Type: text/html\r\n";
-    response += "Content-Length: " + size.str() + "\r\n";
-    response += "\r\n";
-    response += _getBody();
-    return response;
-}
-
-std::string HttpError::_getBody() const
+std::string HttpError::getBody() const
 {
     std::ostringstream body, ssc;
 	ssc << _status_code;
