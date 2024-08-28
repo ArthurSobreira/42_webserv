@@ -11,14 +11,13 @@ public:
     HttpError(HttpError const &src);
     HttpError &operator=(HttpError const &rhs);
     ~HttpError();
-    std::string getResponse() const;
+    std::string getBody() const;
 
 private:
     int _status_code;
     std::string _custom_message;
     std::map<int, std::string> _status_messages;
     void _initStatusMessages();
-    std::string _getBody() const;
 };
 
 #endif // HTTPERROR_HPP
