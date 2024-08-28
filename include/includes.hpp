@@ -12,6 +12,7 @@
 #include <algorithm> // Funções de algoritmo padrão
 #include <ctime>	 // Manipulação de tempo
 #include <memory>	 // Gerenciamento de memória'
+#include <cassert>  // Macros de asserção
 // C headers
 #include <cstring> // Manipulação de strings em C (ex: strlen, strcpy)
 #include <cstdlib> // Funções de utilitários gerais (ex: malloc, free)
