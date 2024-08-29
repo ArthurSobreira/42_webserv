@@ -9,4 +9,12 @@
 #define CYAN "\033[36m"
 #define RESET "\033[0m"
 
+#define MAX_EVENTS 64
+
+typedef struct sockaddr_in sockaddrIn;
+typedef struct epoll_event epollEvent;
+typedef struct sockaddr sockaddr;
+typedef struct stat status;
+typedef struct dirent diretory;
+
 #endif // DEFINES_HPP_
