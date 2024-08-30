@@ -53,10 +53,11 @@ dkms.conf
 
 # Local files
 .vscode/
-*/.vscode/
+*/..vscode/
 .dist/
 */.dist/
 */*/build/
 
 # Executables
 webserv
+*.out
