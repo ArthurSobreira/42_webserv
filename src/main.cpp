@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: phenriq2 <phenriq2@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: arsobrei <arsobrei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/22 18:29:45 by phenriq2          #+#    #+#             */
-/*   Updated: 2024/08/22 20:08:48 by phenriq2         ###   ########.fr       */
+/*   Updated: 2024/08/23 17:51:02 by arsobrei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/includes.hpp"
+#include "includes.hpp"
 
 void ft_error(const char *message, const char *error_detail, const char *function, const char *file, int line, int error_code)
 {
