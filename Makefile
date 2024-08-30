@@ -16,6 +16,7 @@ RM		=	rm -rf
 
 NAME	=	webserv
 BUILD	=	./build
+LOG		=	./logs
 SRCS	=	src/main.cpp src/cgi_handler.cpp src/response.cpp \
 			src/server.cpp src/request.cpp src/utils.cpp \
 			src/HttpError.cpp src/Logger.cpp src/getters.cpp
@@ -44,6 +45,7 @@ $(BUILD)/%.o: src/%.cpp $(INC)
 
 $(BUILD):
 	@mkdir -p $(BUILD)
+	@mkdir -p $(LOG)
 
 clean:
 	@echo $(RED)[Cleaning object files...]$(LIMITER)
@@ -51,12 +53,13 @@ clean:
 
 fclean: clean
 	@echo $(RED)[Cleaning $(NAME) executable...]$(LIMITER)
+	@echo $(RED)[Cleaning logs files...]$(LIMITER)
 	@$(RM) $(NAME)
+	@$(RM) $(LOG)
 
 re: fclean all
 
 run: all
 	@echo $(CYAN)[Running $(NAME) executable...]$(LIMITER)
-	@$(RM) -rf ./logs/server.log
 	@echo $(GREEN)[Server is running...]$(LIMITER)
-	./$(NAME) config/server.conf
+	@./$(NAME) config/server.conf
