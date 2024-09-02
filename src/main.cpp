@@ -255,7 +255,7 @@ int main(int argc, char **argv)
 	{
 		signal(SIGINT, signals);
 		signal(SIGQUIT, signals);
-		arr.push_back(serverInit("10.11.9.1", 13000));  // IP fixo, mudar na mão
+		arr.push_back(serverInit("127.0.0.1", 13000));  // IP fixo, mudar na mão
 		if (epoll_fd == -1)
 			ft_error("Erro ao criar epoll", __FUNCTION__, __FILE__, __LINE__, std::runtime_error(strerror(errno)));
 		struct epoll_event event;
