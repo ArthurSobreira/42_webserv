@@ -1,14 +1,13 @@
 #include "includes.hpp"
 
+Logger &getLogger( void ) {
+	static Logger logger(LOG_FILE);
 
-Logger &getLogger()
-{
-	static Logger logger("logs/server.log");
-	return logger;
+	return (logger);
 }
 
-HttpError &getError404(){
+HttpError &getError404( void ) {
 	static HttpError error(404);
-	return error;
-}
 
+	return (error);
+}

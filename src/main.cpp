@@ -248,14 +248,14 @@ int main(int argc, char **argv)
 	std::vector<int> arr;
 	if (argc != 2)
 	{
-		std::cerr << "Usage: " << argv[0] << " <config file> " << std::endl;
+		std::cerr << COLORIZE(RED, "Usage: " << argv[0] << " <config file> ") << std::endl;
 		return 1;
 	}
 	try
 	{
 		signal(SIGINT, signals);
 		signal(SIGQUIT, signals);
-		arr.push_back(serverInit("10.11.8.1", 13000));
+		arr.push_back(serverInit("10.11.9.1", 13000));  // IP fixo, mudar na mão
 		if (epoll_fd == -1)
 			ft_error("Erro ao criar epoll", __FUNCTION__, __FILE__, __LINE__, std::runtime_error(strerror(errno)));
 		struct epoll_event event;
