@@ -1,23 +1,25 @@
 #ifndef LOGGER_HPP
-# define LOGGER_HPP
+#define LOGGER_HPP
 
-# include <string>
-# include <fstream>
-# include <iostream>
-# include <ctime>
+#include <string>
+#include <fstream>
+#include <iostream>
+#include <ctime>
 
 class Logger
 {
 public:
-    Logger(const std::string &filename);
-    Logger(Logger const &src);
+    Logger(const std::string &log, const std::string &logAccess, const std::string &logError);
     ~Logger();
-    Logger &operator=(Logger const &rhs);
-    void log(const std::string &message);
+    void logDebug(const std::string &message);
+    void logAccess(const std::string& client_ip, const std::string& request_line, int status_code, size_t response_size);
+    void logError(const std::string &severity, const std::string &message);
 
 private:
-    std::ofstream _logfile;
-	std::string _filename;
+    std::ofstream _debugLog;
+    std::ofstream _logAccess;
+    std::ofstream _logError;
+
 
     std::string _currentDateTime() const;
 };

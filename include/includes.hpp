@@ -49,7 +49,7 @@
 #include <sys/wait.h> // waitpid
 
 // Custom project headers (headers próprios do projeto)
-#include "server.hpp"	   // Declarações da classe do servidor
+#include "Server.hpp"	   // Declarações da classe do servidor
 #include "request.hpp"	   // Declarações para o tratamento de requisições
 #include "response.hpp"	   // Declarações para o tratamento de respostas
 #include "cgi_handler.hpp" // Declarações para o gerenciamento de CGI
@@ -58,5 +58,8 @@
 #include "Logger.hpp" 	// Classe para gerenciamento de logs
 #include "defines.hpp"	// Definições de constantes e macros
 #include "getters.hpp"	// Funções de acesso a variáveis globais
+#include "unitTests.hpp"  // Funções de teste unitário
+
+
 
 #endif // WEBSERV_INCLUDES_HPP

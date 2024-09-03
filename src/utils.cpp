@@ -13,7 +13,7 @@ bool inetPton(const std::string &ip_str, uint32_t &out_binary_ip)
 			std::istringstream str(segment);
 			str >> byte;
 			if (byte < 0 || byte > 255 || str.fail())
-				return getLogger().log("Erro na conversão: byte inválido"), false;
+				return getLogger().logDebug("Erro na conversão: byte inválido"), getLogger().logError("ERROR", "Erro na conversão: byte inválido"), false;
 			bytes.push_back(byte);
 	}
 	if (bytes.size() != 4)
@@ -40,8 +40,18 @@ void ft_error(const char *message, const char *function, const char *file, int l
 {
     std::ostringstream  oss;
     oss << "Erro: " << message << " in function " << function << " at " << file << ":" << line << " Exception: " << e.what();
-    getLogger().log(oss.str());
+    getLogger().logDebug(oss.str());
+	getLogger().logError("ERROR", oss.str());
     oss << std::endl;
     std::cerr << oss.str();
     throw e; 
+}
+
+std::string readFile(const std::string &path)
+{
+	std::ifstream file(path.c_str(), std::ios::in | std::ios::binary);
+	if (!file.is_open())
+		return "";
+	std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+	return content;
 }

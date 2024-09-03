@@ -10,6 +10,8 @@ typedef struct stat status;
 typedef struct dirent diretory;
 
 #define LOG_FILE "logs/server.log"
+#define LOG_ACCESS_FILE "logs/access.log"
+#define LOG_ERROR_FILE "logs/error.log"
 
 /* Colors Macros */
 # define RESET "\033[0m"
