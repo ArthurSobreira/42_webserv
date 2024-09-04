@@ -190,9 +190,10 @@ void serverLoop(int sockfd)
 		ft_error("Erro ao receber dados", __FUNCTION__, __FILE__, __LINE__, std::runtime_error(strerror(errno)));
 	std::string request(buffer);
 	std::istringstream request_stream(request);
+	std::ostringstream log;
+	log << "\n\n\n" << request << "acabou\n\n\n";
 	std::string method, path, protocol;
 	request_stream >> method >> path >> protocol;
-	std::ostringstream log;
 	log << "Requisição recebida: " << method << " " << path << " " << protocol;
 	getLogger().log(log.str());
 	if (method == "GET")
@@ -255,7 +256,7 @@ int main(int argc, char **argv)
 	{
 		signal(SIGINT, signals);
 		signal(SIGQUIT, signals);
-		arr.push_back(serverInit("10.11.9.1", 13000));  // IP fixo, mudar na mão
+		arr.push_back(serverInit("10.11.8.4", 13000));  // IP fixo, mudar na mão
 		if (epoll_fd == -1)
 			ft_error("Erro ao criar epoll", __FUNCTION__, __FILE__, __LINE__, std::runtime_error(strerror(errno)));
 		struct epoll_event event;
