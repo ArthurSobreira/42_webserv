@@ -1,0 +1,80 @@
+Iniciando log...
+2024-09-05 17:56:09 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-05 17:56:09 - Successfully converted IP to binary format: 10.11.9.1
+2024-09-05 17:56:09 - Socket created
+2024-09-05 17:56:09 - Binded to port 13000
+2024-09-05 17:56:09 - Listening on socket with backlog: 4096
+2024-09-05 17:56:09 - Server created on 127.0.0.1:13000
+2024-09-05 17:56:09 - Socket created
+2024-09-05 17:56:09 - Binded to port 13001
+2024-09-05 17:56:09 - Listening on socket with backlog: 4096
+2024-09-05 17:56:09 - Server created on 10.11.9.1:13001
+Iniciando log...
+2024-09-05 18:05:12 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-05 18:05:12 - Successfully converted IP to binary format: 10.11.9.1
+2024-09-05 18:05:12 - Socket created
+2024-09-05 18:05:12 - Binded to port 13000
+2024-09-05 18:05:12 - Listening on socket with backlog: 4096
+2024-09-05 18:05:12 - Server created on 127.0.0.1:13000
+2024-09-05 18:05:12 - Socket created
+2024-09-05 18:05:12 - Binded to port 13001
+2024-09-05 18:05:12 - Listening on socket with backlog: 4096
+2024-09-05 18:05:12 - Server created on 10.11.9.1:13001
+Iniciando log...
+2024-09-05 18:06:19 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-05 18:06:19 - Successfully converted IP to binary format: 10.11.9.1
+2024-09-05 18:06:19 - Socket created
+2024-09-05 18:06:19 - Binded to port 13000
+2024-09-05 18:06:19 - Listening on socket with backlog: 4096
+2024-09-05 18:06:19 - Server created on 127.0.0.1:13000
+2024-09-05 18:06:19 - Socket created
+2024-09-05 18:06:19 - Binded to port 13001
+2024-09-05 18:06:19 - Listening on socket with backlog: 4096
+2024-09-05 18:06:19 - Server created on 10.11.9.1:13001
+Iniciando log...
+2024-09-05 18:06:22 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-05 18:06:22 - Successfully converted IP to binary format: 10.11.9.1
+2024-09-05 18:06:22 - Socket created
+2024-09-05 18:06:22 - Binded to port 13000
+2024-09-05 18:06:22 - Listening on socket with backlog: 4096
+2024-09-05 18:06:22 - Server created on 127.0.0.1:13000
+2024-09-05 18:06:22 - Socket created
+2024-09-05 18:06:22 - Binded to port 13001
+2024-09-05 18:06:22 - Listening on socket with backlog: 4096
+2024-09-05 18:06:22 - Server created on 10.11.9.1:13001
+Iniciando log...
+2024-09-05 18:06:26 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-05 18:06:26 - Successfully converted IP to binary format: 10.11.9.1
+2024-09-05 18:06:26 - Socket created
+2024-09-05 18:06:26 - Binded to port 13000
+2024-09-05 18:06:26 - Listening on socket with backlog: 4096
+2024-09-05 18:06:26 - Server created on 127.0.0.1:13000
+2024-09-05 18:06:26 - Socket created
+2024-09-05 18:06:26 - Binded to port 13001
+2024-09-05 18:06:26 - Listening on socket with backlog: 4096
+2024-09-05 18:06:26 - Server created on 10.11.9.1:13001
+Iniciando log...
+2024-09-05 19:16:10 - Testando logDebug
+2024-09-05 19:16:10 - Successfully converted IP to binary format: 127.0.0.1
+Iniciando log...
+2024-09-05 19:18:24 - Testando logDebug
+2024-09-05 19:18:24 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-05 19:18:24 - Socket created
+2024-09-05 19:18:24 - Socket created
+2024-09-05 19:18:24 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-05 19:18:24 - Binded to port 8080
+2024-09-05 19:18:24 - Socket created
+2024-09-05 19:18:24 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-05 19:18:24 - Binded to port 8080
+2024-09-05 19:18:24 - Listening on socket with backlog: 4096
+Iniciando log...
+2024-09-05 19:26:13 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-05 19:26:13 - Successfully converted IP to binary format: 10.11.9.1
+2024-09-05 19:26:13 - Socket created
+2024-09-05 19:26:13 - Binded to port 13000
+2024-09-05 19:26:13 - Listening on socket with backlog: 4096
+2024-09-05 19:26:13 - Server created on 127.0.0.1:13000
+2024-09-05 19:26:13 - Socket created
+2024-09-05 19:26:13 - Binded to port 13001
+2024-09-05 19:26:13 - Listening on socket with backlog: 4096
+2024-09-05 19:26:13 - Server created on 10.11.9.1:13001
