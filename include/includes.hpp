@@ -58,8 +58,11 @@
 #include "Logger.hpp" 	// Classe para gerenciamento de logs
 #include "defines.hpp"	// Definições de constantes e macros
 #include "getters.hpp"	// Funções de acesso a variáveis globais
-#include "unitTests.hpp"  // Funções de teste unitário
 
+bool createSocket(int &sockfd, int domain, int protocol, Logger &logger);
+bool bindSocket(int &sockfd, int &port, uint32_t &ip, sockaddrIn &serv_addr, Logger &logger);
+bool listenSocket(int &sockfd, int &backlog, Logger &logger);
+void createServer(int &sockfd, int &port, uint32_t &ip, int &backlog, Logger &logger);
 
 
 #endif // WEBSERV_INCLUDES_HPP
