@@ -1,35 +1,55 @@
-// #include "Server.hpp"
+#include "includes.hpp"
 
-// Server::Server(const std::string &config_path)
-// {
-// 	loadConfiguration(config_path);
-// 	setupSocket();
-// 	setupRoutes();
-// 	return;
-// }
 
-// // Copy constructor
-// Server::Server(const Server &other)
-// {
-// 	*this = other;
-// 	return;
-// }
+bool createSocket(int &sockfd, int domain, int protocol, Logger &logger)
+{
+	sockfd = socket(domain, protocol, 0);
+	if (sockfd < 0)
+	{
+		logger.logError("ERROR", "Error opening socket");
+		return false;
+	}
+	logger.logDebug("Socket created");
+	return true;
+}
 
-// // Copy assignment overload
-// Server &Server::operator=(const Server &rhs)
-// {
-// 	(void)rhs;
-// 	return *this;
-// }
+bool bindSocket(int &sockfd, int &port, uint32_t &ip , sockaddrIn &serv_addr, Logger &logger)
+{
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_addr.s_addr = ip;
+	if (port < 0 || port > 65535)
+	{
+		logger.logError("ERROR", "Invalid port number");
+		return false;
+	}
+	serv_addr.sin_port = htons(port);
+	std::ostringstream log;
+	if (bind(sockfd, (sockAddr*)&serv_addr, sizeof(serv_addr)) < 0)
+	{
+		log << "Error on binding to port " << port;
+		logger.logError("ERROR", log.str());
+		return false;
+	}
+	log << "Binded to port " << port;
+	logger.logDebug(log.str());
+	return true;
+}
 
-// // Default destructor
-// Server::~Server() { return; }
-
-// void Server::loadConfiguration(const std::string &config_path)
-// {}
-// void Server::setupSocket() {}
-// void Server::setupRoutes() {}
-// void Server::handleRequest(int client_fd) {}
-// void Server::sendResponse(int client_fd, const std::string &response) {}
-// std::string Server::generateErrorResponse(int error_code) {}
-// void Server::forkAndHandle(int client_fd) {}
+bool listenSocket(int &sockfd, int &backlog, Logger &logger)
+{
+	std::ostringstream log;
+	if (backlog < 0 || backlog > SOMAXCONN)
+	{
+		log << "Invalid backlog number: " << backlog;
+		logger.logError("ERROR", log.str());
+		return false;
+	}
+	if (listen(sockfd, backlog) < 0)
+	{
+		logger.logError("ERROR", "Error on listening");
+		return false;
+	}
+	log << "Listening on socket with backlog: " << backlog;
+	logger.logDebug(log.str());
+	return true;
+}
