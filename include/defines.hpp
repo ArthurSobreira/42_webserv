@@ -5,11 +5,11 @@
 
 typedef struct sockaddr_in sockaddrIn;
 typedef struct epoll_event epollEvent;
-typedef struct sockaddr sockaddr;
+typedef struct sockaddr sockAddr;
 typedef struct stat status;
 typedef struct dirent diretory;
 
-#define LOG_FILE "logs/server.log"
+#define LOG_FILE "logs/debug.log"
 #define LOG_ACCESS_FILE "logs/access.log"
 #define LOG_ERROR_FILE "logs/error.log"
 
