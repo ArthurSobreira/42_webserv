@@ -1,8 +1,6 @@
 #ifndef DEFINES_HPP_
 #define DEFINES_HPP_
 
-#define MAX_EVENTS 64
-
 typedef struct sockaddr_in sockaddrIn;
 typedef struct epoll_event epollEvent;
 typedef struct sockaddr sockaddr;
@@ -10,6 +8,7 @@ typedef struct stat status;
 typedef struct dirent diretory;
 
 #define LOG_FILE "logs/server.log"
+#define MAX_EVENTS 64
 
 /* Colors Macros */
 # define RESET "\033[0m"
@@ -25,4 +24,4 @@ typedef struct dirent diretory;
 
 # define COLORIZE(color, text) color << text << RESET
 
-#endif // DEFINES_HPP_
+#endif
