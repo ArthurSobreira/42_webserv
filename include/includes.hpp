@@ -60,9 +60,20 @@
 #include "getters.hpp"	// Funções de acesso a variáveis globais
 
 bool createSocket(int &sockfd, int domain, int protocol, Logger &logger);
-bool bindSocket(int &sockfd, int &port, uint32_t &ip, sockaddrIn &serv_addr, Logger &logger);
+bool bindSocket(int &sockfd, const int &port, const uint32_t &ip, sockaddrIn &serv_addr, Logger &logger);
 bool listenSocket(int &sockfd, int &backlog, Logger &logger);
-void createServer(int &sockfd, int &port, uint32_t &ip, int &backlog, Logger &logger);
+void createServer(int &sockfd, const int &port, const uint32_t &ip, int &backlog, Logger &logger);
+
+
+typedef struct s_request
+{
+	std::string method;
+	std::string uri;
+	std::string http_version;
+	int client_socket;
+	int status;
+} t_request;
+
 
 
 #endif // WEBSERV_INCLUDES_HPP

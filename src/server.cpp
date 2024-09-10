@@ -13,7 +13,7 @@ bool createSocket(int &sockfd, int domain, int protocol, Logger &logger)
 	return true;
 }
 
-bool bindSocket(int &sockfd, int &port, uint32_t &ip , sockaddrIn &serv_addr, Logger &logger)
+bool bindSocket(int &sockfd, const int &port, const uint32_t &ip , sockaddrIn &serv_addr, Logger &logger)
 {
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_addr.s_addr = ip;

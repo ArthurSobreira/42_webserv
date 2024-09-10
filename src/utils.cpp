@@ -63,3 +63,19 @@ std::string readFile(const std::string &path)
 	std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 	return content;
 }
+
+
+// getTimestamp
+
+std::string getTimestamp()
+{
+	time_t rawtime;
+	struct tm *timeinfo;
+	char buffer[80];
+
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
+
+	strftime(buffer, 80, "%d/%b/%Y:%H:%M:%S %z", timeinfo);
+	return std::string(buffer);
+}
