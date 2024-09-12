@@ -29,7 +29,7 @@ struct ServerConfigs {
 	std::string server_name;
 	errorMap error_pages;
 	const int limit_body_size;
-	std::vector<struct LocationConfigs> locations;
+	std::vector<LocationConfigs> locations;
 };
 
 class Config {
@@ -38,7 +38,7 @@ class Config {
 		std::vector<ServerConfigs> _servers;
 
 	public:
-		/* Constructor Method */
+		/* Constructor Methods */
 		Config( void );
 		Config( const std::string &fileName );
 		
