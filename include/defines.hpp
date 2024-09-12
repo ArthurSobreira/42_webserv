@@ -11,7 +11,6 @@ typedef struct dirent diretory;
 #define LOG_ACCESS_FILE "logs/access.log"
 #define LOG_ERROR_FILE "logs/error.log"
 #define MAX_EVENTS 64
-#define MAX_EVENTS 64
 
 /* Colors Macros */
 # define RESET "\033[0m"
@@ -26,9 +25,5 @@ typedef struct dirent diretory;
 # define WHITE "\033[37m"
 
 # define COLORIZE(color, text) color << text << RESET
-
-
-
-
 
 #endif
