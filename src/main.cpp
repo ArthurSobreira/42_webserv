@@ -14,60 +14,58 @@
 
 int epoll_fd;
 
-std::string getHttpError(int status_code)
-{
-	switch (status_code)
-	{
-	case 200:
-		return "OK";
-	case 400:
-		return "Bad Request";
-	case 404:
-		return "Not Found";
-	case 500:
-		return "Internal Server Error";
-	default:
-		return "Unknown";
-	}
-}
+// std::string getHttpError(int status_code)
+// {
+// 	switch (status_code)
+// 	{
+// 	case 200:
+// 		return "OK";
+// 	case 400:
+// 		return "Bad Request";
+// 	case 404:
+// 		return "Not Found";
+// 	case 500:
+// 		return "Internal Server Error";
+// 	default:
+// 		return "Unknown";
+// 	}
+// }
 
-std::string getContentType(const std::string &path)
-{
-	if (path.find(".html") != std::string::npos)
-		return "text/html";
-	if (path.find(".css") != std::string::npos)
-		return "text/css";
-	if (path.find(".jpg") != std::string::npos || path.find(".jpeg") != std::string::npos)
-		return "image/jpeg";
-	if (path.find(".png") != std::string::npos)
-		return "image/png";
-	if (path.find(".gif") != std::string::npos)
-		return "image/gif";
-	if (path.find(".ico") != std::string::npos)
-		return "image/x-icon";
-	if (path.find(".js") != std::string::npos)
-		return "application/javascript";
-	if (path.find(".json") != std::string::npos)
-		return "application/json";
-	return "text/plain";
-}
+// std::string getContentType(const std::string &path)
+// {
+// 	if (path.find(".html") != std::string::npos)
+// 		return "text/html";
+// 	if (path.find(".css") != std::string::npos)
+// 		return "text/css";
+// 	if (path.find(".jpg") != std::string::npos || path.find(".jpeg") != std::string::npos)
+// 		return "image/jpeg";
+// 	if (path.find(".png") != std::string::npos)
+// 		return "image/png";
+// 	if (path.find(".gif") != std::string::npos)
+// 		return "image/gif";
+// 	if (path.find(".ico") != std::string::npos)
+// 		return "image/x-icon";
+// 	if (path.find(".js") != std::string::npos)
+// 		return "application/javascript";
+// 	if (path.find(".json") != std::string::npos)
+// 		return "application/json";
+// 	return "text/plain";
+// }
 
-std::string createHeaderRequest(const std::string &path, int status_code, int content_length)
-{
-	std::ostringstream header;
-	header << "HTTP/1.1 " << status_code << " " << getHttpError(status_code) << "\r\n";
-	header << "Content-Type: " << getContentType(path) << "\r\n";
-	header << "Content-Length: " << content_length << "\r\n";
-	header << "Connection: close\r\n\r\n";
-	return header.str();
-}
+// std::string createHeaderRequest(const std::string &path, int status_code, int content_length)
+// {
+// 	std::ostringstream header;
+// 	header << "HTTP/1.1 " << status_code << " " << getHttpError(status_code) << "\r\n";
+// 	header << "Content-Type: " << getContentType(path) << "\r\n";
+// 	header << "Content-Length: " << content_length << "\r\n";
+// 	header << "Connection: close\r\n\r\n";
+// 	return header.str();
+// }
 
-
-
-
-t_request clientServerAccept(int sockfd, Logger &logger){
+Request clientServerAccept(int sockfd, Logger &logger){
 	sockaddrIn cli_addr;
 	socklen_t clilen = sizeof(cli_addr);
+	Request request;
 	int newsockfd = accept(sockfd, (sockAddr*)&cli_addr, &clilen);
 	if (newsockfd < 0)
 	{
@@ -84,73 +82,68 @@ t_request clientServerAccept(int sockfd, Logger &logger){
 		ft_error("Error reading from socket", __FUNCTION__, __FILE__, __LINE__, std::runtime_error("Error reading from socket"));
 	}
 
-	std::stringstream stream(buffer);
-	t_request request;
-	stream >> request.method >> request.uri >> request.http_version;
-	if (stream.fail())
-	{
+	std::string str(buffer);
+	if(!request.parseRequest(str)){
+		request.requestIsValid = false;
 		logger.logError("ERROR", "Error parsing request");
-		close(newsockfd);
-		ft_error("Error parsing request", __FUNCTION__, __FILE__, __LINE__, std::runtime_error("Error parsing request"));
 	}
-	log << "Received request: " << request.method << " " << request.uri << " " << request.http_version;
+	log << "Request received: " << request.method << " " << request.uri << " " << request.http_version;
 	logger.logDebug(log.str());
 	request.client_socket = newsockfd;
-	request.status = 200;
-	access_log << inetNtop(cli_addr.sin_addr.s_addr) << " - - [" << getTimestamp() << "] \"" << request.method << " " << request.uri << " " << request.http_version << "\" " << request.status << " " << n;
-	// logger.logAccess(access_log.str());
+	access_log << inetNtop(cli_addr.sin_addr.s_addr) << " - -  \"" << request.method << " " << request.uri << " " << request.http_version << "\" ";
+	logger.logAccess(access_log.str());
 	return request;	
 }
 
-std::string requestHandler(t_request &request, Logger &logger)
-{
-	std::ostringstream log;
-	if(request.method.empty() || request.uri.empty() || request.http_version.empty())
-	{
-		logger.logError("ERROR", "Error parsing request");
-		std::string response = readFile("static/405.html");
-		request.status = 405;
-		return response;
-	}
-	std::string path = "static" + request.uri;
-	if (path[path.size() - 1] == '/')
-		path += "index.html";
-	std::string response;
-	status status;
-	if (stat(path.c_str(), &status) != 0)
-	{
-		logger.logError("ERROR", "File not found");
-		response = readFile("static/404.html");
-		request.status = 404;
-		return response;
-	}
-	if(S_ISDIR(status.st_mode))
-	{
-		logger.logError("ERROR", "Path is a directory");
-		response = readFile("static/404.html");
-		request.status = 404;
-		return response;
-	}
-	if(access(path.c_str(), R_OK) != 0)
-	{
-		logger.logError("ERROR", "File not readable");
-		response = readFile("static/403.html");
-		request.status = 403;
-		return response;
-	}
-	response = readFile(path);
-	return response;
-}
+// std::string requestHandler(t_request &request, Logger &logger)
+// {
+// 	std::ostringstream log;
+// 	if(request.method.empty() || request.uri.empty() || request.http_version.empty())
+// 	{
+// 		logger.logError("ERROR", "Error parsing request");
+// 		std::string response = readFile("static/405.html");
+// 		request.status = 405;
+// 		return response;
+// 	}
+// 	std::string path = "static" + request.uri;
+// 	if (path[path.size() - 1] == '/')
+// 		path += "index.html";
+// 	std::string response;
+// 	status status;
+// 	if (stat(path.c_str(), &status) != 0)
+// 	{
+// 		logger.logError("ERROR", "File not found");
+// 		response = readFile("static/404.html");
+// 		request.status = 404;
+// 		return response;
+// 	}
+// 	if(S_ISDIR(status.st_mode))
+// 	{
+// 		logger.logError("ERROR", "Path is a directory");
+// 		response = readFile("static/404.html");
+// 		request.status = 404;
+// 		return response;
+// 	}
+// 	if(access(path.c_str(), R_OK) != 0)
+// 	{
+// 		logger.logError("ERROR", "File not readable");
+// 		response = readFile("static/403.html");
+// 		request.status = 403;
+// 		return response;
+// 	}
+// 	response = readFile(path);
+// 	return response;
+// }
 
-void sendResponse(int sockfd, const std::string &response, Logger &logger)
-{
-	int n = send(sockfd, response.c_str(), response.size(), 0);
-	if (n < 0)
-	{
-		logger.logError("ERROR", "Error writing to socket");
-	}
-	close(sockfd);
-}
+// void sendResponse(int sockfd, const std::string &response, Logger &logger)
+// {
+// 	int n = send(sockfd, response.c_str(), response.size(), 0);
+// 	if (n < 0)
+// 	{
+// 		logger.logError("ERROR", "Error writing to socket");
+// 	}
+// 	close(sockfd);
+// }
 
 
 void createServer(int &sockfd, const int &port, const uint32_t &ip, int &backlog, Logger &logger)
@@ -235,7 +228,8 @@ void initializeServers(const std::vector<uint32_t>& servers, const std::vector<i
 void startEventLoop(Logger& logger)
 {
 	struct epoll_event events[MAX_EVENTS];
-	t_request request;
+	Request request;
+	Response response;
 
 	while (true)
 	{
@@ -250,10 +244,11 @@ void startEventLoop(Logger& logger)
 		{
 			int sockfd = events[i].data.fd;
 			request = clientServerAccept(sockfd, logger);
-			std::string response = requestHandler(request, logger);
-			std::string header = createHeaderRequest(request.uri, request.status, response.size());
-			response = header + response;
-			sendResponse(request.client_socket, response, logger);
+
+			// std::string response = requestHandler(request, logger);
+			// std::string header = createHeaderRequest(request.uri, request.status, response.size());
+			// response = header + response;
+			// sendResponse(request.client_socket, response, logger);
 		}
 	}
 }
