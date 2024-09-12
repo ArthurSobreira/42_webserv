@@ -6,7 +6,8 @@ Logger::Logger(const std::string &debugLog, const std::string &logAccess, const 
       _logError(logError.c_str(), std::ios::out | std::ios::app)
 {
     if (!_debugLog.is_open() || !_logAccess.is_open() || !_logError.is_open())
-        ft_error("Erro ao abrir o arquivo de log!", __FUNCTION__, __FILE__, __LINE__, std::runtime_error("Erro ao abrir o arquivo de log!"));
+        ft_error("Erro ao abrir o arquivo de log!", __FUNCTION__, __FILE__, \
+        __LINE__, std::runtime_error("Erro ao abrir o arquivo de log!"));
     if (_debugLog.is_open())
         _debugLog << "Iniciando log..." << std::endl;
     if (_logAccess.is_open())
@@ -14,6 +15,7 @@ Logger::Logger(const std::string &debugLog, const std::string &logAccess, const 
     if (_logError.is_open())
         _logError << "Iniciando log..." << std::endl;
 }
+
 Logger::~Logger()
 {
     if (_debugLog.is_open())
@@ -23,7 +25,6 @@ Logger::~Logger()
     if (_logError.is_open())
         _logError.close();
 }
-
 
 void Logger::logDebug(const std::string &message)
 {
