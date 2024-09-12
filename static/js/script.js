@@ -216,10 +216,6 @@ const FourOhFour = () => {
     React.createElement(Code, { className: "four-oh-four__code" }, "404"), /*#__PURE__*/
     React.createElement(CodeMessage, { className: "four-oh-four__code-message" }, "Not found"))));
 
-
-
-
-
 };
 const ROOT = document.getElementById('app');
 render( /*#__PURE__*/React.createElement(FourOhFour, null), ROOT);

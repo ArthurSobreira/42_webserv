@@ -1,9 +1,15 @@
 #ifndef GETTERS_HPP
 #define GETTERS_HPP
+#include "structs.hpp"
+
+// Logger &getLogger();
+// HttpError &getError404();
 
 
 Logger &getLogger();
-HttpError &getError404();
+void setLogger(Logger &log);
+
+
 
 
 
