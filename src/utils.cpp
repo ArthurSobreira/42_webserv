@@ -64,18 +64,68 @@ std::string readFile(const std::string &path)
 	return content;
 }
 
-
-// getTimestamp
-
-std::string getTimestamp()
-{
-	time_t rawtime;
-	struct tm *timeinfo;
-	char buffer[80];
-
-	time(&rawtime);
-	timeinfo = localtime(&rawtime);
-
-	strftime(buffer, 80, "%d/%b/%Y:%H:%M:%S %z", timeinfo);
-	return std::string(buffer);
+std::string getContentType(const std::string &uri){
+	std::string extension = uri.substr(uri.find_last_of(".") + 1);
+	if (extension == "html" || extension == "htm")
+		return "text/html";
+	if (extension == "css")
+		return "text/css";
+	if (extension == "js")
+		return "text/javascript";
+	if (extension == "jpeg" || extension == "jpg")
+		return "image/jpeg";
+	if (extension == "png")
+		return "image/png";
+	if (extension == "gif")
+		return "image/gif";
+	if (extension == "bmp")
+		return "image/bmp";
+	if (extension == "ico")
+		return "image/x-icon";
+	if (extension == "svg")
+		return "image/svg+xml";
+	if (extension == "json")
+		return "application/json";
+	if (extension == "pdf")
+		return "application/pdf";
+	if (extension == "zip")
+		return "application/zip";
+	if (extension == "tar")
+		return "application/x-tar";
+	if (extension == "gz")
+		return "application/gzip";
+	if (extension == "rar")
+		return "application/x-rar-compressed";
+	if (extension == "tar")
+		return "application/x-tar";
+	if (extension == "tar.gz")
+		return "application/x-gzip";
+	if (extension == "tar.Z")
+		return "application/x-compress";
+	if (extension == "tar.bz2")
+		return "application/x-bzip2";
+	if (extension == "7z")
+		return "application/x-7z-compressed";
+	if (extension == "txt")
+		return "text/plain";
+	if (extension == "rtf")
+		return "application/rtf";
+	if (extension == "doc")
+		return "application/msword";
+	if (extension == "docx")
+		return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+	if (extension == "xls")
+		return "application/vnd.ms-excel";
+	if (extension == "xlsx")
+		return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+	if (extension == "ppt")
+		return "application/vnd.ms-powerpoint";
+	if (extension == "pptx")
+		return "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+	if (extension == "csv")
+		return "text/csv";
+	if (extension == "xml")
+		return "application/xml";
+	if (extension == "mp3")
+		return "audio/mpeg";
 }
