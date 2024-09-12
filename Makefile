@@ -22,7 +22,7 @@ BUILD_TEST =	./build_test
 SRCS	=	src/cgi_handler.cpp src/response.cpp \
 			src/server.cpp src/request.cpp src/utils.cpp \
 			src/HttpError.cpp src/Logger.cpp src/getters.cpp \
-			src/main.cpp 
+			src/listDirectory.cpp src/main.cpp 
 TEST_SRCS = test/main.cpp $(filter-out src/main.cpp, $(SRCS)) 
 OBJS	=	$(addprefix $(BUILD)/, $(notdir $(SRCS:.cpp=.o)))
 OBJSTESTS =	$(addprefix $(BUILD_TEST)/, $(notdir $(TEST_SRCS:.cpp=.o)))
@@ -62,6 +62,7 @@ $(BUILD_TEST)/%.o: src/%.cpp $(INC)
 
 $(BUILD):
 	@mkdir -p $(BUILD)
+	@mkdir -p $(LOG)
 
 $(BUILD_TEST):
 	@mkdir -p $(BUILD_TEST)
