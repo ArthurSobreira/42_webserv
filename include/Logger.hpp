@@ -12,7 +12,7 @@ public:
     Logger(const std::string &log, const std::string &logAccess, const std::string &logError);
     ~Logger();
     void logDebug(const std::string &message);
-    void logAccess(const std::string& client_ip, const std::string& request_line, int status_code, size_t response_size);
+    void logAccess(const std::string &message);
     void logError(const std::string &severity, const std::string &message);
 
 private:
