@@ -1,4 +1,5 @@
 #include "includes.hpp"
+
 bool inetPton(const std::string &ip_str, uint32_t &out_binary_ip, Logger &logger)
 {
 	std::istringstream stream(ip_str);
@@ -128,4 +129,5 @@ std::string getContentType(const std::string &uri){
 		return "application/xml";
 	if (extension == "mp3")
 		return "audio/mpeg";
+	return "plain/text";
 }
