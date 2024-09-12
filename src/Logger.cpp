@@ -31,14 +31,11 @@ void Logger::logDebug(const std::string &message)
         _debugLog << _currentDateTime() << " - " << message << std::endl;
 }
 
-void Logger::logAccess(const std::string &client_ip, const std::string &request_line, int status_code, size_t response_size)
+void Logger::logAccess(const std::string &message)
 {
     if (_logAccess.is_open())
         _logAccess << _currentDateTime() << " "
-                   << client_ip << " "
-                   << "\"" << request_line << "\" "
-                   << status_code << " "
-                   << response_size << std::endl;
+                   << message << std::endl;
 }
 
 void Logger::logError(const std::string &severity, const std::string &message)
