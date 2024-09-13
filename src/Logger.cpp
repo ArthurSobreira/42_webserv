@@ -1,68 +1,58 @@
-#include "Logger.hpp"
+#include "includes.hpp"
 
-// Construtor padrão e parametrizado
-Logger::Logger(const std::string &filename)
-    : _logfile(filename.c_str(), std::ios::out | std::ios::app), _filename(filename)
+Logger::Logger(const std::string &debugLog, const std::string &logAccess, const std::string &logError)
+    : _debugLog(debugLog.c_str(), std::ios::out | std::ios::app), 
+      _logAccess(logAccess.c_str(), std::ios::out | std::ios::app), 
+      _logError(logError.c_str(), std::ios::out | std::ios::app)
 {
-    if (!_logfile.is_open())
-    {
-        std::cerr << "Erro ao abrir o arquivo de log!" << std::endl;
-    }
+    if (!_debugLog.is_open() || !_logAccess.is_open() || !_logError.is_open())
+        ft_error("Erro ao abrir o arquivo de log!", __FUNCTION__, __FILE__, \
+        __LINE__, std::runtime_error("Erro ao abrir o arquivo de log!"));
+    if (_debugLog.is_open())
+        _debugLog << "Iniciando log..." << std::endl;
+    if (_logAccess.is_open())
+        _logAccess << "Iniciando log..." << std::endl;
+    if (_logError.is_open())
+        _logError << "Iniciando log..." << std::endl;
 }
 
-// Construtor de cópia
-Logger::Logger(Logger const &src)
-    : _logfile(src._filename.c_str(), std::ios::out | std::ios::app), _filename(src._filename)
-{
-    if (!_logfile.is_open())
-    {
-        std::cerr << "Erro ao abrir o arquivo de log!" << std::endl;
-    }
-}
-
-// Destrutor
 Logger::~Logger()
 {
-    if (_logfile.is_open())
-    {
-        _logfile.close();
-    }
+    if (_debugLog.is_open())
+        _debugLog.close();
+    if (_logAccess.is_open())
+        _logAccess.close();
+    if (_logError.is_open())
+        _logError.close();
 }
 
-// Operador de atribuição
-Logger &Logger::operator=(Logger const &rhs)
+void Logger::logDebug(const std::string &message)
 {
-    if (this != &rhs)
-    {
-        if (_logfile.is_open())
-        {
-            _logfile.close();
-        }
-        _filename = rhs._filename;
-        _logfile.open(_filename.c_str(), std::ios::out | std::ios::app);
-        if (!_logfile.is_open())
-        {
-            std::cerr << "Erro ao abrir o arquivo de log!" << std::endl;
-        }
-    }
-    return *this;
+    if (_debugLog.is_open())
+        _debugLog << _currentDateTime() << " - " << message << std::endl;
 }
 
-void Logger::log(const std::string &message)
+void Logger::logAccess(const std::string &message)
 {
-    if (_logfile.is_open())
-    {
-        _logfile << _currentDateTime() << " - " << message << std::endl;
-    }
+    if (_logAccess.is_open())
+        _logAccess << _currentDateTime() << " "
+                   << message << std::endl;
+}
+
+void Logger::logError(const std::string &severity, const std::string &message)
+{
+    if (_logError.is_open())
+        _logError << _currentDateTime() << " "
+                  << "[" << severity << "] "
+                  << message << std::endl;
 }
 
 std::string Logger::_currentDateTime() const
 {
-    std::time_t now = std::time(0);
+    time_t now = time(0);
     struct tm tstruct;
     char buf[80];
-    tstruct = *std::localtime(&now);
-    std::strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
-
+    tstruct = *localtime(&now);
+    strftime(buf, sizeof(buf), "%Y-%m-%d %X", &tstruct);
     return buf;
 }
