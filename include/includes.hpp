@@ -59,6 +59,7 @@
 #include "Logger.hpp" 	// Classe para gerenciamento de logs
 #include "defines.hpp"	// Definições de constantes e macros
 #include "getters.hpp"	// Funções de acesso a variáveis globais
+#include "Config.hpp"	// Classe para leitura e armazenamento de configurações
 
 bool createSocket(int &sockfd, int domain, int protocol, Logger &logger);
 bool bindSocket(int &sockfd, const int &port, const uint32_t &ip, sockaddrIn &serv_addr, Logger &logger);
