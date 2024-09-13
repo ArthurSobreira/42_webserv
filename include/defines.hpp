@@ -7,6 +7,8 @@ typedef struct sockaddr sockAddr;
 typedef struct stat status;
 typedef struct dirent diretory;
 
+typedef std::map<std::string, std::string> errorMap;
+
 #define LOG_FILE "logs/debug.log"
 #define LOG_ACCESS_FILE "logs/access.log"
 #define LOG_ERROR_FILE "logs/error.log"
@@ -23,7 +25,6 @@ typedef struct dirent diretory;
 # define MAGENTA "\033[35m"
 # define CYAN "\033[36m"
 # define WHITE "\033[37m"
-
 # define COLORIZE(color, text) color << text << RESET
 
 #endif
