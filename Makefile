@@ -14,19 +14,19 @@ CC		=	c++
 CFLAGS	=	-Wall -Werror -Wextra -std=c++98 -g3 -I includes/
 RM		=	rm -rf
 
-NAME	=	webserv
-TESTNAME =	testes  
-BUILD	=	./build
-LOG		=	./logs
-BUILD_TEST =	./build_test
-SRCS	=	src/cgi_handler.cpp src/Config.cpp src/response.cpp \
-			src/server.cpp src/request.cpp src/utils.cpp \
-			src/HttpError.cpp src/Logger.cpp src/getters.cpp \
-			src/listDirectory.cpp src/main.cpp 
-TEST_SRCS = test/main.cpp $(filter-out src/main.cpp, $(SRCS)) 
-OBJS	=	$(addprefix $(BUILD)/, $(notdir $(SRCS:.cpp=.o)))
-OBJSTESTS =	$(addprefix $(BUILD_TEST)/, $(notdir $(TEST_SRCS:.cpp=.o)))
-INC		=	$(wildcard include/*.hpp)
+NAME		=	webserv
+TESTNAME	=	testes  
+BUILD		=	./build
+LOG			=	./logs
+BUILD_TEST	=	./build_test
+SRCS		=	src/Config.cpp src/HttpError.cpp src/listDirectory.cpp \
+				src/Logger.cpp src/Request.cpp src/Response.cpp \
+				src/Server.cpp src/Utils.cpp src/main.cpp\
+
+TEST_SRCS	=	test/main.cpp $(filter-out src/main.cpp, $(SRCS)) 
+OBJS		=	$(addprefix $(BUILD)/, $(notdir $(SRCS:.cpp=.o)))
+OBJSTESTS	=	$(addprefix $(BUILD_TEST)/, $(notdir $(TEST_SRCS:.cpp=.o)))
+INC			=	$(wildcard include/*.hpp)
 
 GREEN	=	"\033[32;1m"
 RED		=	"\033[31;1m"
