@@ -1,14 +1,7 @@
-#ifndef DEFINES_HPP_
-#define DEFINES_HPP_
+#ifndef DEFINES_HPP
+#define DEFINES_HPP
 
-typedef struct sockaddr_in sockaddrIn;
-typedef struct epoll_event epollEvent;
-typedef struct sockaddr sockAddr;
-typedef struct stat status;
-typedef struct dirent diretory;
-
-typedef std::map<std::string, std::string> errorMap;
-
+/* Server Macros */
 #define LOG_FILE "logs/debug.log"
 #define LOG_ACCESS_FILE "logs/access.log"
 #define LOG_ERROR_FILE "logs/error.log"
