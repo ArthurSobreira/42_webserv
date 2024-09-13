@@ -6,7 +6,7 @@
 /*   By: arsobrei <arsobrei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/13 13:00:04 by phenriq2          #+#    #+#             */
-/*   Updated: 2024/09/13 17:39:15 by arsobrei         ###   ########.fr       */
+/*   Updated: 2024/09/13 18:02:45 by arsobrei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,7 +152,6 @@ Request clientServerAccept(int sockfd, Logger &logger){
 // 	close(sockfd);
 // }
 
-
 void createServer(int &sockfd, const int &port, const uint32_t &ip, int &backlog, Logger &logger)
 {
 	sockaddrIn serv_addr;
@@ -176,7 +175,6 @@ void createServer(int &sockfd, const int &port, const uint32_t &ip, int &backlog
 	logger.logDebug(log.str(), true);
 }
 
-
 void populateServersAndPorts(std::string config_file_path, std::vector<uint32_t> &servers, std::vector<int> &ports, Logger &logger)
 {
 	(void) config_file_path;
@@ -196,8 +194,6 @@ void populateServersAndPorts(std::string config_file_path, std::vector<uint32_t>
 	ports.push_back(porta1);
 	ports.push_back(porta2);
 }
-
-
 
 void initializeEpoll()
 {
