@@ -10,6 +10,8 @@ std::string inetNtop(uint32_t binary_ip);
 std::string readFile(const std::string &path);
 std::string getContentType(const std::string &uri);
 std::string listDirectory(const std::string &dirPath);
+std::string getContentType(const std::string &uri);
+
 
 
 
