@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: phenriq2 <phenriq2@student.42sp.org.br>    +#+  +:+       +#+        */
+/*   By: arsobrei <arsobrei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/13 13:00:04 by phenriq2          #+#    #+#             */
-/*   Updated: 2024/09/13 13:00:08 by phenriq2         ###   ########.fr       */
+/*   Updated: 2024/09/13 17:39:15 by arsobrei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,7 +173,7 @@ void createServer(int &sockfd, const int &port, const uint32_t &ip, int &backlog
 		ft_error("Error listening on socket", __FUNCTION__, __FILE__, __LINE__, std::runtime_error("Error listening on socket"));
 	}
 	log<<"Server created on "<<inetNtop(ip)<<":"<<port;
-	logger.logDebug(log.str());
+	logger.logDebug(log.str(), true);
 }
 
 
@@ -181,7 +181,7 @@ void populateServersAndPorts(std::string config_file_path, std::vector<uint32_t>
 {
 	(void) config_file_path;
 	std::string server1 = "127.0.0.1";
-	std::string server2 = "10.12.12.2";
+	std::string server2 = "10.12.12.3";
 	uint32_t ip1;
 	uint32_t ip2;
 	
@@ -295,6 +295,8 @@ int main(int argc, char **argv)
 
 	try
 	{
+		Config config(config_file_path, logger);
+
 		initializeEpoll();
 		populateServersAndPorts(config_file_path, servers, ports, logger);
 		initializeServers(servers, ports,fds, logger);
@@ -304,6 +306,7 @@ int main(int argc, char **argv)
 	}
 	catch (const std::exception &e)
 	{
+		logger.logError("ERROR", e.what(), true);
 		return EXIT_FAILURE;
 	}
 
