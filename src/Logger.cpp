@@ -1,7 +1,7 @@
 #include "Includes.hpp"
 #include "Defines.hpp"
-#include "Logger.hpp"
 #include "Utils.hpp"
+#include "Logger.hpp"
 
 Logger::Logger( const std::string &debugLog, const std::string &logAccess, 
     const std::string &logError )
@@ -10,8 +10,8 @@ Logger::Logger( const std::string &debugLog, const std::string &logAccess,
       _logError(logError.c_str(), std::ios::out | std::ios::app)
 {
     if (!_debugLog.is_open() || !_logAccess.is_open() || !_logError.is_open())
-        ft_error(ERROR_LOG_FILE, __FUNCTION__, __FILE__, __LINE__, 
-            std::runtime_error(ERROR_LOG_FILE));
+        ft_error(ERROR_OPEN_LOG_FILE, __FUNCTION__, __FILE__, __LINE__, 
+            std::runtime_error(ERROR_OPEN_LOG_FILE));
     this->logDebug("Starting debug log...", true);
     this->logAccess("Starting access log...", true);
     this->logError("INFO", "Starting error log...", true);
