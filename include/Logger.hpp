@@ -19,8 +19,9 @@ class Logger {
 
         /* Public Methods */
         std::string _currentDateTime( void ) const;
-        void logDebug( const std::string &message );
-        void logAccess( const std::string &message );
+        bool _isTerminal( std::ostream &os ) const;
+        void logDebug( const std::string &message, bool tty = false );
+        void logAccess( const std::string &message, bool tty = false );
         void logError( const std::string &severity,
             const std::string &message, bool tty = false );
 };
