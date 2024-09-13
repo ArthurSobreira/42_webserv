@@ -1,4 +1,6 @@
-#include "includes.hpp"
+#include "Includes.hpp"
+#include "Logger.hpp"
+#include "Utils.hpp"
 
 Logger::Logger(const std::string &debugLog, const std::string &logAccess, const std::string &logError)
     : _debugLog(debugLog.c_str(), std::ios::out | std::ios::app), 
