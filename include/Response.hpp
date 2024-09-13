@@ -3,6 +3,8 @@
 #define RESPONSE_HPP_
 
 #include "Includes.hpp"
+#include "Request.hpp"
+#include "Logger.hpp"
 
 class Response {
 public:
@@ -21,6 +23,7 @@ public:
     std::string getBody() const;
 
     std::string generateResponse() const ;
+    void responseTratament(Request &request, Logger &logger);
 
 
 private:

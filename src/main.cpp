@@ -98,6 +98,7 @@ Request clientServerAccept(int sockfd, Logger &logger){
 	request.client_socket = newsockfd;
 	access_log << inetNtop(cli_addr.sin_addr.s_addr) << " - -  \"" << request.method << " " << request.uri << " " << request.http_version << "\" ";
 	logger.logAccess(access_log.str());
+	request.requestIsValid = true;
 	return request;	
 }
 
@@ -180,7 +181,7 @@ void populateServersAndPorts(std::string config_file_path, std::vector<uint32_t>
 {
 	(void) config_file_path;
 	std::string server1 = "127.0.0.1";
-	std::string server2 = "10.12.12.3";
+	std::string server2 = "10.12.12.2";
 	uint32_t ip1;
 	uint32_t ip2;
 	
@@ -245,12 +246,14 @@ void startEventLoop(Logger& logger)
 			logger.logError("ERROR", "Error on epoll_wait");
 			continue;
 		}
-
 		for (int i = 0; i < num_events; ++i)
 		{
 			int sockfd = events[i].data.fd;
 			request = clientServerAccept(sockfd, logger);
-
+			response.responseTratament(request, logger);
+			std::string responseFull = response.generateResponse();
+			send(request.client_socket, responseFull.c_str(), responseFull.size(), 0);
+			close(request.client_socket);
 			// std::string response = requestHandler(request, logger);
 			// std::string header = createHeaderRequest(request.uri, request.status, response.size());
 			// response = header + response;
@@ -295,6 +298,7 @@ int main(int argc, char **argv)
 		initializeEpoll();
 		populateServersAndPorts(config_file_path, servers, ports, logger);
 		initializeServers(servers, ports,fds, logger);
+		
 		startEventLoop(logger);
 		cleanup(fds);
 	}
