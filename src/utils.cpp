@@ -128,4 +128,5 @@ std::string getContentType(const std::string &uri){
 		return "application/xml";
 	if (extension == "mp3")
 		return "audio/mpeg";
+	return "application/octet-stream";
 }
