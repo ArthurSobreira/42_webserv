@@ -2,10 +2,8 @@
 #ifndef REQUEST_HPP_
 #define REQUEST_HPP_
 
-#include <string>
-#include <map>
-#include <sstream>
-#include <iostream>
+#include "Includes.hpp"
+
 // Class declaration
 class Request {
 public:

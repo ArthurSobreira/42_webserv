@@ -10,7 +10,13 @@
 /*																			*/
 /* ************************************************************************** */
 
-#include "includes.hpp"
+#include "Includes.hpp"
+#include "Defines.hpp"
+#include "Config.hpp"
+#include "Request.hpp"
+#include "Response.hpp"
+#include "Logger.hpp"
+#include "Utils.hpp"
 
 int epoll_fd;
 
@@ -174,7 +180,7 @@ void populateServersAndPorts(std::string config_file_path, std::vector<uint32_t>
 {
 	(void) config_file_path;
 	std::string server1 = "127.0.0.1";
-	std::string server2 = "10.12.12.2";
+	std::string server2 = "10.12.12.3";
 	uint32_t ip1;
 	uint32_t ip2;
 	

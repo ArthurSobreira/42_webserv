@@ -2,10 +2,7 @@
 #ifndef RESPONSE_HPP_
 #define RESPONSE_HPP_
 
-#include <string>
-#include <map>
-#include <sstream>
-#include <iostream>
+#include "Includes.hpp"
 
 class Response {
 public:

@@ -20,4 +20,4 @@ private:
     void _initStatusMessages();
 };
 
-#endif // HTTPERROR_HPP
+#endif

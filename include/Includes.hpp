@@ -49,33 +49,14 @@
 // Process control functions (waitpid, kill)
 #include <sys/wait.h> // waitpid
 
-// Custom project headers (headers próprios do projeto)
-#include "Server.hpp"	   // Declarações da classe do servidor
-#include "request.hpp"	   // Declarações para o tratamento de requisições
-#include "response.hpp"	   // Declarações para o tratamento de respostas
-#include "cgi_handler.hpp" // Declarações para o gerenciamento de CGI
-#include "utils.hpp"	   // Funções utilitárias e macros
-#include "HttpError.hpp"   // Classe para tratamento de erros HTTP
-#include "Logger.hpp" 	// Classe para gerenciamento de logs
-#include "defines.hpp"	// Definições de constantes e macros
-#include "getters.hpp"	// Funções de acesso a variáveis globais
-#include "Config.hpp"	// Classe para leitura e armazenamento de configurações
+// // Custom project headers (headers próprios do projeto)
+// #include "Config.hpp"	// Classe para leitura e armazenamento de configurações
+// #include "Defines.hpp"	// Definições de constantes e macros
+// #include "HttpError.hpp"   // Classe para tratamento de erros HTTP
+// #include "Logger.hpp" 	// Classe para gerenciamento de logs
+// #include "Request.hpp"	   // Declarações para o tratamento de requisições
+// #include "Response.hpp"	   // Declarações para o tratamento de respostas
+// #include "Server.hpp"	   // Declarações da classe do servidor
+// #include "Utils.hpp"	   // Funções utilitárias e macros
 
-bool createSocket(int &sockfd, int domain, int protocol, Logger &logger);
-bool bindSocket(int &sockfd, const int &port, const uint32_t &ip, sockaddrIn &serv_addr, Logger &logger);
-bool listenSocket(int &sockfd, int &backlog, Logger &logger);
-void createServer(int &sockfd, const int &port, const uint32_t &ip, int &backlog, Logger &logger);
-
-
-typedef struct s_request
-{
-	std::string method;
-	std::string uri;
-	std::string http_version;
-	int client_socket;
-	int status;
-} t_request;
-
-
-
-#endif // WEBSERV_INCLUDES_HPP
+#endif
