@@ -21,6 +21,7 @@ BUILD_TEST =	./build_test
 SRCS	=	src/cgi_handler.cpp src/response.cpp \
 			src/server.cpp src/request.cpp src/utils.cpp \
 			src/HttpError.cpp src/Logger.cpp src/getters.cpp \
+			src/listDirectory.cpp \
 			src/main.cpp 
 TEST_SRCS = test/main.cpp $(filter-out src/main.cpp, $(SRCS)) 
 OBJS	=	$(addprefix $(BUILD)/, $(notdir $(SRCS:.cpp=.o)))
