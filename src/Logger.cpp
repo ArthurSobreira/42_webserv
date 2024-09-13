@@ -29,19 +29,19 @@ Logger::~Logger( void ) {
 void Logger::logDebug( const std::string &message, bool tty ) {
     if (_debugLog.is_open())
         _debugLog << _currentDateTime() << " - " 
-                    << message << std::endl;
+                << "[INFO] " << message << std::endl;
     if (tty && _isTerminal(std::cout))
-        std::cout << _currentDateTime() << " - " 
-                    << message << std::endl;
+        std::cout << COLORIZE(GRAY, _currentDateTime()) << " - " 
+                << "[INFO] " << message << std::endl;
 }
 
 void Logger::logAccess( const std::string &message, bool tty ) {
     if (_logAccess.is_open())
         _logAccess << _currentDateTime() << " - "
-                   << message << std::endl;
+                << "[INFO] " << message << std::endl;
     if (tty && _isTerminal(std::cout))
-        std::cout << _currentDateTime() << " - "
-                  << message << std::endl;
+        std::cout << COLORIZE(GRAY, _currentDateTime()) << " - "
+                << "[INFO] " << message << std::endl;
 }
 
 void Logger::logError( const std::string &severity,
@@ -49,12 +49,12 @@ void Logger::logError( const std::string &severity,
 {
     if (_logError.is_open())
         _logError << _currentDateTime() << " - "
-                  << "[" << severity << "] "
-                  << message << std::endl;
+                << "[" << severity << "] "
+                << message << std::endl;
     if (tty && _isTerminal(std::cerr))
-        std::cerr << _currentDateTime() << " - "
-                  << "[" << severity << "] "
-                  << message << std::endl;
+        std::cerr << COLORIZE(GRAY, _currentDateTime()) << " - "
+                << "[" << severity << "] "
+                << message << std::endl;
 }
 
 std::string Logger::_currentDateTime( void ) const {
