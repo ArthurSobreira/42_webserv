@@ -12,7 +12,8 @@ std::string Response::generateResponse() const {
 		response_stream << it->first << ": " << it->second << "\r\n";
 	}
 	response_stream << "\r\n";
-	response_stream << body;
+	std::cout << response_stream.str() << std::endl;
+	response_stream << this->body;
 
 	return response_stream.str();
 }
@@ -55,46 +56,47 @@ std::string Response::getBody() const {
 
 
 
-Response responseTratament(Request &request, Logger &logger){
-	Response response;
+void Response::responseTratament(Request &request, Logger &logger){
 	std::ostringstream log;
 	if(!request.requestIsValid){
 		logger.logError("ERROR", "Error parsing request");
-		std::string body = readFile("static/405.html");
-		response.setStatus(405, "Method Not Allowed");
-		response.setBody(body);
-		return response;
+		std::string bodyr = readFile("static/405.html");
+		this->setStatus(405, "Method Not Allowed");
+		this->setBody(bodyr);
+		return ;
 	}
 	std::string path = "static" + request.uri;
 	if (path[path.size() - 1] == '/')
 		path += "index.html";
-	std::string body;
+	std::string bodyr;
 	struct stat status;
 	if (stat(path.c_str(), &status) != 0)
 	{
 		logger.logError("ERROR", "File not found");
-		body = readFile("static/404.html");
-		response.setStatus(404, "Not Found");
-		response.setBody(body);
-		return response;
+		bodyr = readFile("static/404.html");
+		this->setStatus(404, "Not Found");
+		this->setBody(bodyr);
+		this->setHeader("Content-Type", getContentType("static/404.html"));
+		return ;
 	}
 	if(S_ISDIR(status.st_mode) && request.allow_directory_listing)
 	{
-		body = listDirectory(path);
-		response.setStatus(200, "OK");
-		response.setBody(body);
-		return response;
+		bodyr = listDirectory(path);
+		this->setStatus(200, "OK");
+		this->setBody(bodyr);
+		this->setHeader("Content-Type", getContentType("static/404.html"));
+		return ;
 	}
 	if(access(path.c_str(), R_OK) != 0)
 	{
 		logger.logError("ERROR", "File not readable");
-		body = readFile("static/403.html");
-		response.setStatus(403, "Forbidden");
-		response.setBody(body);
-		return response;
+		bodyr = readFile("static/403.html");
+		this->setStatus(403, "Forbidden");
+		this->setBody(bodyr);
+		this->setHeader("Content-Type", getContentType("static/403.html")); 
+		return ;
 	}
 	body = readFile(path);
-	response.setStatus(200, "OK");
-	response.setBody(body);
-	return response;
+	this->setStatus(200, "OK");
+	this->setHeader("Content-Type", getContentType(path));
 }
