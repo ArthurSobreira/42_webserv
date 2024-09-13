@@ -1,10 +1,7 @@
 #ifndef LOGGER_HPP
 #define LOGGER_HPP
 
-#include <string>
-#include <fstream>
-#include <iostream>
-#include <ctime>
+#include "Includes.hpp"
 
 class Logger
 {
