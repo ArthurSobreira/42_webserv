@@ -1897,3 +1897,485 @@ Iniciando log...
 2024-09-10 19:56:09 - Binded to port 13001
 2024-09-10 19:56:09 - Listening on socket with backlog: 4096
 2024-09-10 19:56:09 - Server created on 10.12.12.2:13001
+Iniciando log...
+2024-09-13 11:50:41 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 11:50:41 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 11:50:41 - Socket created
+2024-09-13 11:50:41 - Binded to port 13000
+2024-09-13 11:50:41 - Listening on socket with backlog: 4096
+2024-09-13 11:50:41 - Server created on 127.0.0.1:13000
+2024-09-13 11:50:41 - Socket created
+2024-09-13 11:50:41 - Binded to port 13001
+2024-09-13 11:50:41 - Listening on socket with backlog: 4096
+2024-09-13 11:50:41 - Server created on 10.12.12.2:13001
+Iniciando log...
+2024-09-13 11:51:18 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 11:51:18 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 11:51:18 - Socket created
+2024-09-13 11:51:18 - Binded to port 13000
+2024-09-13 11:51:18 - Listening on socket with backlog: 4096
+2024-09-13 11:51:18 - Server created on 127.0.0.1:13000
+2024-09-13 11:51:18 - Socket created
+2024-09-13 11:51:18 - Binded to port 13001
+2024-09-13 11:51:18 - Listening on socket with backlog: 4096
+2024-09-13 11:51:18 - Server created on 10.12.12.2:13001
+2024-09-13 11:51:38 - Request received: GET / HTTP/1.1
+Iniciando log...
+2024-09-13 11:51:49 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 11:51:49 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 11:51:49 - Socket created
+2024-09-13 11:51:49 - Binded to port 13000
+2024-09-13 11:51:49 - Listening on socket with backlog: 4096
+2024-09-13 11:51:49 - Server created on 127.0.0.1:13000
+2024-09-13 11:51:49 - Socket created
+2024-09-13 11:51:49 - Binded to port 13001
+2024-09-13 11:51:49 - Listening on socket with backlog: 4096
+2024-09-13 11:51:49 - Server created on 10.12.12.2:13001
+2024-09-13 11:51:55 - Request received: GET / HTTP/1.1
+Iniciando log...
+2024-09-13 11:52:03 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 11:52:03 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 11:52:03 - Socket created
+2024-09-13 11:52:03 - Binded to port 13000
+2024-09-13 11:52:03 - Listening on socket with backlog: 4096
+2024-09-13 11:52:03 - Server created on 127.0.0.1:13000
+2024-09-13 11:52:03 - Socket created
+2024-09-13 11:52:03 - Binded to port 13001
+2024-09-13 11:52:03 - Listening on socket with backlog: 4096
+2024-09-13 11:52:03 - Server created on 10.12.12.2:13001
+2024-09-13 11:52:06 - Request received: GET / HTTP/1.1
+Iniciando log...
+2024-09-13 11:52:39 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 11:52:39 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 11:52:39 - Socket created
+2024-09-13 11:52:39 - Binded to port 13000
+2024-09-13 11:52:39 - Listening on socket with backlog: 4096
+2024-09-13 11:52:39 - Server created on 127.0.0.1:13000
+2024-09-13 11:52:39 - Socket created
+2024-09-13 11:52:39 - Binded to port 13001
+2024-09-13 11:52:39 - Listening on socket with backlog: 4096
+2024-09-13 11:52:39 - Server created on 10.12.12.2:13001
+2024-09-13 11:52:55 - Request received: GET / HTTP/1.1
+Iniciando log...
+2024-09-13 11:56:37 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 11:56:37 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 11:56:37 - Socket created
+2024-09-13 11:56:37 - Binded to port 13000
+2024-09-13 11:56:37 - Listening on socket with backlog: 4096
+2024-09-13 11:56:37 - Server created on 127.0.0.1:13000
+2024-09-13 11:56:37 - Socket created
+2024-09-13 11:56:37 - Binded to port 13001
+2024-09-13 11:56:37 - Listening on socket with backlog: 4096
+2024-09-13 11:56:37 - Server created on 10.12.12.2:13001
+2024-09-13 11:56:43 - Request received: GET / HTTP/1.1
+Iniciando log...
+2024-09-13 11:57:12 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 11:57:12 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 11:57:12 - Socket created
+2024-09-13 11:57:12 - Binded to port 13000
+2024-09-13 11:57:12 - Listening on socket with backlog: 4096
+2024-09-13 11:57:12 - Server created on 127.0.0.1:13000
+2024-09-13 11:57:12 - Socket created
+2024-09-13 11:57:12 - Binded to port 13001
+2024-09-13 11:57:12 - Listening on socket with backlog: 4096
+2024-09-13 11:57:12 - Server created on 10.12.12.2:13001
+Iniciando log...
+2024-09-13 11:57:28 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 11:57:28 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 11:57:28 - Socket created
+2024-09-13 11:57:28 - Binded to port 13000
+2024-09-13 11:57:28 - Listening on socket with backlog: 4096
+2024-09-13 11:57:28 - Server created on 127.0.0.1:13000
+2024-09-13 11:57:28 - Socket created
+2024-09-13 11:57:28 - Binded to port 13001
+2024-09-13 11:57:28 - Listening on socket with backlog: 4096
+2024-09-13 11:57:28 - Server created on 10.12.12.2:13001
+2024-09-13 11:58:18 - Request received: GET / HTTP/1.1
+Iniciando log...
+2024-09-13 11:58:54 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 11:58:54 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 11:58:54 - Socket created
+2024-09-13 11:58:54 - Binded to port 13000
+2024-09-13 11:58:54 - Listening on socket with backlog: 4096
+2024-09-13 11:58:54 - Server created on 127.0.0.1:13000
+2024-09-13 11:58:54 - Socket created
+2024-09-13 11:58:54 - Binded to port 13001
+2024-09-13 11:58:54 - Listening on socket with backlog: 4096
+2024-09-13 11:58:54 - Server created on 10.12.12.2:13001
+2024-09-13 11:59:00 - Request received: GET / HTTP/1.1
+Iniciando log...
+2024-09-13 11:59:15 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 11:59:15 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 11:59:15 - Socket created
+2024-09-13 11:59:15 - Binded to port 13000
+2024-09-13 11:59:15 - Listening on socket with backlog: 4096
+2024-09-13 11:59:15 - Server created on 127.0.0.1:13000
+2024-09-13 11:59:15 - Socket created
+2024-09-13 11:59:15 - Binded to port 13001
+2024-09-13 11:59:15 - Listening on socket with backlog: 4096
+2024-09-13 11:59:15 - Server created on 10.12.12.2:13001
+2024-09-13 11:59:22 - Request received: GET / HTTP/1.1
+Iniciando log...
+2024-09-13 11:59:39 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 11:59:39 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 11:59:39 - Socket created
+2024-09-13 11:59:39 - Binded to port 13000
+2024-09-13 11:59:39 - Listening on socket with backlog: 4096
+2024-09-13 11:59:39 - Server created on 127.0.0.1:13000
+2024-09-13 11:59:39 - Socket created
+2024-09-13 11:59:39 - Binded to port 13001
+2024-09-13 11:59:39 - Listening on socket with backlog: 4096
+2024-09-13 11:59:39 - Server created on 10.12.12.2:13001
+2024-09-13 11:59:48 - Request received: GET / HTTP/1.1
+Iniciando log...
+2024-09-13 12:00:01 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 12:00:01 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 12:00:01 - Socket created
+2024-09-13 12:00:01 - Binded to port 13000
+2024-09-13 12:00:01 - Listening on socket with backlog: 4096
+2024-09-13 12:00:01 - Server created on 127.0.0.1:13000
+2024-09-13 12:00:01 - Socket created
+2024-09-13 12:00:01 - Binded to port 13001
+2024-09-13 12:00:01 - Listening on socket with backlog: 4096
+2024-09-13 12:00:01 - Server created on 10.12.12.2:13001
+2024-09-13 12:00:03 - Request received: GET / HTTP/1.1
+Iniciando log...
+2024-09-13 12:01:01 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 12:01:01 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 12:01:01 - Socket created
+2024-09-13 12:01:01 - Binded to port 13000
+2024-09-13 12:01:01 - Listening on socket with backlog: 4096
+2024-09-13 12:01:01 - Server created on 127.0.0.1:13000
+2024-09-13 12:01:01 - Socket created
+2024-09-13 12:01:01 - Binded to port 13001
+2024-09-13 12:01:01 - Listening on socket with backlog: 4096
+2024-09-13 12:01:01 - Server created on 10.12.12.2:13001
+2024-09-13 12:01:03 - Request received: GET / HTTP/1.1
+2024-09-13 12:01:03 - Request received: GET /favicon.ico HTTP/1.1
+Iniciando log...
+2024-09-13 12:02:12 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 12:02:12 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 12:02:12 - Socket created
+2024-09-13 12:02:12 - Binded to port 13000
+2024-09-13 12:02:12 - Listening on socket with backlog: 4096
+2024-09-13 12:02:12 - Server created on 127.0.0.1:13000
+2024-09-13 12:02:12 - Socket created
+2024-09-13 12:02:12 - Binded to port 13001
+2024-09-13 12:02:12 - Listening on socket with backlog: 4096
+2024-09-13 12:02:12 - Server created on 10.12.12.2:13001
+2024-09-13 12:02:14 - Request received: GET / HTTP/1.1
+2024-09-13 12:02:15 - Request received: GET /favicon.ico HTTP/1.1
+Iniciando log...
+2024-09-13 12:05:02 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 12:05:02 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 12:05:02 - Socket created
+2024-09-13 12:05:02 - Binded to port 13000
+2024-09-13 12:05:02 - Listening on socket with backlog: 4096
+2024-09-13 12:05:02 - Server created on 127.0.0.1:13000
+2024-09-13 12:05:02 - Socket created
+2024-09-13 12:05:02 - Binded to port 13001
+2024-09-13 12:05:02 - Listening on socket with backlog: 4096
+2024-09-13 12:05:02 - Server created on 10.12.12.2:13001
+2024-09-13 12:05:04 - Request received: GET / HTTP/1.1
+2024-09-13 12:05:05 - Request received: GET /favicon.ico HTTP/1.1
+Iniciando log...
+2024-09-13 12:05:50 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 12:05:50 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 12:05:50 - Socket created
+2024-09-13 12:05:50 - Binded to port 13000
+2024-09-13 12:05:50 - Listening on socket with backlog: 4096
+2024-09-13 12:05:50 - Server created on 127.0.0.1:13000
+2024-09-13 12:05:50 - Socket created
+2024-09-13 12:05:50 - Binded to port 13001
+2024-09-13 12:05:50 - Listening on socket with backlog: 4096
+2024-09-13 12:05:50 - Server created on 10.12.12.2:13001
+2024-09-13 12:05:52 - Request received: GET / HTTP/1.1
+2024-09-13 12:05:53 - Request received: GET /favicon.ico HTTP/1.1
+2024-09-13 12:06:01 - Request received: GET / HTTP/1.1
+2024-09-13 12:06:02 - Request received: GET /favicon.ico HTTP/1.1
+Iniciando log...
+2024-09-13 12:06:07 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 12:06:07 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 12:06:07 - Socket created
+2024-09-13 12:06:07 - Binded to port 13000
+2024-09-13 12:06:07 - Listening on socket with backlog: 4096
+2024-09-13 12:06:07 - Server created on 127.0.0.1:13000
+2024-09-13 12:06:07 - Socket created
+2024-09-13 12:06:07 - Binded to port 13001
+2024-09-13 12:06:07 - Listening on socket with backlog: 4096
+2024-09-13 12:06:07 - Server created on 10.12.12.2:13001
+2024-09-13 12:06:10 - Request received: GET / HTTP/1.1
+2024-09-13 12:06:10 - Request received: GET /favicon.ico HTTP/1.1
+2024-09-13 12:06:20 - Request received: GET / HTTP/1.1
+2024-09-13 12:06:21 - Request received: GET /favicon.ico HTTP/1.1
+Iniciando log...
+2024-09-13 12:06:25 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 12:06:25 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 12:06:25 - Socket created
+2024-09-13 12:06:25 - Binded to port 13000
+2024-09-13 12:06:25 - Listening on socket with backlog: 4096
+2024-09-13 12:06:25 - Server created on 127.0.0.1:13000
+2024-09-13 12:06:25 - Socket created
+2024-09-13 12:06:25 - Binded to port 13001
+2024-09-13 12:06:25 - Listening on socket with backlog: 4096
+2024-09-13 12:06:25 - Server created on 10.12.12.2:13001
+2024-09-13 12:06:27 - Request received: GET / HTTP/1.1
+2024-09-13 12:06:28 - Request received: GET /favicon.ico HTTP/1.1
+Iniciando log...
+2024-09-13 12:06:44 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 12:06:44 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 12:06:44 - Socket created
+2024-09-13 12:06:44 - Binded to port 13000
+2024-09-13 12:06:44 - Listening on socket with backlog: 4096
+2024-09-13 12:06:44 - Server created on 127.0.0.1:13000
+2024-09-13 12:06:44 - Socket created
+2024-09-13 12:06:44 - Binded to port 13001
+2024-09-13 12:06:44 - Listening on socket with backlog: 4096
+2024-09-13 12:06:44 - Server created on 10.12.12.2:13001
+2024-09-13 12:06:46 - Request received: GET / HTTP/1.1
+2024-09-13 12:06:46 - Request received: GET /favicon.ico HTTP/1.1
+Iniciando log...
+2024-09-13 12:08:29 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 12:08:29 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 12:08:29 - Socket created
+2024-09-13 12:08:29 - Binded to port 13000
+2024-09-13 12:08:29 - Listening on socket with backlog: 4096
+2024-09-13 12:08:29 - Server created on 127.0.0.1:13000
+2024-09-13 12:08:29 - Socket created
+2024-09-13 12:08:29 - Binded to port 13001
+2024-09-13 12:08:29 - Listening on socket with backlog: 4096
+2024-09-13 12:08:29 - Server created on 10.12.12.2:13001
+2024-09-13 12:08:31 - Request received: GET / HTTP/1.1
+2024-09-13 12:08:32 - Request received: GET /favicon.ico HTTP/1.1
+Iniciando log...
+2024-09-13 12:09:22 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 12:09:22 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 12:09:22 - Socket created
+2024-09-13 12:09:22 - Binded to port 13000
+2024-09-13 12:09:22 - Listening on socket with backlog: 4096
+2024-09-13 12:09:22 - Server created on 127.0.0.1:13000
+2024-09-13 12:09:22 - Socket created
+2024-09-13 12:09:22 - Binded to port 13001
+2024-09-13 12:09:22 - Listening on socket with backlog: 4096
+2024-09-13 12:09:22 - Server created on 10.12.12.2:13001
+2024-09-13 12:09:25 - Request received: GET / HTTP/1.1
+2024-09-13 12:09:25 - Request received: GET /favicon.ico HTTP/1.1
+Iniciando log...
+2024-09-13 12:09:41 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 12:09:41 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 12:09:41 - Socket created
+2024-09-13 12:09:41 - Binded to port 13000
+2024-09-13 12:09:41 - Listening on socket with backlog: 4096
+2024-09-13 12:09:41 - Server created on 127.0.0.1:13000
+2024-09-13 12:09:41 - Socket created
+2024-09-13 12:09:41 - Binded to port 13001
+2024-09-13 12:09:41 - Listening on socket with backlog: 4096
+2024-09-13 12:09:41 - Server created on 10.12.12.2:13001
+2024-09-13 12:09:45 - Request received: GET / HTTP/1.1
+2024-09-13 12:09:47 - Request received: GET /favicon.ico HTTP/1.1
+Iniciando log...
+2024-09-13 12:10:07 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 12:10:07 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 12:10:07 - Socket created
+2024-09-13 12:10:07 - Binded to port 13000
+2024-09-13 12:10:07 - Listening on socket with backlog: 4096
+2024-09-13 12:10:07 - Server created on 127.0.0.1:13000
+2024-09-13 12:10:07 - Socket created
+2024-09-13 12:10:07 - Binded to port 13001
+2024-09-13 12:10:07 - Listening on socket with backlog: 4096
+2024-09-13 12:10:07 - Server created on 10.12.12.2:13001
+2024-09-13 12:10:09 - Request received: GET / HTTP/1.1
+2024-09-13 12:10:09 - Request received: GET /favicon.ico HTTP/1.1
+Iniciando log...
+2024-09-13 12:10:22 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 12:10:22 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 12:10:22 - Socket created
+2024-09-13 12:10:22 - Binded to port 13000
+2024-09-13 12:10:22 - Listening on socket with backlog: 4096
+2024-09-13 12:10:22 - Server created on 127.0.0.1:13000
+2024-09-13 12:10:22 - Socket created
+2024-09-13 12:10:22 - Binded to port 13001
+2024-09-13 12:10:22 - Listening on socket with backlog: 4096
+2024-09-13 12:10:22 - Server created on 10.12.12.2:13001
+2024-09-13 12:10:24 - Request received: GET / HTTP/1.1
+2024-09-13 12:10:24 - Request received: GET /favicon.ico HTTP/1.1
+Iniciando log...
+2024-09-13 12:10:49 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 12:10:49 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 12:10:49 - Socket created
+2024-09-13 12:10:49 - Binded to port 13000
+2024-09-13 12:10:49 - Listening on socket with backlog: 4096
+2024-09-13 12:10:49 - Server created on 127.0.0.1:13000
+2024-09-13 12:10:49 - Socket created
+2024-09-13 12:10:49 - Binded to port 13001
+2024-09-13 12:10:49 - Listening on socket with backlog: 4096
+2024-09-13 12:10:49 - Server created on 10.12.12.2:13001
+2024-09-13 12:10:51 - Request received: GET / HTTP/1.1
+2024-09-13 12:10:51 - Request received: GET /favicon.ico HTTP/1.1
+2024-09-13 12:11:52 - Request received: GET / HTTP/1.1
+2024-09-13 12:11:52 - Request received: GET /favicon.ico HTTP/1.1
+Iniciando log...
+2024-09-13 12:12:24 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 12:12:24 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 12:12:24 - Socket created
+2024-09-13 12:12:24 - Binded to port 13000
+2024-09-13 12:12:24 - Listening on socket with backlog: 4096
+2024-09-13 12:12:24 - Server created on 127.0.0.1:13000
+2024-09-13 12:12:24 - Socket created
+2024-09-13 12:12:24 - Binded to port 13001
+2024-09-13 12:12:24 - Listening on socket with backlog: 4096
+2024-09-13 12:12:24 - Server created on 10.12.12.2:13001
+2024-09-13 12:12:26 - Request received: GET / HTTP/1.1
+2024-09-13 12:12:27 - Request received: GET /favicon.ico HTTP/1.1
+Iniciando log...
+2024-09-13 12:14:15 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 12:14:15 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 12:14:15 - Socket created
+2024-09-13 12:14:15 - Binded to port 13000
+2024-09-13 12:14:15 - Listening on socket with backlog: 4096
+2024-09-13 12:14:15 - Server created on 127.0.0.1:13000
+2024-09-13 12:14:15 - Socket created
+2024-09-13 12:14:15 - Binded to port 13001
+2024-09-13 12:14:15 - Listening on socket with backlog: 4096
+2024-09-13 12:14:15 - Server created on 10.12.12.2:13001
+2024-09-13 12:14:18 - Request received: GET / HTTP/1.1
+2024-09-13 12:14:19 - Request received: GET /favicon.ico HTTP/1.1
+Iniciando log...
+2024-09-13 12:14:53 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 12:14:53 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 12:14:53 - Socket created
+2024-09-13 12:14:53 - Binded to port 13000
+2024-09-13 12:14:53 - Listening on socket with backlog: 4096
+2024-09-13 12:14:53 - Server created on 127.0.0.1:13000
+2024-09-13 12:14:53 - Socket created
+2024-09-13 12:14:53 - Binded to port 13001
+2024-09-13 12:14:53 - Listening on socket with backlog: 4096
+2024-09-13 12:14:53 - Server created on 10.12.12.2:13001
+2024-09-13 12:14:55 - Request received: GET / HTTP/1.1
+2024-09-13 12:14:55 - Request received: GET /favicon.ico HTTP/1.1
+Iniciando log...
+2024-09-13 12:16:11 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 12:16:11 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 12:16:11 - Socket created
+2024-09-13 12:16:11 - Binded to port 13000
+2024-09-13 12:16:11 - Listening on socket with backlog: 4096
+2024-09-13 12:16:11 - Server created on 127.0.0.1:13000
+2024-09-13 12:16:11 - Socket created
+2024-09-13 12:16:11 - Binded to port 13001
+2024-09-13 12:16:11 - Listening on socket with backlog: 4096
+2024-09-13 12:16:11 - Server created on 10.12.12.2:13001
+2024-09-13 12:16:11 - Request received: GET / HTTP/1.1
+2024-09-13 12:16:12 - Request received: GET /favicon.ico HTTP/1.1
+Iniciando log...
+2024-09-13 12:16:44 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 12:16:44 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 12:16:44 - Socket created
+2024-09-13 12:16:44 - Binded to port 13000
+2024-09-13 12:16:44 - Listening on socket with backlog: 4096
+2024-09-13 12:16:44 - Server created on 127.0.0.1:13000
+2024-09-13 12:16:44 - Socket created
+2024-09-13 12:16:44 - Binded to port 13001
+2024-09-13 12:16:44 - Listening on socket with backlog: 4096
+2024-09-13 12:16:44 - Server created on 10.12.12.2:13001
+2024-09-13 12:16:46 - Request received: GET / HTTP/1.1
+2024-09-13 12:16:46 - Request received: GET /favicon.ico HTTP/1.1
+Iniciando log...
+2024-09-13 12:18:24 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 12:18:24 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 12:18:24 - Socket created
+2024-09-13 12:18:24 - Binded to port 13000
+2024-09-13 12:18:24 - Listening on socket with backlog: 4096
+2024-09-13 12:18:24 - Server created on 127.0.0.1:13000
+2024-09-13 12:18:24 - Socket created
+2024-09-13 12:18:24 - Binded to port 13001
+2024-09-13 12:18:24 - Listening on socket with backlog: 4096
+2024-09-13 12:18:24 - Server created on 10.12.12.2:13001
+2024-09-13 12:18:29 - Request received: GET / HTTP/1.1
+2024-09-13 12:18:30 - Request received: GET /favicon.ico HTTP/1.1
+Iniciando log...
+2024-09-13 12:20:39 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 12:20:39 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 12:20:39 - Socket created
+2024-09-13 12:20:39 - Binded to port 13000
+2024-09-13 12:20:39 - Listening on socket with backlog: 4096
+2024-09-13 12:20:39 - Server created on 127.0.0.1:13000
+2024-09-13 12:20:39 - Socket created
+2024-09-13 12:20:39 - Binded to port 13001
+2024-09-13 12:20:39 - Listening on socket with backlog: 4096
+2024-09-13 12:20:39 - Server created on 10.12.12.2:13001
+2024-09-13 12:20:42 - Request received: GET / HTTP/1.1
+2024-09-13 12:20:44 - Request received: GET /favicon.ico HTTP/1.1
+Iniciando log...
+2024-09-13 12:22:16 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 12:22:16 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 12:22:16 - Socket created
+2024-09-13 12:22:16 - Binded to port 13000
+2024-09-13 12:22:16 - Listening on socket with backlog: 4096
+2024-09-13 12:22:16 - Server created on 127.0.0.1:13000
+2024-09-13 12:22:16 - Socket created
+2024-09-13 12:22:16 - Binded to port 13001
+2024-09-13 12:22:16 - Listening on socket with backlog: 4096
+2024-09-13 12:22:16 - Server created on 10.12.12.2:13001
+2024-09-13 12:22:18 - Request received: GET / HTTP/1.1
+2024-09-13 12:22:19 - Request received: GET /favicon.ico HTTP/1.1
+2024-09-13 12:22:30 - Request received: GET /login HTTP/1.1
+2024-09-13 12:22:30 - Request received: GET /css/style2.css HTTP/1.1
+2024-09-13 12:22:30 - Request received: GET /js/script.js HTTP/1.1
+2024-09-13 12:22:30 - Request received: GET /js/script.js HTTP/1.1
+2024-09-13 12:24:57 - Request received: GET /f HTTP/1.1
+Iniciando log...
+2024-09-13 12:27:55 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 12:27:55 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 12:27:55 - Socket created
+2024-09-13 12:27:55 - Binded to port 13000
+2024-09-13 12:27:55 - Listening on socket with backlog: 4096
+2024-09-13 12:27:55 - Server created on 127.0.0.1:13000
+2024-09-13 12:27:55 - Socket created
+2024-09-13 12:27:55 - Binded to port 13001
+2024-09-13 12:27:55 - Listening on socket with backlog: 4096
+2024-09-13 12:27:55 - Server created on 10.12.12.2:13001
+2024-09-13 12:28:06 - Request received: GET / HTTP/1.1
+2024-09-13 12:28:11 - Request received: GET /login HTTP/1.1
+2024-09-13 12:28:11 - Request received: GET /css/style2.css HTTP/1.1
+2024-09-13 12:28:11 - Request received: GET /js/script.js HTTP/1.1
+2024-09-13 12:28:11 - Request received: GET /js/script.js HTTP/1.1
+Iniciando log...
+2024-09-13 12:29:24 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 12:29:24 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 12:29:24 - Socket created
+2024-09-13 12:29:24 - Binded to port 13000
+2024-09-13 12:29:24 - Listening on socket with backlog: 4096
+2024-09-13 12:29:24 - Server created on 127.0.0.1:13000
+2024-09-13 12:29:24 - Socket created
+2024-09-13 12:29:24 - Binded to port 13001
+2024-09-13 12:29:24 - Listening on socket with backlog: 4096
+2024-09-13 12:29:24 - Server created on 10.12.12.2:13001
+2024-09-13 12:29:26 - Request received: GET /login HTTP/1.1
+2024-09-13 12:29:26 - Request received: GET /css/style2.css HTTP/1.1
+2024-09-13 12:29:26 - Request received: GET /js/script.js HTTP/1.1
+2024-09-13 12:29:26 - Request received: GET /js/script.js HTTP/1.1
+2024-09-13 12:29:27 - Request received: GET /favicon.ico HTTP/1.1
+Iniciando log...
+2024-09-13 12:30:16 - Successfully converted IP to binary format: 127.0.0.1
+2024-09-13 12:30:16 - Successfully converted IP to binary format: 10.12.12.2
+2024-09-13 12:30:16 - Socket created
+2024-09-13 12:30:16 - Binded to port 13000
+2024-09-13 12:30:16 - Listening on socket with backlog: 4096
+2024-09-13 12:30:16 - Server created on 127.0.0.1:13000
+2024-09-13 12:30:16 - Socket created
+2024-09-13 12:30:16 - Binded to port 13001
+2024-09-13 12:30:16 - Listening on socket with backlog: 4096
+2024-09-13 12:30:16 - Server created on 10.12.12.2:13001
+2024-09-13 12:30:17 - Request received: GET / HTTP/1.1
+2024-09-13 12:30:18 - Request received: GET /favicon.ico HTTP/1.1
+2024-09-13 12:30:18 - Request received: GET /login HTTP/1.1
+2024-09-13 12:30:18 - Request received: GET /css/style2.css HTTP/1.1
+2024-09-13 12:30:18 - Request received: GET /js/script.js HTTP/1.1
+2024-09-13 12:30:19 - Request received: GET /favicon.ico HTTP/1.1
+2024-09-13 12:31:51 - Request received: GET /f HTTP/1.1
+2024-09-13 12:31:51 - Request received: GET /icons/blank.gif HTTP/1.1
+2024-09-13 12:31:51 - Request received: GET /icons/folder.gif HTTP/1.1
+2024-09-13 12:31:51 - Request received: GET /icons/html.png HTTP/1.1
+2024-09-13 12:31:51 - Request received: GET /icons/unknown.png HTTP/1.1
+2024-09-13 12:31:51 - Request received: GET /favicon.ico HTTP/1.1
+2024-09-13 12:32:24 - Request received: GET / HTTP/1.1
