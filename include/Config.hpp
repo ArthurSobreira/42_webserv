@@ -49,7 +49,7 @@ class Config {
 		~Config( void );
 		
 		/* Public Methods */
-		void parseConfigFile( void );
+		void _parseConfigFile( std::ifstream &configFile );
 };
 
 #endif
