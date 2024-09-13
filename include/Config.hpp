@@ -1,7 +1,8 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#include "includes.hpp"
+#include "Utils.hpp"
+#include "Includes.hpp"
 
 typedef enum {
 	GET,
@@ -36,6 +37,7 @@ class Config {
 	private:
 		const std::string _fileName;
 		std::vector<ServerConfigs> _servers;
+		// Logger	*_logger;
 
 	public:
 		/* Constructor Methods */
