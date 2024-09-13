@@ -3,6 +3,7 @@
 
 #include "Utils.hpp"
 #include "Includes.hpp"
+#include "Logger.hpp"
 
 typedef enum {
 	GET,
@@ -37,12 +38,12 @@ class Config {
 	private:
 		const std::string _fileName;
 		std::vector<ServerConfigs> _servers;
-		// Logger	*_logger;
+		Logger &_logger;
 
 	public:
-		/* Constructor Methods */
-		Config( void );
-		Config( const std::string &fileName );
+		/* Constructor Method */
+		Config( const std::string &fileName, 
+			Logger &logger );
 		
 		/* Destructor Method */
 		~Config( void );
