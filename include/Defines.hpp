@@ -18,6 +18,10 @@
 # define MAGENTA "\033[35m"
 # define CYAN "\033[36m"
 # define WHITE "\033[37m"
-# define COLORIZE(color, text) color << text << RESET
+# define COLORIZE(color, text) \
+	color << text << RESET
+
+/* Error Macros */
+# define ERROR_LOG_FILE "Error Opening Log File!"
 
 #endif
