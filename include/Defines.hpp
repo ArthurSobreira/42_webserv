@@ -2,10 +2,10 @@
 #define DEFINES_HPP
 
 /* Server Macros */
-#define LOG_FILE "logs/debug.log"
-#define LOG_ACCESS_FILE "logs/access.log"
-#define LOG_ERROR_FILE "logs/error.log"
-#define MAX_EVENTS 64
+# define LOG_FILE "logs/debug.log"
+# define LOG_ACCESS_FILE "logs/access.log"
+# define LOG_ERROR_FILE "logs/error.log"
+# define MAX_EVENTS 64
 
 /* Colors Macros */
 # define RESET "\033[0m"
@@ -22,6 +22,8 @@
 	color << text << RESET
 
 /* Error Macros */
-# define ERROR_LOG_FILE "Error Opening Log File!"
+# define ERROR_OPEN_LOG_FILE "Error Opening Log File!"
+# define ERROR_NOT_CONFIG_FILE "Error: Config File Not Passed!"
+# define ERROR_OPEN_CONFIG_FILE "Error Opening Config File!"
 
 #endif
