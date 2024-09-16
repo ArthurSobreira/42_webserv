@@ -49,6 +49,7 @@ class Config {
 		~Config( void );
 		
 		/* Public Methods */
+		std::vector<ServerConfigs> getServers( void ) const;
 		void _parseConfigFile( std::ifstream &configFile );
 };
 
