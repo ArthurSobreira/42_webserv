@@ -3,6 +3,7 @@
 
 #include "Utils.hpp"
 #include "Includes.hpp"
+#include "Logger.hpp"
 
 typedef enum {
 	GET,
@@ -36,19 +37,21 @@ struct ServerConfigs {
 class Config {
 	private:
 		const std::string _fileName;
+		short _serverCount;
 		std::vector<ServerConfigs> _servers;
-		// Logger	*_logger;
+		Logger &_logger;
 
 	public:
-		/* Constructor Methods */
-		Config( void );
-		Config( const std::string &fileName );
-		
+		/* Constructor Method */
+		Config( const std::string &fileName,
+			Logger &logger );
+
 		/* Destructor Method */
 		~Config( void );
-		
+
 		/* Public Methods */
-		void parseConfigFile( void );
+		std::vector<ServerConfigs> getServers( void ) const;
+		void _parseConfigFile( std::ifstream &configFile );
 };
 
 #endif
