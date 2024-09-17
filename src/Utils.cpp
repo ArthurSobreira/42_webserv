@@ -1,4 +1,5 @@
 #include "Includes.hpp"
+#include "Defines.hpp"
 #include "Logger.hpp"
 
 bool inetPton(const std::string &ip_str, uint32_t &out_binary_ip, Logger &logger)
@@ -17,7 +18,7 @@ bool inetPton(const std::string &ip_str, uint32_t &out_binary_ip, Logger &logger
 		if (byte < 0 || byte > 255 || str.fail())
 		{
 			log << "Invalid byte in IP address: " << segment;
-			logger.logError("ERROR", log.str());
+			logger.logError(LOG_ERROR, log.str());
 			return false;
 		}
 		bytes.push_back(byte);
@@ -26,12 +27,12 @@ bool inetPton(const std::string &ip_str, uint32_t &out_binary_ip, Logger &logger
 	if (bytes.size() != 4)
 	{
 		log << "IP address should have exactly 4 bytes, got " << bytes.size();
-		logger.logError("ERROR", log.str());
+		logger.logError(LOG_ERROR, log.str());
 		return false;
 	}
 
 	out_binary_ip = htonl((bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3]);
-	logger.logDebug("Successfully converted IP to binary format: " + ip_str);
+	logger.logDebug(LOG_DEBUG, "Successfully converted IP to binary format: " + ip_str);
 	return true;
 }
 

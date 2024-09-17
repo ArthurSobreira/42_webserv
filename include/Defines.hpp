@@ -21,6 +21,12 @@
 # define COLORIZE(color, text) \
 	color << text << RESET
 
+/* Logger Macros */
+# define LOG_DEBUG "[DEBUG] "
+# define LOG_INFO  "[INFO] "
+# define LOG_WARN  "[WARNING] "
+# define LOG_ERROR "[ERROR] "
+
 /* Error Macros */
 # define ERROR_OPEN_LOG_FILE "Could Not Open Log File!"
 # define ERROR_OPEN_CONFIG_FILE "Could Not Opening Config File!"

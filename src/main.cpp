@@ -6,7 +6,7 @@
 /*   By: arsobrei <arsobrei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/13 13:00:04 by phenriq2          #+#    #+#             */
-/*   Updated: 2024/09/13 18:02:45 by arsobrei         ###   ########.fr       */
+/*   Updated: 2024/09/17 20:12:57 by arsobrei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ Request clientServerAccept(int sockfd, Logger &logger){
 	int newsockfd = accept(sockfd, (sockAddr*)&cli_addr, &clilen);
 	if (newsockfd < 0)
 	{
-		logger.logError("ERROR", "Error on accept");
+		logger.logError(LOG_ERROR, "Error on accept");
 		ft_error("Error on accept", __FUNCTION__, __FILE__, __LINE__, std::runtime_error("Error on accept"));
 	}
 	std::ostringstream log, access_log;
@@ -83,7 +83,7 @@ Request clientServerAccept(int sockfd, Logger &logger){
 	int n = recv(newsockfd, buffer, 4095, 0);
 	if (n < 0)
 	{
-		logger.logError("ERROR", "Error reading from socket");
+		logger.logError(LOG_ERROR, "Error reading from socket");
 		close(newsockfd);
 		ft_error("Error reading from socket", __FUNCTION__, __FILE__, __LINE__, std::runtime_error("Error reading from socket"));
 	}
@@ -91,13 +91,13 @@ Request clientServerAccept(int sockfd, Logger &logger){
 	std::string str(buffer);
 	if(!request.parseRequest(str)){
 		request.requestIsValid = false;
-		logger.logError("ERROR", "Error parsing request");
+		logger.logError(LOG_ERROR, "Error parsing request");
 	}
 	log << "Request received: " << request.method << " " << request.uri << " " << request.http_version;
-	logger.logDebug(log.str());
+	logger.logDebug(LOG_DEBUG, log.str());
 	request.client_socket = newsockfd;
 	access_log << inetNtop(cli_addr.sin_addr.s_addr) << " - -  \"" << request.method << " " << request.uri << " " << request.http_version << "\" ";
-	logger.logAccess(access_log.str());
+	logger.logAccess(LOG_INFO, access_log.str());
 	request.requestIsValid = true;
 	return request;	
 }
@@ -172,7 +172,7 @@ void createServer(int &sockfd, const int &port, const uint32_t &ip, int &backlog
 		ft_error("Error listening on socket", __FUNCTION__, __FILE__, __LINE__, std::runtime_error("Error listening on socket"));
 	}
 	log<<"Server created on "<<inetNtop(ip)<<":"<<port;
-	logger.logDebug(log.str(), true);
+	logger.logDebug(LOG_DEBUG, log.str(), true);
 }
 
 void populateServersAndPorts(std::string config_file_path, std::vector<uint32_t> &servers, std::vector<int> &ports, Logger &logger)
@@ -239,7 +239,7 @@ void startEventLoop(Logger& logger)
 		int num_events = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
 		if (num_events == -1)
 		{
-			logger.logError("ERROR", "Error on epoll_wait");
+			logger.logError(LOG_ERROR, "Error on epoll_wait");
 			continue;
 		}
 		for (int i = 0; i < num_events; ++i)
@@ -302,7 +302,7 @@ int main(int argc, char **argv)
 	}
 	catch (const std::exception &e)
 	{
-		logger.logError("ERROR", e.what(), true);
+		logger.logError(LOG_ERROR, e.what(), true);
 		return EXIT_FAILURE;
 	}
 
