@@ -113,13 +113,14 @@ void Config::_parseConfigFile( std::ifstream &configFile ) {
 	while (std::getline(configFile, line)) {
 		if (line.find("server_name") == std::string::npos && 
 			line.find("server") != std::string::npos) {
-			size_t pos = line.find("server") + std::string("server").length();
+			size_t serverEndPos = line.find("server") + std::string("server").length();
 
-			while (pos <= line.length() && std::isspace(line[pos])) {
-				pos++;
+			while (serverEndPos <= line.length() && std::isspace(line[serverEndPos])) {
+				serverEndPos++;
 			}
 
-			if (pos <= line.length() && (line[pos] == '{' || line[pos] == '\0')) {
+			if (serverEndPos <= line.length() && 
+				(line[serverEndPos] == '{' || line[serverEndPos] == '\0')) {
 				insideServerBlock = true;
 			}
 		}
