@@ -117,10 +117,15 @@ void Config::_parseConfigFile( std::ifstream &configFile ) {
 			for (std::string::iterator it = line.begin(); 
 				it != line.end(); ++it) {
 				char chr = *it;
-				if (chr == '{') 
+				if (chr == '{') {
 					braceCount++;
-				if (chr == '}')
+				} else if (chr == '}') {
 					braceCount--;
+
+					if (braceCount < 0) {
+						throw std::runtime_error(ERROR_EXTRA_CLOSE_BRACE);
+					}
+				}
 			}
 
 			if (braceCount == 0) {
@@ -135,5 +140,8 @@ void Config::_parseConfigFile( std::ifstream &configFile ) {
 				braceCount = 0;
 			}
 		}
+	}
+	if (braceCount != 0) {
+		throw std::runtime_error(ERROR_UNCLOSED_BLOCK);
 	}
 }
