@@ -10,12 +10,24 @@ namespace ConfigUtils {
 		}
 
 		short serverCount = 0;
+		short braceCount = 0;
 		std::string line;
 		while (std::getline(configFile, line)) {
 			if (line.find("server_name") == std::string::npos && 
 				line.find("server") != std::string::npos) {
 				serverCount++;
+			} 
+			if (line.find("{") != std::string::npos || 
+				line.find("}") != std::string::npos) {
+				braceCount++;
 			}
+			if (line.find("{") != std::string::npos && 
+				line.find("}") != std::string::npos) {
+				throw std::runtime_error(ERROR_INVALID_SERVER);
+			}
+		}
+		if (braceCount != serverCount * 2) {
+			throw std::runtime_error(ERROR_INVALID_SERVER);
 		}
 		configFile.close();
 		return (serverCount);
@@ -55,7 +67,7 @@ namespace ConfigUtils {
 	std::string shortToString( const short &value ) {
 		std::stringstream ss;
 		ss << value;
-		return ss.str();
+		return (ss.str());
 	}
 }
 
@@ -88,7 +100,7 @@ Config::~Config( void ) {};
 
 /* Public Methods */
 std::vector<ServerConfigs> Config::getServers( void ) const {
-	return this->_servers;
+	return (this->_servers);
 }
 
 void Config::_parseConfigFile( std::ifstream &configFile ) {
