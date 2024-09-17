@@ -26,6 +26,7 @@
 # define ERROR_OPEN_CONFIG_FILE "Could Not Opening Config File!"
 # define ERROR_NOT_CONFIG_FILE "Config File Not Passed!"
 # define ERROR_EMPTY_CONFIG_FILE "Config File Is Empty!"
+# define ERROR_INVALID_SERVER "Invalid Server Block!"
 # define ERROR_EXTRA_CLOSE_BRACE "Extra closing brace '}' detected!"
 # define ERROR_UNCLOSED_BLOCK "Unclosed server block detected!"
 
