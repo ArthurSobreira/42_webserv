@@ -43,12 +43,12 @@ class Config {
 
 	public:
 		/* Constructor Method */
-		Config( const std::string &fileName, 
+		Config( const std::string &fileName,
 			Logger &logger );
-		
+
 		/* Destructor Method */
 		~Config( void );
-		
+
 		/* Public Methods */
 		std::vector<ServerConfigs> getServers( void ) const;
 		void _parseConfigFile( std::ifstream &configFile );
