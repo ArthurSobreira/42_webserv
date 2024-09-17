@@ -1,4 +1,5 @@
 #include "Includes.hpp"
+#include "Defines.hpp"
 #include "Server.hpp"
 #include "Logger.hpp"
 #include "Utils.hpp"
@@ -8,10 +9,10 @@ bool createSocket(int &sockfd, int domain, int protocol, Logger &logger)
 	sockfd = socket(domain, protocol, 0);
 	if (sockfd < 0)
 	{
-		logger.logError("ERROR", "Error opening socket");
+		logger.logError(LOG_ERROR, "Error opening socket");
 		return false;
 	}
-	logger.logDebug("Socket created");
+	logger.logDebug(LOG_DEBUG, "Socket created");
 	return true;
 }
 
@@ -21,7 +22,7 @@ bool bindSocket(int &sockfd, const int &port, const uint32_t &ip , sockaddrIn &s
 	serv_addr.sin_addr.s_addr = ip;
 	if (port < 0 || port > 65535)
 	{
-		logger.logError("ERROR", "Invalid port number");
+		logger.logError(LOG_ERROR, "Invalid port number");
 		return false;
 	}
 	serv_addr.sin_port = htons(port);
@@ -33,7 +34,7 @@ bool bindSocket(int &sockfd, const int &port, const uint32_t &ip , sockaddrIn &s
 		return false;
 	}
 	log << "Binded to port " << port;
-	logger.logDebug(log.str());
+	logger.logDebug(LOG_DEBUG, log.str());
 	return true;
 }
 
@@ -48,10 +49,10 @@ bool listenSocket(int &sockfd, int &backlog, Logger &logger)
 	}
 	if (listen(sockfd, backlog) < 0)
 	{
-		logger.logError("ERROR", "Error on listening");
+		logger.logError(LOG_ERROR, "Error on listening");
 		return false;
 	}
 	log << "Listening on socket with backlog: " << backlog;
-	logger.logDebug(log.str());
+	logger.logDebug(LOG_DEBUG, log.str());
 	return true;
 }
