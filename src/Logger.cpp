@@ -12,9 +12,9 @@ Logger::Logger( const std::string &debugLog, const std::string &logAccess,
     if (!_debugLog.is_open() || !_logAccess.is_open() || !_logError.is_open())
         ft_error(ERROR_OPEN_LOG_FILE, __FUNCTION__, __FILE__, __LINE__, 
             std::runtime_error(ERROR_OPEN_LOG_FILE));
-    this->logDebug("Starting debug log...", true);
-    this->logAccess("Starting access log...", true);
-    this->logError("INFO", "Starting error log...", true);
+    this->logDebug(LOG_INFO, "Starting debug log...", true);
+    this->logAccess(LOG_INFO, "Starting access log...", true);
+    this->logError(LOG_INFO, "Starting error log...", true);
 }
 
 Logger::~Logger( void ) {
@@ -26,22 +26,24 @@ Logger::~Logger( void ) {
         _logError.close();
 }
 
-void Logger::logDebug( const std::string &message, bool tty ) {
+void Logger::logDebug( const std::string &severity,
+            const std::string &message, bool tty ) {
     if (_debugLog.is_open())
         _debugLog << _currentDateTime() << " - " 
-                << "[INFO] " << message << std::endl;
+                << severity << message << std::endl;
     if (tty && _isTerminal(std::cout))
         std::cout << COLORIZE(GRAY, _currentDateTime()) << " - " 
-                << "[INFO] " << message << std::endl;
+                << severity << message << std::endl;
 }
 
-void Logger::logAccess( const std::string &message, bool tty ) {
+void Logger::logAccess( const std::string &severity,
+            const std::string &message, bool tty ) {
     if (_logAccess.is_open())
         _logAccess << _currentDateTime() << " - "
-                << "[INFO] " << message << std::endl;
+                << severity << message << std::endl;
     if (tty && _isTerminal(std::cout))
         std::cout << COLORIZE(GRAY, _currentDateTime()) << " - "
-                << "[INFO] " << message << std::endl;
+                << severity << message << std::endl;
 }
 
 void Logger::logError( const std::string &severity,
@@ -49,12 +51,10 @@ void Logger::logError( const std::string &severity,
 {
     if (_logError.is_open())
         _logError << _currentDateTime() << " - "
-                << "[" << severity << "] "
-                << message << std::endl;
+                << severity << message << std::endl;
     if (tty && _isTerminal(std::cerr))
         std::cerr << COLORIZE(GRAY, _currentDateTime()) << " - "
-                << "[" << severity << "] "
-                << message << std::endl;
+                << severity << message << std::endl;
 }
 
 std::string Logger::_currentDateTime( void ) const {
