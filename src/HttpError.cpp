@@ -45,22 +45,22 @@ void HttpError::_initStatusMessages()
 
 std::string HttpError::getBody() const
 {
-    std::ostringstream body, ssc;
+	std::ostringstream body, ssc;
 	ssc << _status_code;
 	std::string path = "static/" + ssc.str() + ".html";
-    std::ifstream file(path.c_str());
+	std::ifstream file(path.c_str());
 
-    if (file.is_open())
-    {
-        body << file.rdbuf(); 
-        file.close();
-    }
-    else
-    {
-        body << "<html><head><title>" + _status_messages.at(_status_code) + "</title></head>";
-        body << "<body><h1>" + ssc.str() + " " + _status_messages.at(_status_code) + "</h1>";
-        body << "<p>" + (_custom_message.empty() ? _status_messages.at(_status_code) : _custom_message) + "</p>";
-        body << "</body></html>";
-    }
-    return body.str();
+	if (file.is_open())
+	{
+		body << file.rdbuf(); 
+		file.close();
+	}
+	else
+	{
+		body << "<html><head><title>" + _status_messages.at(_status_code) + "</title></head>";
+		body << "<body><h1>" + ssc.str() + " " + _status_messages.at(_status_code) + "</h1>";
+		body << "<p>" + (_custom_message.empty() ? _status_messages.at(_status_code) : _custom_message) + "</p>";
+		body << "</body></html>";
+	}
+	return body.str();
 }

@@ -1,16 +1,16 @@
 // void addHeader(std::ostringstream &oss, const std::string &title) {
-//     oss << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">\n"
-//         << "<html>\n<head>\n"
-//         << "<title>Index of " << title << "</title>\n"
-//         << "</head>\n<body>\n"
-//         << "<h1>Index of " << title << "</h1>\n"
-//         << "<table>\n"
-//         << "<tr><th valign=\"top\"><img src=\"/icons/blank.gif\" alt=\"[ICO]\"></th>"
-//         << "<th><a href=\"?C=N;O=D\">Name</a></th>"
-//         << "<th><a href=\"?C=M;O=A\">Last modified</a></th>"
-//         << "<th><a href=\"?C=S;O=A\">Size</a></th>"
-//         << "<th><a href=\"?C=D;O=A\">Description</a></th></tr>\n"
-//         << "<tr><th colspan=\"5\"><hr></th></tr>\n";
+//	 oss << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">\n"
+//		 << "<html>\n<head>\n"
+//		 << "<title>Index of " << title << "</title>\n"
+//		 << "</head>\n<body>\n"
+//		 << "<h1>Index of " << title << "</h1>\n"
+//		 << "<table>\n"
+//		 << "<tr><th valign=\"top\"><img src=\"/icons/blank.gif\" alt=\"[ICO]\"></th>"
+//		 << "<th><a href=\"?C=N;O=D\">Name</a></th>"
+//		 << "<th><a href=\"?C=M;O=A\">Last modified</a></th>"
+//		 << "<th><a href=\"?C=S;O=A\">Size</a></th>"
+//		 << "<th><a href=\"?C=D;O=A\">Description</a></th></tr>\n"
+//		 << "<tr><th colspan=\"5\"><hr></th></tr>\n";
 // }
 
 // void addFileEntry(std::ostringstream &oss, const std::string &name, const std::string &modDate, const std::string &size, std::string &icon) {
@@ -18,16 +18,16 @@
 // 		icon = "/icons/html.png";
 // 	else if (name.find(".png") != std::string::npos || name.find(".jpg") != std::string::npos || name.find(".jpeg") != std::string::npos)
 // 		icon = "/icons/image.png";
-//     oss << "<tr><td valign=\"top\"><img src=\"" << icon << "\" alt=\"[   ]\"></td>"
-//         << "<td><a href=\"" << name << "\">" << name << "</a></td>"
-//         << "<td align=\"right\">" << modDate << "</td>"
-//         << "<td align=\"right\">" << size << "</td>"
-//         << "<td>&nbsp;</td></tr>\n";
+//	 oss << "<tr><td valign=\"top\"><img src=\"" << icon << "\" alt=\"[   ]\"></td>"
+//		 << "<td><a href=\"" << name << "\">" << name << "</a></td>"
+//		 << "<td align=\"right\">" << modDate << "</td>"
+//		 << "<td align=\"right\">" << size << "</td>"
+//		 << "<td>&nbsp;</td></tr>\n";
 // }
 
 // void addFooter(std::ostringstream &oss) {
-//     oss << "<tr><th colspan=\"5\"><hr></th></tr>\n"
-//         << "</table>\n</body></html>";
+//	 oss << "<tr><th colspan=\"5\"><hr></th></tr>\n"
+//		 << "</table>\n</body></html>";
 // }
 
 // bool isDirectory(const std::string& path) {

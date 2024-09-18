@@ -8,29 +8,29 @@
 
 class Response {
 public:
-    Response();
+	Response();
 
 
-    // setters
+	// setters
 
-    void setStatus(int code, const std::string &reason) ;
-    void setHeader(const std::string &key, const std::string &value);
-    void setBody(const std::string &bodyContent);
-    // getters
-    int getStatusCode() const;
-    std::string getReasonPhrase();
-    std::string getHeader(const std::string &key) const;
-    std::string getBody() const;
+	void setStatus(int code, const std::string &reason) ;
+	void setHeader(const std::string &key, const std::string &value);
+	void setBody(const std::string &bodyContent);
+	// getters
+	int getStatusCode() const;
+	std::string getReasonPhrase();
+	std::string getHeader(const std::string &key) const;
+	std::string getBody() const;
 
-    std::string generateResponse() const ;
-    void responseTratament(Request &request, Logger &logger);
+	std::string generateResponse() const ;
+	void responseTratament(Request &request, Logger &logger);
 
 
 private:
-    int status_code;
-    std::string reason_phrase;
-    std::map<std::string, std::string> headers;
-    std::string body;
+	int status_code;
+	std::string reason_phrase;
+	std::map<std::string, std::string> headers;
+	std::string body;
 };
 
 #endif // RESPONSE_HPP_

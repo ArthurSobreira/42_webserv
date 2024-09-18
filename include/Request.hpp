@@ -13,8 +13,8 @@ public:
 	bool requestIsValid;
 	int client_socket;
 	bool allow_directory_listing;
-	// std::map<std::string, std::string> headers;
-	// std::string body;
+	std::map<std::string, std::string> headers;
+	std::string body;
 		
 	// Método para parsear a requisição do cliente
 	bool parseRequest(const std::string &raw_request);
