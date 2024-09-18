@@ -52,6 +52,8 @@ class Config {
 		/* Public Methods */
 		std::vector<ServerConfigs> getServers( void ) const;
 		void _parseConfigFile( std::ifstream &configFile );
+		void _parseServerBlock( const std::string &serverBlock, 
+			int serverIndex );
 };
 
 #endif
