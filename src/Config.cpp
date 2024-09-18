@@ -33,37 +33,6 @@ namespace ConfigUtils {
 		return (serverCount);
 	}
 
-	void	parseServerBlock( const std::string &serverBlock, int serverIndex ) {
-		std::cout << "serverIndex: " << serverIndex << std::endl;
-		std::cout << '[' << serverBlock << ']' << std::endl;
-		// ServerConfigs server;
-		// std::string line;
-		// std::istringstream serverStream(serverBlock);
-		// while (std::getline(serverStream, line)) {
-		// 	if (line.find("server_name") != std::string::npos) {
-		// 		server.server_name = line.substr(line.find("server_name") + std::string("server_name").length());
-		// 		server.server_name.erase(std::remove(server.server_name.begin(), server.server_name.end(), ' '), server.server_name.end());
-		// 	}
-		// 	if (line.find("host") != std::string::npos) {
-		// 		server.host = line.substr(line.find("host") + std::string("host").length());
-		// 		server.host.erase(std::remove(server.host.begin(), server.host.end(), ' '), server.host.end());
-		// 	}
-		// 	if (line.find("port") != std::string::npos) {
-		// 		server.port = std::stoi(line.substr(line.find("port") + std::string("port").length()));
-		// 	}
-		// 	if (line.find("error_page") != std::string::npos) {
-		// 		std::string errorPage = line.substr(line.find("error_page") + std::string("error_page").length());
-		// 		errorPage.erase(std::remove(errorPage.begin(), errorPage.end(), ' '), errorPage.end());
-		// 		std::string errorCode = errorPage.substr(0, errorPage.find(" "));
-		// 		std::string errorPath = errorPage.substr(errorPage.find(" ") + 1);
-		// 		server.error_pages[std::stoi(errorCode)] = errorPath;
-		// 	}
-		// 	if (line.find("limit_body_size") != std::string::npos) {
-		// 		server.limit_body_size = std::stoi(line.substr(line.find("limit_body_size") + std::string("limit_body_size").length()));
-		// 	}
-		// }
-	}
-
 	std::string shortToString( const short &value ) {
 		std::stringstream ss;
 		ss << value;
@@ -147,7 +116,7 @@ void Config::_parseConfigFile( std::ifstream &configFile ) {
 					continue;
 				}
 				insideServerBlock = false;
-				ConfigUtils::parseServerBlock(serverBlock, serverIndex);
+				_parseServerBlock(serverBlock, serverIndex);
 				serverBlock.clear();
 				serverIndex++;
 				braceCount = 0;
@@ -157,4 +126,36 @@ void Config::_parseConfigFile( std::ifstream &configFile ) {
 	if (braceCount != 0) {
 		throw std::runtime_error(ERROR_UNCLOSED_BLOCK);
 	}
+}
+
+void	Config::_parseServerBlock( const std::string &serverBlock, int serverIndex ) {
+	_logger.logDebug(LOG_DEBUG, "Server index: " 
+		+ ConfigUtils::shortToString(serverIndex), true);
+	_logger.logDebug(LOG_DEBUG, "Server block: \n" + serverBlock, true);
+	// std::istringstream serverStream(serverBlock);
+	// ServerConfigs server;
+	// std::string line;
+	// while (std::getline(serverStream, line)) {
+	// 	if (line.find("server_name") != std::string::npos) {
+	// 		server.server_name = line.substr(line.find("server_name") + std::string("server_name").length());
+	// 		server.server_name.erase(std::remove(server.server_name.begin(), server.server_name.end(), ' '), server.server_name.end());
+	// 	}
+	// 	if (line.find("host") != std::string::npos) {
+	// 		server.host = line.substr(line.find("host") + std::string("host").length());
+	// 		server.host.erase(std::remove(server.host.begin(), server.host.end(), ' '), server.host.end());
+	// 	}
+	// 	if (line.find("port") != std::string::npos) {
+	// 		server.port = std::stoi(line.substr(line.find("port") + std::string("port").length()));
+	// 	}
+	// 	if (line.find("error_page") != std::string::npos) {
+	// 		std::string errorPage = line.substr(line.find("error_page") + std::string("error_page").length());
+	// 		errorPage.erase(std::remove(errorPage.begin(), errorPage.end(), ' '), errorPage.end());
+	// 		std::string errorCode = errorPage.substr(0, errorPage.find(" "));
+	// 		std::string errorPath = errorPage.substr(errorPage.find(" ") + 1);
+	// 		server.error_pages[std::stoi(errorCode)] = errorPath;
+	// 	}
+	// 	if (line.find("limit_body_size") != std::string::npos) {
+	// 		server.limit_body_size = std::stoi(line.substr(line.find("limit_body_size") + std::string("limit_body_size").length()));
+	// 	}
+	// }
 }
