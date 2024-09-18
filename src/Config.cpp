@@ -33,6 +33,39 @@ namespace ConfigUtils {
 		return (serverCount);
 	}
 
+	std::string	trimServerBlock( const std::string &serverBlock ) {
+		std::stringstream	timmedServerBlock;
+		std::istringstream	serverStream(serverBlock);
+		std::string	line;
+
+		while (std::getline(serverStream, line)) {
+			size_t first = line.find_first_not_of(' ');
+			if (first == std::string::npos) {
+				continue;
+			}
+			size_t last = line.find_last_not_of(' ');
+			line = line.substr(first, (last - first + 1));
+
+			if (line.empty()) {
+				continue;
+			}
+
+			if ((line.find("server") != std::string::npos &&
+				line.find("server_name") == std::string::npos) ||
+				line.find("{") != std::string::npos ||
+				line.find("}") != std::string::npos) {
+				continue;
+			}
+
+			size_t firstNonSpacePos = line.find_first_not_of(" \t");
+			if (firstNonSpacePos != std::string::npos) {
+				line = line.substr(firstNonSpacePos);
+			}
+			timmedServerBlock << line << std::string("\n");
+		}
+		return (timmedServerBlock.str());
+	}
+
 	std::string shortToString( const short &value ) {
 		std::stringstream ss;
 		ss << value;
@@ -75,7 +108,7 @@ std::vector<ServerConfigs> Config::getServers( void ) const {
 void Config::_parseConfigFile( std::ifstream &configFile ) {
 	std::string line;
 	std::string serverBlock;
-	short braceCount = 0;
+	int braceCount = 0;
 	int	serverIndex = 0;
 	bool insideServerBlock = false;
 
@@ -132,7 +165,10 @@ void	Config::_parseServerBlock( const std::string &serverBlock, int serverIndex 
 	_logger.logDebug(LOG_DEBUG, "Server index: " 
 		+ ConfigUtils::shortToString(serverIndex), true);
 	_logger.logDebug(LOG_DEBUG, "Server block: \n" + serverBlock, true);
-	// std::istringstream serverStream(serverBlock);
+
+	std::string	trimmedBlock = ConfigUtils::trimServerBlock(serverBlock);
+	_logger.logDebug(LOG_DEBUG, "Trimmed block: \n" + trimmedBlock, true);
+	// std::istringstream serverStream(trimmedBlock);
 	// ServerConfigs server;
 	// std::string line;
 	// while (std::getline(serverStream, line)) {
