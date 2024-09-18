@@ -124,7 +124,7 @@ Config::Config( const std::string &fileName, Logger &logger )
 		_serverCount = ConfigUtils::getServerCount(fileName);
 		_logger.logDebug(LOG_DEBUG, "Server count: " 
 				+ ConfigUtils::shortToString(_serverCount), true);
-		this->_parseConfigFile(configFile);
+		_parseConfigFile(configFile);
 		configFile.close();
 		return ;
 	}
@@ -201,11 +201,19 @@ void	Config::_parseServerBlock( const std::string &serverBlock, int serverIndex 
 
 	std::string	trimmedBlock = ConfigUtils::trimServerBlock(serverBlock);
 	_logger.logDebug(LOG_DEBUG, "Trimmed block: \n" + trimmedBlock, true);
+
 	ConfigUtils::validateLocationBrackets(trimmedBlock);
+
 	std::istringstream serverStream(trimmedBlock);
-	// ServerConfigs server;
-	// std::string line;
-	// while (std::getline(serverStream, line)) {
+	ServerConfigs server;
+	std::string line;
+	while (std::getline(serverStream, line)) {
+		if (line.find("listen") != std::string::npos) {
+			std::string portStr = line.substr(line.find("listen") + std::string("listen").length());
+			portStr.erase(std::remove(portStr.begin(), portStr.end(), ' '), portStr.end());
+			std::stringstream ss(portStr);
+			ss >> server.port;
+		}
 	// 	if (line.find("server_name") != std::string::npos) {
 	// 		server.server_name = line.substr(line.find("server_name") + std::string("server_name").length());
 	// 		server.server_name.erase(std::remove(server.server_name.begin(), server.server_name.end(), ' '), server.server_name.end());
@@ -213,9 +221,6 @@ void	Config::_parseServerBlock( const std::string &serverBlock, int serverIndex 
 	// 	if (line.find("host") != std::string::npos) {
 	// 		server.host = line.substr(line.find("host") + std::string("host").length());
 	// 		server.host.erase(std::remove(server.host.begin(), server.host.end(), ' '), server.host.end());
-	// 	}
-	// 	if (line.find("port") != std::string::npos) {
-	// 		server.port = std::stoi(line.substr(line.find("port") + std::string("port").length()));
 	// 	}
 	// 	if (line.find("error_page") != std::string::npos) {
 	// 		std::string errorPage = line.substr(line.find("error_page") + std::string("error_page").length());
@@ -227,5 +232,5 @@ void	Config::_parseServerBlock( const std::string &serverBlock, int serverIndex 
 	// 	if (line.find("limit_body_size") != std::string::npos) {
 	// 		server.limit_body_size = std::stoi(line.substr(line.find("limit_body_size") + std::string("limit_body_size").length()));
 	// 	}
-	// }
+	}
 }
