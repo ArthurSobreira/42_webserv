@@ -11,19 +11,20 @@ bool Request::parseRequest(const std::string &raw_request)
     }
     std::string line;
 	std::getline(stream, line);
-    while (std::getline(stream, line))
+    while (std::getline(stream, line) && line != "\r")
     {
         size_t pos = line.find(": ");
         if (pos != std::string::npos)
         {
             std::string key = line.substr(0, pos);
             std::string value = line.substr(pos + 2);
+            value.erase(value.find_last_not_of(" \n\r\t") + 1);
             headers[key] = value;
-			std::cout << "["<< key <<"]" << std::endl;
-			std::cout << "["<< value <<"]" << std::endl;
+			// std::cout << "["<< key <<"]" << std::endl;
+			// std::cout << "["<< value <<"]" << std::endl;
         }
     }
-    std::cout << "["<< headers["accept"] <<"]" << std::endl;
+    // std::cout << "["<< headers["accept"] <<"]" << std::endl;
 
     return true;
 }

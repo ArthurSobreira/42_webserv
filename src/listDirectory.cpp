@@ -17,10 +17,12 @@ void addHeader(std::ostringstream &oss, const std::string &title)
 		<< "<tr><th colspan=\"5\"><hr></th></tr>\n";
 }
 
-void addFileEntry(std::ostringstream &oss, const std::string &name, const std::string &modDate, const std::string &size, std::string icon)
+void addFileEntry(std::ostringstream &oss, const std::string &dirPath, const std::string &name, const std::string &modDate, const std::string &size, std::string icon)
 {
+	// Adicionar o caminho do diretório ao nome do arquivo
+	std::string fullPath = dirPath + "/" + name;
 	oss << "<tr><td valign=\"top\"><img src=\"" << icon << "\" alt=\"[   ]\"></td>"
-		<< "<td><a href=\"" << name << "\">" << name << "</a></td>"
+		<< "<td><a href=\"" << fullPath << "\">" << name << "</a></td>"
 		<< "<td align=\"right\">" << modDate << "</td>"
 		<< "<td align=\"right\">" << size << "</td>"
 		<< "<td>&nbsp;</td></tr>\n";
@@ -49,16 +51,14 @@ std::string findImage(std::string &name)
 
 	}
 	if (name.find(".html") != std::string::npos)
-		return "/icons/html.png";
+		return "/icons/html.gif";
 	if (name.find(".png") != std::string::npos || name.find(".jpg") != std::string::npos || name.find(".jpeg") != std::string::npos)
 		return "/icons/image.png";
-	return "/icons/unknown.png";
+	return "/icons/unknown.gif";
 }
 
 std::string listDirectory(const std::string &dirPath)
 {
-	std::string dirIcon = "/icons/folder.gif";
-	std::string fileIcon = "/icons/unknown.png";
 	DIR *dir = opendir(dirPath.c_str());
 	if (!dir)
 	{
@@ -69,10 +69,11 @@ std::string listDirectory(const std::string &dirPath)
 	addHeader(html, dirPath);
 
 	diretory *entry;
+	addFileEntry(html, dirPath, "../", "-", "-", "/icons/folder.gif");
 	while ((entry = readdir(dir)) != NULL)
 	{
 		std::string name = entry->d_name;
-		if (name == ".")
+		if (name == "." || name == "..")
 			continue;
 		std::string path = dirPath + "/" + name;
 		status statbuf;
@@ -80,7 +81,7 @@ std::string listDirectory(const std::string &dirPath)
 		std::string modDate = ctime(&statbuf.st_mtime);
 		std::ostringstream size;
 		size << statbuf.st_size;
-		addFileEntry(html, name, modDate, size.str(), findImage(name));
+		addFileEntry(html, dirPath, name, modDate, size.str(), findImage(name));
 	}
 	addFooter(html);
 	closedir(dir);

@@ -64,7 +64,9 @@ void Response::responseTratament(Request &request, Logger &logger){
 		logger.logError("ERROR", "Error parsing request");
 		std::string bodyr = readFile("static/405.html");
 		this->setStatus(405, "Method Not Allowed");
+		setHeader("Content-Type", getContentType("static/405.html"));
 		this->setBody(bodyr);
+		std::cout << "["<< headers["Content-Type"]<< "]" << std::endl;
 		return ;
 	}
 	std::string path = "static" + request.uri;
@@ -79,6 +81,7 @@ void Response::responseTratament(Request &request, Logger &logger){
 		this->setStatus(404, "Not Found");
 		this->setBody(bodyr);
 		this->setHeader("Content-Type", getContentType("static/404.html"));
+		std::cout << "["<< headers["Content-Type"]<< "]" << std::endl;
 		return ;
 	}
 	if(S_ISDIR(status.st_mode) && request.allow_directory_listing)
@@ -87,6 +90,7 @@ void Response::responseTratament(Request &request, Logger &logger){
 		this->setStatus(200, "OK");
 		this->setBody(bodyr);
 		this->setHeader("Content-Type", getContentType("static/404.html"));
+		std::cout << "["<< headers["Content-Type"]<< "]" << std::endl;
 		return ;
 	}
 	if(access(path.c_str(), R_OK) != 0)
@@ -96,9 +100,12 @@ void Response::responseTratament(Request &request, Logger &logger){
 		this->setStatus(403, "Forbidden");
 		this->setBody(bodyr);
 		this->setHeader("Content-Type", getContentType("static/403.html")); 
+		std::cout << "["<< headers["Content-Type"]<< "]" << std::endl;
 		return ;
 	}
-	body = readFile(path);
+	bodyr = readFile(path);
 	this->setStatus(200, "OK");
 	this->setHeader("Content-Type", getContentType(path));
+	setBody(bodyr);
+	std::cout << "["<< headers["Content-Type"]<< "]" << std::endl;
 }
