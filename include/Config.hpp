@@ -26,11 +26,11 @@ struct LocationConfigs {
 };
 
 struct ServerConfigs {
+	unsigned short	port;
 	std::string	host;
-	const int	port;
 	std::string server_name;
+	size_t limit_body_size;
 	errorMap error_pages;
-	const int limit_body_size;
 	std::vector<LocationConfigs> locations;
 };
 
