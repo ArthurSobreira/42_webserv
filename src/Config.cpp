@@ -61,6 +61,14 @@ namespace ConfigUtils {
 			if (firstNonSpacePos != std::string::npos) {
 				line = line.substr(firstNonSpacePos);
 			}
+
+			if (line.find("#") != std::string::npos) {
+				if (line[0] == '#') {
+					continue;
+				} else {
+					line = line.substr(0, line.find("#"));
+				}
+			}
 			timmedServerBlock << line << std::string("\n");
 		}
 		return (timmedServerBlock.str());
