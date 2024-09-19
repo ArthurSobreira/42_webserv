@@ -50,8 +50,8 @@ struct ServerConfigs {
 class Config {
 	private:
 		const std::string _fileName;
-		short _serverCount;
 		std::vector<ServerConfigs> _servers;
+		short _serverCount;
 		Logger &_logger;
 
 	public:
