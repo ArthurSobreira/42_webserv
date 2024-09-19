@@ -83,8 +83,8 @@ re: fclean all
 run: all
 	@echo $(CYAN)[Running $(NAME) executable...]$(LIMITER)
 	@echo $(GREEN)[Server is running...]$(LIMITER)
-	@./$(NAME) config/server.conf
+	@./$(NAME) config/serverTest.conf
 
 tests: $(TESTNAME)
 	@echo $(CYAN)[Running tests...]$(LIMITER)
-	./$(TESTNAME) config/server.conf
+	./$(TESTNAME) config/serverTest.conf

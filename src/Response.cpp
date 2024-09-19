@@ -64,6 +64,7 @@ void Response::responseTratament(Request &request, Logger &logger){
 		logger.logError("ERROR", "Error parsing request");
 		std::string bodyr = readFile("static/405.html");
 		this->setStatus(405, "Method Not Allowed");
+		setHeader("Content-Type", getContentType("static/405.html"));
 		this->setBody(bodyr);
 		return ;
 	}
@@ -98,7 +99,8 @@ void Response::responseTratament(Request &request, Logger &logger){
 		this->setHeader("Content-Type", getContentType("static/403.html")); 
 		return ;
 	}
-	body = readFile(path);
+	bodyr = readFile(path);
 	this->setStatus(200, "OK");
 	this->setHeader("Content-Type", getContentType(path));
+	setBody(bodyr);
 }

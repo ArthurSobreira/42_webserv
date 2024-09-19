@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: arsobrei <arsobrei@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/13 13:00:04 by phenriq2          #+#    #+#             */
-/*   Updated: 2024/09/18 18:59:33 by arsobrei         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "Includes.hpp"
 #include "Defines.hpp"
 #include "Config.hpp"
@@ -179,7 +167,7 @@ void populateServersAndPorts(std::string config_file_path, std::vector<uint32_t>
 {
 	(void) config_file_path;
 	std::string server1 = "127.0.0.1";
-	std::string server2 = "10.12.12.3";
+	std::string server2 = "192.168.18.4";
 	uint32_t ip1;
 	uint32_t ip2;
 	
