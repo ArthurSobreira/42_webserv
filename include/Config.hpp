@@ -29,7 +29,7 @@ struct LocationConfigs {
 	std::string uploadPath;
 	bool autoindex;
 	bool uploadEnabled;
-	CGIConfigs cgi;
+	CGIConfigs cgiConfig;
 
 	/* Struct Constructor */
 	LocationConfigs( void );
