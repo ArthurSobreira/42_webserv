@@ -6,39 +6,52 @@
 #include "Logger.hpp"
 
 typedef enum {
-	GET,
+	GET = 1,
 	POST,
 	DELETE,
 } httpMethod;
 
+struct CGIConfigs {
+	std::string cgiPath;
+	std::string cgiExtension;
+	bool cgiEnabled;
+
+	/* Struct Constructor */
+	CGIConfigs( void );
+};
+
 struct LocationConfigs {
 	std::vector<httpMethod> methods;
-	std::string location_path;
+	std::string locationPath;
 	std::string root;
 	std::string index;
 	std::string redirect;
-	std::string upload_path;
-	std::string cgi_path;
-	std::string cgi_extension;
+	std::string uploadPath;
 	bool autoindex;
-	bool upload_enabled;
-	bool cgi_enabled;
+	bool uploadEnabled;
+	CGIConfigs cgiConfig;
+
+	/* Struct Constructor */
+	LocationConfigs( void );
 };
 
 struct ServerConfigs {
+	unsigned short	port;
 	std::string	host;
-	const int	port;
-	std::string server_name;
-	errorMap error_pages;
-	const int limit_body_size;
+	std::string serverName;
+	size_t limitBodySize;
+	errorMap errorPages;
 	std::vector<LocationConfigs> locations;
+
+	/* Struct Constructor */
+	ServerConfigs( void );
 };
 
 class Config {
 	private:
 		const std::string _fileName;
-		short _serverCount;
 		std::vector<ServerConfigs> _servers;
+		short _serverCount;
 		Logger &_logger;
 
 	public:
@@ -52,6 +65,8 @@ class Config {
 		/* Public Methods */
 		std::vector<ServerConfigs> getServers( void ) const;
 		void _parseConfigFile( std::ifstream &configFile );
+		void _parseServerBlock( const std::string &serverBlock, 
+			int serverIndex );
 };
 
 #endif
