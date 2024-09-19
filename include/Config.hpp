@@ -6,7 +6,7 @@
 #include "Logger.hpp"
 
 typedef enum {
-	GET,
+	GET = 1,
 	POST,
 	DELETE,
 } httpMethod;
