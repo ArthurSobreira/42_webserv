@@ -11,27 +11,40 @@ typedef enum {
 	DELETE,
 } httpMethod;
 
+struct CGIConfigs {
+	std::string cgiPath;
+	std::string cgiExtension;
+	bool cgiEnabled;
+
+	/* Struct Constructor */
+	CGIConfigs( void );
+};
+
 struct LocationConfigs {
 	std::vector<httpMethod> methods;
-	std::string location_path;
+	std::string locationPath;
 	std::string root;
 	std::string index;
 	std::string redirect;
-	std::string upload_path;
-	std::string cgi_path;
-	std::string cgi_extension;
+	std::string uploadPath;
 	bool autoindex;
-	bool upload_enabled;
-	bool cgi_enabled;
+	bool uploadEnabled;
+	CGIConfigs cgi;
+
+	/* Struct Constructor */
+	LocationConfigs( void );
 };
 
 struct ServerConfigs {
 	unsigned short	port;
 	std::string	host;
-	std::string server_name;
-	size_t limit_body_size;
-	errorMap error_pages;
+	std::string serverName;
+	size_t limitBodySize;
+	errorMap errorPages;
 	std::vector<LocationConfigs> locations;
+
+	/* Struct Constructor */
+	ServerConfigs( void );
 };
 
 class Config {
