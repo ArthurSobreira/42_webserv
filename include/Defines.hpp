@@ -57,5 +57,6 @@
 # define ERROR_INVALID_LINE "Line must end with a semicolon ';' !"
 # define ERROR_MISSING_VALUE "Missing value in configuration file!"
 # define ERROR_INVALID_HOST "Server: Invalid Host Address!"
+# define ERROR_INVALID_PORT "Server: Invalid Port Number!"
 
 #endif
