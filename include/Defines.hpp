@@ -49,12 +49,13 @@
 /* Error Macros */
 # define ERROR_OPEN_LOG_FILE "Could Not Open Log File!"
 # define ERROR_OPEN_CONFIG_FILE "Could Not Opening Config File!"
-# define ERROR_NOT_CONFIG_FILE "Config File Not Passed!"
 # define ERROR_EMPTY_CONFIG_FILE "Config File Is Empty!"
 # define ERROR_INVALID_SERVER "Invalid Server Block!"
 # define ERROR_EXTRA_CLOSE_BRACE "Extra closing brace '}' detected!"
 # define ERROR_UNCLOSED_BLOCK "Unclosed server block detected!"
 # define ERROR_INVALID_LOCATION "Invalid Location Block!"
 # define ERROR_INVALID_LINE "Line must end with a semicolon ';' !"
+# define ERROR_MISSING_VALUE "Missing value in configuration file!"
+# define ERROR_INVALID_HOST "Server: Invalid Host Address!"
 
 #endif
