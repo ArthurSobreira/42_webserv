@@ -55,5 +55,6 @@
 # define ERROR_EXTRA_CLOSE_BRACE "Extra closing brace '}' detected!"
 # define ERROR_UNCLOSED_BLOCK "Unclosed server block detected!"
 # define ERROR_INVALID_LOCATION "Invalid Location Block!"
+# define ERROR_INVALID_LINE "Line must end with a semicolon ';' !"
 
 #endif
