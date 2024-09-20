@@ -225,6 +225,58 @@ void Config::_parseConfigFile( std::ifstream &configFile ) {
 	}
 }
 
+void	Config::_extractHost( std::vector<std::string> &tokens, 
+	ServerConfigs &server ) {
+	if (tokens.size() < 2 || tokens[1].empty()) {
+		throw std::runtime_error(ERROR_MISSING_VALUE);
+	}
+	uint32_t temp_ip;
+	if (!inetPton(tokens[1], temp_ip, _logger)) {
+		throw std::runtime_error(ERROR_INVALID_HOST);
+	}
+	server.host = tokens[1];
+}
+
+void	Config::_extractPort( std::vector<std::string> &tokens, 
+	ServerConfigs &server ) {
+	if (tokens.size() < 2 || tokens[1].empty()) {
+		throw std::runtime_error(ERROR_MISSING_VALUE);
+	}
+	std::stringstream stringPort(tokens[1]);
+	if (stringPort >> server.port) {
+		if (server.port < 1024 || server.port > 65535) {
+			throw std::runtime_error(ERROR_INVALID_PORT);
+		}
+	} else {
+		throw std::runtime_error(ERROR_INVALID_PORT);
+	}
+}
+
+void	Config::_extractServerName( std::vector<std::string> &tokens, 
+	ServerConfigs &server ) {
+	if (tokens.size() < 2 || tokens[1].empty()) {
+		throw std::runtime_error(ERROR_MISSING_VALUE);
+	}
+	server.serverName = tokens[1];
+}
+
+void	Config::_extractLimitBodySize( std::vector<std::string> &tokens, 
+	ServerConfigs &server ) {
+	if (tokens.size() < 2 || tokens[1].empty()) {
+		throw std::runtime_error(ERROR_MISSING_VALUE);
+	}
+	std::stringstream stringSize(tokens[1]);
+	long long limitBodySize;
+	if (stringSize >> limitBodySize) {
+		if (limitBodySize < 0) {
+			throw std::runtime_error(ERROR_INVALID_LIMIT_BODY_SIZE);
+		}
+		server.limitBodySize = static_cast<size_t>(limitBodySize);
+	} else {
+		throw std::runtime_error(ERROR_INVALID_LIMIT_BODY_SIZE);
+	}
+}
+
 static void	printServerStruct( const ServerConfigs &server );
 
 void	Config::_parseServerBlock( const std::string &serverBlock, int serverIndex ) {
@@ -234,36 +286,85 @@ void	Config::_parseServerBlock( const std::string &serverBlock, int serverIndex 
 	std::string line;
 
 	_logger.logDebug(LOG_DEBUG, "Server index: " 
-		+ ConfigUtils::shortToString(serverIndex), true);
-	_logger.logDebug(LOG_DEBUG, "Server block: \n" + serverBlock, true);
+			+ ConfigUtils::shortToString(serverIndex), true);
 	_logger.logDebug(LOG_DEBUG, "Trimmed block: \n" + trimmedBlock, true);
 
 	ConfigUtils::validateLocationBrackets(trimmedBlock);
 	while (std::getline(serverStream, line)) {
-		if (line.find("listen") != std::string::npos) {
-			std::string portStr = line.substr(line.find("listen") + std::string("listen").length());
-			portStr.erase(std::remove(portStr.begin(), portStr.end(), ' '), portStr.end());
-			std::stringstream ss(portStr);
-			ss >> server.port;
+		if ((line[line.size() - 1] != '[' && line[line.size() - 1] != ']') &&
+			(line.empty() || line[line.size() - 1] != ';')) {
+			throw std::runtime_error(ERROR_INVALID_LINE);
 		}
-		// if (line.find("server_name") != std::string::npos) {
-		// 	server.server_name = line.substr(line.find("server_name") + std::string("server_name").length());
-		// 	server.server_name.erase(std::remove(server.server_name.begin(), server.server_name.end(), ' '), server.server_name.end());
+		std::istringstream tokenStream(line);
+		std::string token;
+		std::vector<std::string> tokens;
+
+		while (tokenStream >> token) {
+			if (!token.empty() && token[token.size() - 1] == ';') {
+				token = token.substr(0, token.size() - 1);
+			}
+			tokens.push_back(token);
+		}
+
+		if (tokens.empty()) {
+			continue;
+		}
+
+		if (tokens[0] == "host") { _extractHost(tokens, server); }
+		else if (tokens[0] == "listen") { _extractPort(tokens, server); }
+		else if (tokens[0] == "server_name") { _extractServerName(tokens, server); }
+		else if (tokens[0] == "limit_body_size") { _extractLimitBodySize(tokens, server); }
+
+		// else if (!tokens.empty() && tokens[0] == "limit_body_size") {
+		// 	if (tokens.size() < 2 || tokens[1].empty()) {
+		// 		throw std::runtime_error(ERROR_MISSING_VALUE);
+		// 	}
+		// 	std::stringstream stringSize(tokens[1]);
+		// 	if (stringSize >> server.limitBodySize) {
+		// 		if (server.limitBodySize < 0) {
+		// 			throw std::runtime_error(ERROR_INVALID_PORT);
+		// 		}
+		// 	} else {
+		// 		throw std::runtime_error(ERROR_INVALID_PORT);
+		// 	}
 		// }
-		// if (line.find("host") != std::string::npos) {
-		// 	server.host = line.substr(line.find("host") + std::string("host").length());
-		// 	server.host.erase(std::remove(server.host.begin(), server.host.end(), ' '), server.host.end());
+
+		// else if (!tokens.empty() && tokens[0] == "error_page") {
+		// 	if (tokens.size() < 3 || tokens[1].empty() || tokens[2].empty()) {
+		// 		throw std::runtime_error(ERROR_MISSING_VALUE);
+		// 	}
+		// 	server.errorPages[tokens[1]] = tokens[2];
 		// }
-		// if (line.find("error_page") != std::string::npos) {
-		// 	std::string errorPage = line.substr(line.find("error_page") + std::string("error_page").length());
-		// 	errorPage.erase(std::remove(errorPage.begin(), errorPage.end(), ' '), errorPage.end());
-		// 	std::string errorCode = errorPage.substr(0, errorPage.find(" "));
-		// 	std::string errorPath = errorPage.substr(errorPage.find(" ") + 1);
-		// 	server.error_pages[std::stoi(errorCode)] = errorPath;
-		// }
-		// if (line.find("limit_body_size") != std::string::npos) {
-		// 	server.limit_body_size = std::stoi(line.substr(line.find("limit_body_size") + std::string("limit_body_size").length()));
-		// }
+
+		// else if (!tokens.empty() && tokens[0] == "location") {
+		// 	LocationConfigs location;
+		// 	std::string locationBlock;
+		// 	int locationBraceCount = 0;
+		// 	bool insideLocationBlock = false;
+
+		// 	while (std::getline(serverStream, line)) {
+		// 		if (line.find("location_path") == std::string::npos && 
+		// 			line.find("location") != std::string::npos) {
+		// 			size_t locationEndPos = line.find("location") + std::string("location").length();
+
+		// 			while (locationEndPos <= line.length() && std::isspace(line[locationEndPos])) {
+		// 				locationEndPos++;
+		// 			}
+
+		// 			if (locationEndPos <= line.length() && 
+		// 				(line[locationEndPos] == '{' || line[locationEndPos] == '\0')) {
+		// 				insideLocationBlock = true;
+		// 			}
+		// 		}
+
+		// 		if (insideLocationBlock) {
+		// 			locationBlock += line + std::string("\n");
+		// 			for (std::string::iterator it = line.begin(); 
+		// 				it != line.end(); ++it) {
+		// 				char chr = *it;
+		// 				if (chr == '{') {
+		// 					locationBraceCount
+
 	}
 	_servers.push_back(server);
 	printServerStruct(getServers()[serverIndex]);
