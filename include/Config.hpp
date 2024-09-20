@@ -67,6 +67,14 @@ class Config {
 		void _parseConfigFile( std::ifstream &configFile );
 		void _parseServerBlock( const std::string &serverBlock, 
 			int serverIndex );
+		void _extractHost( std::vector<std::string> &tokens, 
+			ServerConfigs &server );
+		void _extractPort( std::vector<std::string> &tokens, 
+			ServerConfigs &server );
+		void _extractServerName( std::vector<std::string> &tokens, 
+			ServerConfigs &server );
+		void _extractLimitBodySize( std::vector<std::string> &tokens, 
+			ServerConfigs &server );
 };
 
 #endif
