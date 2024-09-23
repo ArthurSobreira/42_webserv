@@ -139,10 +139,13 @@ void	Config::_extractPort( std::vector<std::string> &tokens,
 		throw std::runtime_error(ERROR_MISSING_VALUE);
 	}
 	std::stringstream stringPort(tokens[1]);
-	if (stringPort >> server.port) {
-		if (server.port < 1024 || server.port > 65535) {
+	long long portValue;
+	if (stringPort >> portValue) {
+		if (portValue > std::numeric_limits<unsigned short>::max() || 
+			portValue < 1024) {
 			throw std::runtime_error(ERROR_INVALID_PORT);
 		}
+		server.port = static_cast<unsigned short>(portValue);
 	} else {
 		throw std::runtime_error(ERROR_INVALID_PORT);
 	}
@@ -172,8 +175,6 @@ void	Config::_extractLimitBodySize( std::vector<std::string> &tokens,
 		throw std::runtime_error(ERROR_INVALID_LIMIT_BODY_SIZE);
 	}
 }
-
-static void	printServerStruct( const ServerConfigs &server );
 
 void	Config::_parseServerBlock( const std::string &serverBlock, int serverIndex ) {
 	std::string	trimmedBlock = ConfigUtils::trimServerBlock(serverBlock);
@@ -263,45 +264,5 @@ void	Config::_parseServerBlock( const std::string &serverBlock, int serverIndex 
 
 	}
 	_servers.push_back(server);
-	printServerStruct(getServers()[serverIndex]);
-}
-
-static void	printServerStruct( const ServerConfigs &server ) {
-	std::cout << "              Server Configs " << std::endl;
-	std::cout << "=========================================" << std::endl;
-	std::cout << "port: " << server.port << std::endl;
-	std::cout << "host: " << server.host << std::endl;
-	std::cout << "serverName: " << server.serverName << std::endl;
-	std::cout << "limitBodySize: " << server.limitBodySize << std::endl;
-	for (errorMap::const_iterator it = server.errorPages.begin(); 
-		it != server.errorPages.end(); ++it) {
-		std::cout << "errorPages: " << it->first << " " << it->second << std::endl;
-	}
-	std::cout << "[ Server Locations ]: " << std::endl;
-	for (std::vector<LocationConfigs>::const_iterator it = server.locations.begin(); 
-		it != server.locations.end(); ++it) {
-		std::cout << "\tHTTP Method: ";
-		for (std::vector<httpMethod>::const_iterator it2 = it->methods.begin(); 
-			it2 != it->methods.end(); ++it2) {
-			if (*it2 == GET) {
-				std::cout << "GET";
-			} else if (*it2 == POST) {
-				std::cout << "POST";
-			} else if (*it2 == DELETE) {
-				std::cout << "DELETE";
-			}
-			std::cout << " ";
-		}
-		std::cout << std::endl;
-		std::cout << "\tlocationPath: " << it->locationPath << std::endl;
-		std::cout << "\troot: " << it->root << std::endl;
-		std::cout << "\tindex: " << it->index << std::endl;
-		std::cout << "\tredirect: " << it->redirect << std::endl;
-		std::cout << "\tuploadPath: " << it->uploadPath << std::endl;
-		std::cout << "\tautoindex: " << it->autoindex << std::endl;
-		std::cout << "\tuploadEnabled: " << it->uploadEnabled << std::endl;
-		std::cout << "\tCGI path: " << it->cgiConfig.cgiPath << std::endl;
-		std::cout << "\tCGI extension: " << it->cgiConfig.cgiExtension << std::endl;
-		std::cout << "\tCGI enabled: " << it->cgiConfig.cgiEnabled << std::endl;
-	}
+	ConfigUtils::printServerStruct(getServers()[serverIndex]);
 }
