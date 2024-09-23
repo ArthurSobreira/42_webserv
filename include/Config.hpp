@@ -82,6 +82,7 @@ namespace ConfigUtils {
 	void	validateLocationBrackets( const std::string &serverBlock );
 	std::string	trimServerBlock( const std::string &serverBlock );
 	std::string shortToString( const short &value );
+	void	printServerStruct( const ServerConfigs &server );
 }
 
 #endif
