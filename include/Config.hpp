@@ -75,6 +75,8 @@ class Config {
 			ServerConfigs &server );
 		void _extractLimitBodySize( std::vector<std::string> &tokens, 
 			ServerConfigs &server );
+		void _extractErrorPages( std::vector<std::string> &tokens,
+			ServerConfigs &server );
 };
 
 namespace ConfigUtils {
