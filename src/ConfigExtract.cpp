@@ -27,7 +27,7 @@ namespace ServerExtraction {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
 		}
 		Logger _logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE);
-		if (!inetPton(tokens[1], _logger)) {
+		if (!inetPton(tokens[1])) {
 			throw std::runtime_error(ERROR_INVALID_HOST);
 		}
 		server.host = tokens[1];

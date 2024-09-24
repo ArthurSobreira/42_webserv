@@ -2,8 +2,9 @@
 #include "Defines.hpp"
 #include "Logger.hpp"
 
-bool inetPton(const std::string &ip_str, Logger &logger)
+bool inetPton(const std::string &ip_str)
 {
+	Logger logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE);
 	std::istringstream stream(ip_str);
 	std::string segment;
 	std::vector<int> bytes;
