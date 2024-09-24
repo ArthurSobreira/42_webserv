@@ -99,7 +99,7 @@ namespace ConfigUtils {
 		return (timmedServerBlock.str());
 	}
 
-	std::string shortToString( const short &value ) {
+	std::string	shortToString( const short &value ) {
 		std::stringstream ss;
 		ss << value;
 		return (ss.str());
