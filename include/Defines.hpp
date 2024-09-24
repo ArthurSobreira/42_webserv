@@ -60,5 +60,6 @@
 # define ERROR_INVALID_PORT "Server: Invalid Port Number!"
 # define ERROR_INVALID_LIMIT_BODY_SIZE "Server: Invalid Limit Body Size!"
 # define ERROR_INVALID_ERROR_PAGE "Server: Invalid Error Page!"
+# define ERROR_INVALID_KEY "Server: Invalid Key in Configuration File!"
 
 #endif
