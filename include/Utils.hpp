@@ -3,14 +3,15 @@
 
 #include "Includes.hpp"
 
+class Logger;
+
 typedef std::map<std::string, std::string> errorMap;
+typedef std::vector<std::string> stringVector;
 typedef struct sockaddr_in sockaddrIn;
 typedef struct epoll_event epollEvent;
 typedef struct sockaddr sockAddr;
 typedef struct stat status;
 typedef struct dirent diretory;
-
-class Logger;
 
 bool inetPton(const std::string &ip_str, uint32_t &out_binary_ip, Logger &logger);
 void ft_error(const char *message, const char *function, const char *file, int line, const std::exception &e);
