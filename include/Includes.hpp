@@ -7,6 +7,7 @@
 #include <sstream>	 // Stream de strings
 #include <fstream>	 // Manipulação de arquivos
 #include <map>		 // Containers de mapa associativo
+#include <set>		 // Containers de conjunto
 #include <vector>	 // Containers de vetor
 #include <stdexcept> // Manipulação de exceções
 #include <algorithm> // Funções de algoritmo padrão
