@@ -57,18 +57,10 @@ class Config {
 		/* Private Methods */
 		void _parseConfigFile( std::ifstream &configFile );
 		void _parseServerBlock( const std::string &serverBlock );
-		void _parseLocationStream( std::istringstream &serverStream, ServerConfigs &server );
-		void _parseLocationBlock( const std::string &locationBlock, LocationConfigs &location );
-
-		/* Location Extraction Methods */
-		void _extractMethods( std::vector<std::string> &tokens, LocationConfigs &location );
-		void _extractLocationPath( std::vector<std::string> &tokens, LocationConfigs &location );
-		void _extractRoot( std::vector<std::string> &tokens, LocationConfigs &location );
-		void _extractIndex( std::vector<std::string> &tokens, LocationConfigs &location );
-		void _extractRedirect( std::vector<std::string> &tokens, LocationConfigs &location );
-		void _extractUploadPath( std::vector<std::string> &tokens, LocationConfigs &location );
-		void _extractAutoindex( std::vector<std::string> &tokens, LocationConfigs &location );
-		void _extractUploadEnabled( std::vector<std::string> &tokens, LocationConfigs &location );
+		void _parseLocationStream( std::istringstream &serverStream, 
+			ServerConfigs &server );
+		void _parseLocationBlock( const std::string &locationBlock, 
+			LocationConfigs &location );
 
 	public:
 		/* Constructor Method */
@@ -97,6 +89,18 @@ namespace ServerExtraction {
 	void	serverName( stringVector &tokens, ServerConfigs &server );
 	void	limitBodySize( stringVector &tokens, ServerConfigs &server );
 	void	errorPages( stringVector &tokens, ServerConfigs &server );
+}
+
+/* Location Extraction Functions */
+namespace LocationExtraction {
+	void	methods( stringVector &tokens, LocationConfigs &location );
+	void	locationPath( stringVector &tokens, LocationConfigs &location );
+	void	root( stringVector &tokens, LocationConfigs &location );
+	void	index( stringVector &tokens, LocationConfigs &location );
+	void	redirect( stringVector &tokens, LocationConfigs &location );
+	void	uploadPath( stringVector &tokens, LocationConfigs &location );
+	void	autoindex( stringVector &tokens, LocationConfigs &location );
+	void	uploadEnabled( stringVector &tokens, LocationConfigs &location );
 }
 
 #endif
