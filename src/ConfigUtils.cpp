@@ -142,6 +142,7 @@ namespace ConfigUtils {
 		std::cout << "\tCGI path: " << it->cgiConfig.cgiPath << std::endl;
 		std::cout << "\tCGI extension: " << it->cgiConfig.cgiExtension << std::endl;
 		std::cout << "\tCGI enabled: " << it->cgiConfig.cgiEnabled << std::endl;
+		std::cout << std::endl;
 	}
 }
 }
