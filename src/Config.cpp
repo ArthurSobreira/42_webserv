@@ -161,13 +161,14 @@ void	Config::_parseServerBlock( const std::string &serverBlock ) {
 }
 
 void	Config::_parseLocationStream( std::istringstream &serverStream, ServerConfigs &server ) {
+	std::string line;
 	std::string locationBlock;
+	LocationConfigs location;
 	int locationBracketsCount = 1;
 	bool insideLocationBlock = true;
-	LocationConfigs location;
-	std::string line;
+	static int locationCount = 0;
 
-	while (std::getline(serverStream, line)) {  // Por alguma razão isso reseta o stream
+	while (std::getline(serverStream, line)) {
 		if (insideLocationBlock) {
 			if (line.find("]") == std::string::npos) {
 				locationBlock += line + std::string("\n");
@@ -185,18 +186,24 @@ void	Config::_parseLocationStream( std::istringstream &serverStream, ServerConfi
 			}
 
 			if (locationBracketsCount == 0) {
-				insideLocationBlock = false;
-				// locationBlock = ConfigUtils::trimServerBlock(locationBlock);
-				_logger.logDebug(LOG_DEBUG, "Complete Location block: \n" + locationBlock, true);
-				// location = ConfigUtils::parseLocationBlock(locationBlock);
-				// server.locations.push_back(location);
 				(void)server;
+				if (locationCount == 0) { server.locations.pop_back(); }
+				insideLocationBlock = false;
+				_parseLocationBlock(locationBlock, location);
+				// server.locations.push_back(location);
 				locationBlock.clear();
 				locationBracketsCount = 0;
+				locationCount++;
+				return ;
 			}
 		}
 	}
 	if (locationBracketsCount != 0) {
 		throw std::runtime_error(ERROR_INVALID_LOCATION);
 	}
+}
+
+void	Config::_parseLocationBlock( const std::string &locationBlock, LocationConfigs &location ) {
+	_logger.logDebug(LOG_DEBUG, "Complete Location block: \n" + locationBlock, true);
+	(void)location;
 }
