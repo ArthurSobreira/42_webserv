@@ -58,6 +58,7 @@ class Config {
 		void _parseConfigFile( std::ifstream &configFile );
 		void _parseServerBlock( const std::string &serverBlock );
 		void _parseLocationStream( std::istringstream &serverStream, ServerConfigs &server );
+		void _parseLocationBlock( const std::string &locationBlock, LocationConfigs &location );
 
 		/* Extract Server Methods */
 		void _extractHost( std::vector<std::string> &tokens, ServerConfigs &server );
