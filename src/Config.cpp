@@ -202,8 +202,6 @@ void	Config::_parseLocationStream( std::istringstream &serverStream, ServerConfi
 }
 
 void	Config::_parseLocationBlock( const std::string &locationBlock, LocationConfigs &location ) {
-	_logger.logDebug(LOG_DEBUG, "Complete Location block: \n" + locationBlock, true);
-
 	std::istringstream locationStream(locationBlock);
 	std::set<std::string> locationKeys;
 	std::string line;

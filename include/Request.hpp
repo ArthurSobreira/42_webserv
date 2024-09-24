@@ -25,9 +25,9 @@ public:
 	std::string getMethod() const { return method; }
 	std::string getUri() const { return uri; }
 	std::string getHttpVersion() const { return http_version; }
-	bool isRequestValid() const { return requestIsValid; }
+	bool getIsRequestValid() const { return requestIsValid; }
 	int getClientSocket() const { return client_socket; }
-	bool isAllowDirectoryListing() const { return allow_directory_listing; }
+	bool getIsAllowDirectoryListing() const { return allow_directory_listing; }
 	std::map<std::string, std::string> getHeaders() const { return headers; }
 	std::string getBody() const { return body; }
 

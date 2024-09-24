@@ -27,8 +27,7 @@ namespace ServerExtraction {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
 		}
 		Logger _logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE);
-		uint32_t temp_ip;
-		if (!inetPton(tokens[1], temp_ip, _logger)) {
+		if (!inetPton(tokens[1], _logger)) {
 			throw std::runtime_error(ERROR_INVALID_HOST);
 		}
 		server.host = tokens[1];
@@ -80,8 +79,9 @@ namespace ServerExtraction {
 /* Location Extraction Functions */
 namespace LocationExtraction {
 	void	locationPath( stringVector &tokens, LocationConfigs &location ) {
-		(void)tokens;
-		(void)location;
-		return ;
+		if (tokens.size() < 2 || tokens[1].empty()) {
+			throw std::runtime_error(ERROR_MISSING_VALUE);
+		}
+		location.locationPath = tokens[1];
 	}
 }
