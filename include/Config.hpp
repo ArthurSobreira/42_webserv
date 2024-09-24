@@ -60,12 +60,15 @@ class Config {
 		void _parseLocationStream( std::istringstream &serverStream, ServerConfigs &server );
 		void _parseLocationBlock( const std::string &locationBlock, LocationConfigs &location );
 
-		/* Extract Server Methods */
-		void _extractHost( std::vector<std::string> &tokens, ServerConfigs &server );
-		void _extractPort( std::vector<std::string> &tokens, ServerConfigs &server );
-		void _extractServerName( std::vector<std::string> &tokens, ServerConfigs &server );
-		void _extractLimitBodySize( std::vector<std::string> &tokens, ServerConfigs &server );
-		void _extractErrorPages( std::vector<std::string> &tokens, ServerConfigs &server );
+		/* Location Extraction Methods */
+		void _extractMethods( std::vector<std::string> &tokens, LocationConfigs &location );
+		void _extractLocationPath( std::vector<std::string> &tokens, LocationConfigs &location );
+		void _extractRoot( std::vector<std::string> &tokens, LocationConfigs &location );
+		void _extractIndex( std::vector<std::string> &tokens, LocationConfigs &location );
+		void _extractRedirect( std::vector<std::string> &tokens, LocationConfigs &location );
+		void _extractUploadPath( std::vector<std::string> &tokens, LocationConfigs &location );
+		void _extractAutoindex( std::vector<std::string> &tokens, LocationConfigs &location );
+		void _extractUploadEnabled( std::vector<std::string> &tokens, LocationConfigs &location );
 
 	public:
 		/* Constructor Method */
@@ -79,11 +82,21 @@ class Config {
 		std::vector<ServerConfigs> getServers( void ) const;
 };
 
+/* Config Utils Functions */
 namespace ConfigUtils {
 	short	getServerCount( const std::string &fileName );
 	std::string	trimServerBlock( const std::string &serverBlock );
 	std::string	shortToString( const short &value );
 	void	printServerStruct( const ServerConfigs &server );
+}
+
+/* Server Extraction Functions */
+namespace ServerExtraction {
+	void	port( stringVector &tokens, ServerConfigs &server );
+	void	host( stringVector &tokens, ServerConfigs &server );
+	void	serverName( stringVector &tokens, ServerConfigs &server );
+	void	limitBodySize( stringVector &tokens, ServerConfigs &server );
+	void	errorPages( stringVector &tokens, ServerConfigs &server );
 }
 
 #endif
