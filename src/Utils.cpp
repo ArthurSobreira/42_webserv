@@ -2,7 +2,7 @@
 #include "Defines.hpp"
 #include "Logger.hpp"
 
-bool inetPton(const std::string &ip_str, uint32_t &out_binary_ip, Logger &logger)
+bool inetPton(const std::string &ip_str, Logger &logger)
 {
 	std::istringstream stream(ip_str);
 	std::string segment;
@@ -30,8 +30,6 @@ bool inetPton(const std::string &ip_str, uint32_t &out_binary_ip, Logger &logger
 		logger.logError(LOG_ERROR, log.str());
 		return false;
 	}
-
-	out_binary_ip = htonl((bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3]);
 	logger.logDebug(LOG_DEBUG, "Successfully converted IP to binary format: " + ip_str);
 	return true;
 }
