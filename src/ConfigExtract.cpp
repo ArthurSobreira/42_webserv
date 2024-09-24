@@ -80,8 +80,9 @@ namespace ServerExtraction {
 /* Location Extraction Functions */
 namespace LocationExtraction {
 	void	locationPath( stringVector &tokens, LocationConfigs &location ) {
-		(void)tokens;
-		(void)location;
-		return ;
+		if (tokens.size() < 2 || tokens[1].empty()) {
+			throw std::runtime_error(ERROR_MISSING_VALUE);
+		}
+		location.locationPath = tokens[1];
 	}
 }
