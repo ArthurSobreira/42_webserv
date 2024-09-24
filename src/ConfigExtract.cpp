@@ -76,3 +76,12 @@ namespace ServerExtraction {
 		server.errorPages[errorCode] = fileName;
 	}
 }
+
+/* Location Extraction Functions */
+namespace LocationExtraction {
+	void	locationPath( stringVector &tokens, LocationConfigs &location ) {
+		(void)tokens;
+		(void)location;
+		return ;
+	}
+}
