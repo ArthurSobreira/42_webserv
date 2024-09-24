@@ -119,79 +119,46 @@ void Config::_parseConfigFile( std::ifstream &configFile ) {
 	}
 }
 
-void	Config::_extractHost( std::vector<std::string> &tokens, 
-	ServerConfigs &server ) {
-	if (tokens.size() < 2 || tokens[1].empty()) {
-		throw std::runtime_error(ERROR_MISSING_VALUE);
-	}
-	uint32_t temp_ip;
-	if (!inetPton(tokens[1], temp_ip, _logger)) {
-		throw std::runtime_error(ERROR_INVALID_HOST);
-	}
-	server.host = tokens[1];
-}
+void	Config::_parseServerBlock( const std::string &serverBlock ) {
+	std::string	trimmedBlock = ConfigUtils::trimServerBlock(serverBlock);
+	std::istringstream serverStream(trimmedBlock);
+	ServerConfigs server;
+	std::string line;
 
-void	Config::_extractPort( std::vector<std::string> &tokens, 
-	ServerConfigs &server ) {
-	if (tokens.size() < 2 || tokens[1].empty()) {
-		throw std::runtime_error(ERROR_MISSING_VALUE);
-	}
-	std::stringstream stringPort(tokens[1]);
-	long long portValue;
-	if (stringPort >> portValue) {
-		if (portValue > std::numeric_limits<unsigned short>::max() || 
-			portValue < 1024) {
-			throw std::runtime_error(ERROR_INVALID_PORT);
+	ConfigUtils::validateLocationBrackets(trimmedBlock);
+	while (std::getline(serverStream, line)) {
+		if ((line[line.size() - 1] != '[' && line[line.size() - 1] != ']') &&
+			(line.empty() || line[line.size() - 1] != ';')) {
+			throw std::runtime_error(ERROR_INVALID_LINE);
 		}
-		server.port = static_cast<unsigned short>(portValue);
-	} else {
-		throw std::runtime_error(ERROR_INVALID_PORT);
-	}
-}
+		std::istringstream tokenStream(line);
+		std::string token;
+		std::vector<std::string> tokens;
 
-void	Config::_extractServerName( std::vector<std::string> &tokens, 
-	ServerConfigs &server ) {
-	if (tokens.size() < 2 || tokens[1].empty()) {
-		throw std::runtime_error(ERROR_MISSING_VALUE);
-	}
-	server.serverName = tokens[1];
-}
-
-void	Config::_extractLimitBodySize( std::vector<std::string> &tokens, 
-	ServerConfigs &server ) {
-	if (tokens.size() < 2 || tokens[1].empty()) {
-		throw std::runtime_error(ERROR_MISSING_VALUE);
-	}
-	std::stringstream stringSize(tokens[1]);
-	long long limitBodySize;
-	if (stringSize >> limitBodySize) {
-		if (limitBodySize < 0) {
-			throw std::runtime_error(ERROR_INVALID_LIMIT_BODY_SIZE);
+		while (tokenStream >> token) {
+			if (!token.empty() && token[token.size() - 1] == ';') {
+				token = token.substr(0, token.size() - 1);
+			}
+			tokens.push_back(token);
 		}
-		server.limitBodySize = static_cast<size_t>(limitBodySize);
-	} else {
-		throw std::runtime_error(ERROR_INVALID_LIMIT_BODY_SIZE);
-	}
-}
 
-void	Config::_extractErrorPages( std::vector<std::string> &tokens,
-	ServerConfigs &server ) {
-	if (tokens.size() < 3 || tokens[1].empty() || tokens[2].empty()) {
-		throw std::runtime_error(ERROR_MISSING_VALUE);
-	}
-	std::string	errorCode = tokens[1];
-	std::string	fileName = tokens[2];
-	if (fileName[0] == '/') {
-		fileName = "." + fileName;
-	} else if (fileName[0] != '.' && fileName[1] != '/') {
-		fileName = "./" + fileName;
-	}
+		if (tokens.empty()) {
+			continue;
+		}
 
-	std::ifstream file(fileName.c_str());
-	if (!file.is_open() || file.fail()) {
-		throw std::runtime_error(ERROR_INVALID_ERROR_PAGE);
+		if (tokens[0] == "host") { _extractHost(tokens, server); }
+		else if (tokens[0] == "listen") { _extractPort(tokens, server); }
+		else if (tokens[0] == "server_name") { _extractServerName(tokens, server); }
+		else if (tokens[0] == "limit_body_size") { _extractLimitBodySize(tokens, server); }
+		else if (tokens[0] == "error_page") { _extractErrorPages(tokens, server); }
+		else if (tokens[0] == "location") {
+			if (tokens[1].empty() || tokens.size() < 2 || tokens[1] != "[") { 
+				throw std::runtime_error(ERROR_INVALID_LOCATION);
+			} else { _parseLocationStream(serverStream, server); }
+		} else { throw std::runtime_error(ERROR_INVALID_KEY); }
 	}
-	server.errorPages[errorCode] = fileName;
+	_servers.push_back(server);
+	ConfigUtils::printServerStruct(getServers()[0]);
 }
 
 void	Config::_parseLocationStream( std::istringstream &serverStream, ServerConfigs &server ) {
@@ -233,47 +200,4 @@ void	Config::_parseLocationStream( std::istringstream &serverStream, ServerConfi
 	if (locationBracketsCount != 0) {
 		throw std::runtime_error(ERROR_INVALID_LOCATION);
 	}
-}
-
-
-void	Config::_parseServerBlock( const std::string &serverBlock ) {
-	std::string	trimmedBlock = ConfigUtils::trimServerBlock(serverBlock);
-	std::istringstream serverStream(trimmedBlock);
-	ServerConfigs server;
-	std::string line;
-
-	ConfigUtils::validateLocationBrackets(trimmedBlock);
-	while (std::getline(serverStream, line)) {
-		if ((line[line.size() - 1] != '[' && line[line.size() - 1] != ']') &&
-			(line.empty() || line[line.size() - 1] != ';')) {
-			throw std::runtime_error(ERROR_INVALID_LINE);
-		}
-		std::istringstream tokenStream(line);
-		std::string token;
-		std::vector<std::string> tokens;
-
-		while (tokenStream >> token) {
-			if (!token.empty() && token[token.size() - 1] == ';') {
-				token = token.substr(0, token.size() - 1);
-			}
-			tokens.push_back(token);
-		}
-
-		if (tokens.empty()) {
-			continue;
-		}
-
-		if (tokens[0] == "host") { _extractHost(tokens, server); }
-		else if (tokens[0] == "listen") { _extractPort(tokens, server); }
-		else if (tokens[0] == "server_name") { _extractServerName(tokens, server); }
-		else if (tokens[0] == "limit_body_size") { _extractLimitBodySize(tokens, server); }
-		else if (tokens[0] == "error_page") { _extractErrorPages(tokens, server); }
-		else if (tokens[0] == "location") { 
-			if (tokens[1] == "[") {
-				_parseLocationStream(serverStream, server);
-			} else { throw std::runtime_error(ERROR_INVALID_LOCATION); }
-		} else { throw std::runtime_error(ERROR_INVALID_KEY); }
-	}
-	_servers.push_back(server);
-	ConfigUtils::printServerStruct(getServers()[0]);
 }
