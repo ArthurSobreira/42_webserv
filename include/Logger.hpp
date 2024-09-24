@@ -26,6 +26,7 @@ class Logger {
 			const std::string &message, bool tty = false );
 		void logError( const std::string &severity,
 			const std::string &message, bool tty = false );
+		
 };
 
 #endif
