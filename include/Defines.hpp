@@ -43,8 +43,8 @@
 # define DEFAULT_HOST "127.0.0.1"
 # define DEFAULT_SERVER_NAME "localhost"
 # define DEFAULT_LIMIT_BODY_SIZE 1048576
-# define DEFAULT_ERROR_403 "static/403.html"
-# define DEFAULT_ERROR_404 "static/404.html"
+# define DEFAULT_ERROR_403 "./static/403.html"
+# define DEFAULT_ERROR_404 "./static/404.html"
 
 /* Error Macros */
 # define ERROR_OPEN_LOG_FILE "Could Not Open Log File!"
