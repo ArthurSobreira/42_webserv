@@ -101,7 +101,6 @@ void Config::_parseConfigFile( std::ifstream &configFile ) {
 					}
 				}
 			}
-
 			if (braceCount == 0) {
 				if (serverBlock.find("server") != std::string::npos &&
 					serverBlock.find("{") == std::string::npos) {
