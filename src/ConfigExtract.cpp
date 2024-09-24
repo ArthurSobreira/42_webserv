@@ -2,18 +2,7 @@
 #include "Defines.hpp"
 #include "Config.hpp"
 
-/* Extract Server Methods */
-void	Config::_extractHost( std::vector<std::string> &tokens, ServerConfigs &server ) {
-	if (tokens.size() < 2 || tokens[1].empty()) {
-		throw std::runtime_error(ERROR_MISSING_VALUE);
-	}
-	uint32_t temp_ip;
-	if (!inetPton(tokens[1], temp_ip, _logger)) {
-		throw std::runtime_error(ERROR_INVALID_HOST);
-	}
-	server.host = tokens[1];
-}
-
+/* Server Extraction Methods */
 void	Config::_extractPort( std::vector<std::string> &tokens, ServerConfigs &server ) {
 	if (tokens.size() < 2 || tokens[1].empty()) {
 		throw std::runtime_error(ERROR_MISSING_VALUE);
@@ -29,6 +18,17 @@ void	Config::_extractPort( std::vector<std::string> &tokens, ServerConfigs &serv
 	} else {
 		throw std::runtime_error(ERROR_INVALID_PORT);
 	}
+}
+
+void	Config::_extractHost( std::vector<std::string> &tokens, ServerConfigs &server ) {
+	if (tokens.size() < 2 || tokens[1].empty()) {
+		throw std::runtime_error(ERROR_MISSING_VALUE);
+	}
+	uint32_t temp_ip;
+	if (!inetPton(tokens[1], temp_ip, _logger)) {
+		throw std::runtime_error(ERROR_INVALID_HOST);
+	}
+	server.host = tokens[1];
 }
 
 void	Config::_extractServerName( std::vector<std::string> &tokens, ServerConfigs &server ) {
