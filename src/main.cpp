@@ -220,8 +220,8 @@ void startEventLoop(Logger &logger)
 			request = clientServerAccept(sockfd, logger);
 			response.responseTratament(request, logger);
 			std::string responseFull = response.generateResponse();
-			send(request.client_socket, responseFull.c_str(), responseFull.size(), 0);
-			close(request.client_socket);
+			send(request.getClientSocket(), responseFull.c_str(), responseFull.size(), 0);
+			close(request.getClientSocket());
 			// std::string response = requestHandler(request, logger);
 			// std::string header = createHeaderRequest(request.uri, request.status, response.size());
 			// response = header + response;
