@@ -33,31 +33,6 @@ namespace ConfigUtils {
 		return (serverCount);
 	}
 
-	void	validateLocationBrackets( const std::string &serverBlock ) {
-		std::istringstream	serverStream(serverBlock);
-		short locationCount = 0;
-		short bracketCount = 0;
-		std::string line;
-
-		while (std::getline(serverStream, line)) {
-			if (line.find("location_path") == std::string::npos &&
-				line.find("location") != std::string::npos) {
-				locationCount++;
-			}
-			if (line.find("[") != std::string::npos || 
-				line.find("]") != std::string::npos) {
-				bracketCount++;
-			}
-			if (line.find("[") != std::string::npos && 
-				line.find("]") != std::string::npos) {
-				throw std::runtime_error(ERROR_INVALID_LOCATION);
-			}
-		}
-		if (bracketCount != locationCount * 2) {
-			throw std::runtime_error(ERROR_INVALID_LOCATION);
-		}
-	}
-
 	std::string	trimServerBlock( const std::string &serverBlock ) {
 		std::stringstream	timmedServerBlock;
 		std::istringstream	serverStream(serverBlock);
