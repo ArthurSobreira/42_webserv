@@ -57,18 +57,14 @@ class Config {
 		/* Private Methods */
 		void _parseConfigFile( std::ifstream &configFile );
 		void _parseServerBlock( const std::string &serverBlock );
+		void _parseLocationBlock( std::istringstream &serverStream, ServerConfigs &server );
 
-		/* Extract Methods */
-		void _extractHost( std::vector<std::string> &tokens, 
-			ServerConfigs &server );
-		void _extractPort( std::vector<std::string> &tokens, 
-			ServerConfigs &server );
-		void _extractServerName( std::vector<std::string> &tokens, 
-			ServerConfigs &server );
-		void _extractLimitBodySize( std::vector<std::string> &tokens, 
-			ServerConfigs &server );
-		void _extractErrorPages( std::vector<std::string> &tokens,
-			ServerConfigs &server );
+		/* Extract Server Methods */
+		void _extractHost( std::vector<std::string> &tokens, ServerConfigs &server );
+		void _extractPort( std::vector<std::string> &tokens, ServerConfigs &server );
+		void _extractServerName( std::vector<std::string> &tokens, ServerConfigs &server );
+		void _extractLimitBodySize( std::vector<std::string> &tokens, ServerConfigs &server );
+		void _extractErrorPages( std::vector<std::string> &tokens, ServerConfigs &server );
 
 	public:
 		/* Constructor Method */
