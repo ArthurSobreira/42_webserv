@@ -46,12 +46,12 @@ namespace ServerExtraction {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
 		}
 		std::stringstream stringSize(tokens[1]);
-		long long limitBodySize;
-		if (stringSize >> limitBodySize) {
-			if (limitBodySize < 0) {
+		size_t	limitBodySizeMB;
+		if (stringSize >> limitBodySizeMB) {
+			server.limitBodySize = limitBodySizeMB * 1024 * 1024;
+			if (limitBodySizeMB < 0) {
 				throw std::runtime_error(ERROR_INVALID_LIMIT_BODY_SIZE);
 			}
-			server.limitBodySize = static_cast<size_t>(limitBodySize);
 		} else {
 			throw std::runtime_error(ERROR_INVALID_LIMIT_BODY_SIZE);
 		}
