@@ -97,7 +97,7 @@ void Config::_parseConfigFile( std::ifstream &configFile ) {
 					braceCount--;
 
 					if (braceCount < 0) {
-						throw std::runtime_error(ERROR_EXTRA_CLOSE_BRACE);
+						throw std::runtime_error(ERROR_INVALID_SERVER);
 					}
 				}
 			}
@@ -115,7 +115,7 @@ void Config::_parseConfigFile( std::ifstream &configFile ) {
 		}
 	}
 	if (braceCount != 0) {
-		throw std::runtime_error(ERROR_UNCLOSED_BLOCK);
+		throw std::runtime_error(ERROR_INVALID_SERVER);
 	}
 }
 
@@ -194,13 +194,53 @@ void	Config::_extractErrorPages( std::vector<std::string> &tokens,
 	server.errorPages[errorCode] = fileName;
 }
 
+void	Config::_parseLocationStream( std::istringstream &serverStream, ServerConfigs &server ) {
+	std::string locationBlock;
+	int locationBracketsCount = 1;
+	bool insideLocationBlock = true;
+	LocationConfigs location;
+	std::string line;
+
+	while (std::getline(serverStream, line)) {  // Por alguma razão isso reseta o stream
+		if (insideLocationBlock) {
+			if (line.find("]") == std::string::npos) {
+				locationBlock += line + std::string("\n");
+			}
+			for (std::string::iterator it = line.begin(); 
+				it != line.end(); ++it) {
+				char chr = *it;
+				if (chr == ']') {
+					locationBracketsCount--;
+
+					if (locationBracketsCount < 0) {
+						throw std::runtime_error(ERROR_INVALID_LOCATION);
+					}
+				}
+			}
+
+			if (locationBracketsCount == 0) {
+				insideLocationBlock = false;
+				// locationBlock = ConfigUtils::trimServerBlock(locationBlock);
+				_logger.logDebug(LOG_DEBUG, "Complete Location block: \n" + locationBlock, true);
+				// location = ConfigUtils::parseLocationBlock(locationBlock);
+				// server.locations.push_back(location);
+				(void)server;
+				locationBlock.clear();
+				locationBracketsCount = 0;
+			}
+		}
+	}
+	if (locationBracketsCount != 0) {
+		throw std::runtime_error(ERROR_INVALID_LOCATION);
+	}
+}
+
+
 void	Config::_parseServerBlock( const std::string &serverBlock ) {
 	std::string	trimmedBlock = ConfigUtils::trimServerBlock(serverBlock);
 	std::istringstream serverStream(trimmedBlock);
 	ServerConfigs server;
 	std::string line;
-
-	_logger.logDebug(LOG_DEBUG, "Trimmed block: \n" + trimmedBlock, true);
 
 	ConfigUtils::validateLocationBrackets(trimmedBlock);
 	while (std::getline(serverStream, line)) {
@@ -228,44 +268,11 @@ void	Config::_parseServerBlock( const std::string &serverBlock ) {
 		else if (tokens[0] == "server_name") { _extractServerName(tokens, server); }
 		else if (tokens[0] == "limit_body_size") { _extractLimitBodySize(tokens, server); }
 		else if (tokens[0] == "error_page") { _extractErrorPages(tokens, server); }
-
-
-		// else if (!tokens.empty() && tokens[0] == "error_page") {
-		// 	if (tokens.size() < 3 || tokens[1].empty() || tokens[2].empty()) {
-		// 		throw std::runtime_error(ERROR_MISSING_VALUE);
-		// 	}
-		// 	server.errorPages[tokens[1]] = tokens[2];
-		// }
-
-		// else if (!tokens.empty() && tokens[0] == "location") {
-		// 	LocationConfigs location;
-		// 	std::string locationBlock;
-		// 	int locationBraceCount = 0;
-		// 	bool insideLocationBlock = false;
-
-		// 	while (std::getline(serverStream, line)) {
-		// 		if (line.find("location_path") == std::string::npos && 
-		// 			line.find("location") != std::string::npos) {
-		// 			size_t locationEndPos = line.find("location") + std::string("location").length();
-
-		// 			while (locationEndPos <= line.length() && std::isspace(line[locationEndPos])) {
-		// 				locationEndPos++;
-		// 			}
-
-		// 			if (locationEndPos <= line.length() && 
-		// 				(line[locationEndPos] == '{' || line[locationEndPos] == '\0')) {
-		// 				insideLocationBlock = true;
-		// 			}
-		// 		}
-
-		// 		if (insideLocationBlock) {
-		// 			locationBlock += line + std::string("\n");
-		// 			for (std::string::iterator it = line.begin(); 
-		// 				it != line.end(); ++it) {
-		// 				char chr = *it;
-		// 				if (chr == '{') {
-		// 					locationBraceCount
-
+		else if (tokens[0] == "location") { 
+			if (tokens[1] == "[") {
+				_parseLocationStream(serverStream, server);
+			} else { throw std::runtime_error(ERROR_INVALID_LOCATION); }
+		} else { throw std::runtime_error(ERROR_INVALID_KEY); }
 	}
 	_servers.push_back(server);
 	ConfigUtils::printServerStruct(getServers()[0]);
