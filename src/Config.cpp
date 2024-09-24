@@ -30,7 +30,6 @@ ServerConfigs::ServerConfigs( void ) {
 	limitBodySize = DEFAULT_LIMIT_BODY_SIZE;
 	errorPages["403"] = DEFAULT_ERROR_403;
 	errorPages["404"] = DEFAULT_ERROR_404;
-	locations.push_back(LocationConfigs());
 }
 
 /* Constructor Method */
@@ -106,10 +105,10 @@ void Config::_parseConfigFile( std::ifstream &configFile ) {
 					serverBlock.find("{") == std::string::npos) {
 					continue;
 				}
+				braceCount = 0;
 				insideServerBlock = false;
 				_parseServerBlock(serverBlock);
 				serverBlock.clear();
-				braceCount = 0;
 			}
 		}
 	}
@@ -121,10 +120,10 @@ void Config::_parseConfigFile( std::ifstream &configFile ) {
 void	Config::_parseServerBlock( const std::string &serverBlock ) {
 	std::string	trimmedBlock = ConfigUtils::trimServerBlock(serverBlock);
 	std::istringstream serverStream(trimmedBlock);
+	std::set<std::string> serverKeys;
 	ServerConfigs server;
 	std::string line;
 
-	ConfigUtils::validateLocationBrackets(trimmedBlock);
 	while (std::getline(serverStream, line)) {
 		if ((line[line.size() - 1] != '[' && line[line.size() - 1] != ']') &&
 			(line.empty() || line[line.size() - 1] != ';')) {
@@ -141,9 +140,12 @@ void	Config::_parseServerBlock( const std::string &serverBlock ) {
 			tokens.push_back(token);
 		}
 
-		if (tokens.empty()) {
-			continue;
-		}
+		if (tokens.empty()) { continue; }
+
+		if (tokens[0] != "error_page" && tokens[0] != "location" &&
+			serverKeys.find(tokens[0]) != serverKeys.end()) {
+			throw std::runtime_error(ERROR_DUPLICATE_SERVER_KEY);
+		} else { serverKeys.insert(tokens[0]); }
 
 		if (tokens[0] == "host") { _extractHost(tokens, server); }
 		else if (tokens[0] == "listen") { _extractPort(tokens, server); }
@@ -151,13 +153,13 @@ void	Config::_parseServerBlock( const std::string &serverBlock ) {
 		else if (tokens[0] == "limit_body_size") { _extractLimitBodySize(tokens, server); }
 		else if (tokens[0] == "error_page") { _extractErrorPages(tokens, server); }
 		else if (tokens[0] == "location") {
-			if (tokens[1].empty() || tokens.size() < 2 || tokens[1] != "[") { 
+			if (tokens[1].empty() || tokens.size() != 2 || tokens[1] != "[") { 
 				throw std::runtime_error(ERROR_INVALID_LOCATION);
 			} else { _parseLocationStream(serverStream, server); }
 		} else { throw std::runtime_error(ERROR_INVALID_KEY); }
 	}
 	_servers.push_back(server);
-	ConfigUtils::printServerStruct(getServers()[0]);
+	ConfigUtils::printServerStruct(server);
 }
 
 void	Config::_parseLocationStream( std::istringstream &serverStream, ServerConfigs &server ) {
@@ -166,7 +168,6 @@ void	Config::_parseLocationStream( std::istringstream &serverStream, ServerConfi
 	LocationConfigs location;
 	int locationBracketsCount = 1;
 	bool insideLocationBlock = true;
-	static int locationCount = 0;
 
 	while (std::getline(serverStream, line)) {
 		if (insideLocationBlock) {
@@ -186,14 +187,11 @@ void	Config::_parseLocationStream( std::istringstream &serverStream, ServerConfi
 			}
 
 			if (locationBracketsCount == 0) {
-				(void)server;
-				if (locationCount == 0) { server.locations.pop_back(); }
+				locationBracketsCount = 0;
 				insideLocationBlock = false;
 				_parseLocationBlock(locationBlock, location);
-				// server.locations.push_back(location);
+				server.locations.push_back(location);
 				locationBlock.clear();
-				locationBracketsCount = 0;
-				locationCount++;
 				return ;
 			}
 		}
@@ -205,5 +203,35 @@ void	Config::_parseLocationStream( std::istringstream &serverStream, ServerConfi
 
 void	Config::_parseLocationBlock( const std::string &locationBlock, LocationConfigs &location ) {
 	_logger.logDebug(LOG_DEBUG, "Complete Location block: \n" + locationBlock, true);
-	(void)location;
+
+	std::istringstream locationStream(locationBlock);
+	std::set<std::string> locationKeys;
+	std::string line;
+
+	while (std::getline(locationStream, line)) {
+		if (line.empty() || line[line.size() - 1] != ';') {
+			throw std::runtime_error(ERROR_INVALID_LINE);
+		}
+		std::istringstream tokenStream(line);
+		std::string token;
+		std::vector<std::string> tokens;
+
+		while (tokenStream >> token) {
+			if (!token.empty() && token[token.size() - 1] == ';') {
+				token = token.substr(0, token.size() - 1);
+			}
+			tokens.push_back(token);
+		}
+
+		if (tokens.empty()) { continue; }
+
+		if (locationKeys.find(tokens[0]) != locationKeys.end()) {
+			throw std::runtime_error(ERROR_DUPLICATE_LOCATION_KEY);
+		} else { locationKeys.insert(tokens[0]); }
+
+		_logger.logDebug(LOG_DEBUG, "tokens[0]: " + tokens[0], true);
+		_logger.logDebug(LOG_DEBUG, "tokens[1]: " + tokens[1], true);
+		location.index = "index.coisas";
+	}
+
 }
