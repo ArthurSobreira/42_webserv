@@ -3,8 +3,7 @@
 #include "Config.hpp"
 
 /* Extract Server Methods */
-void	Config::_extractHost( std::vector<std::string> &tokens, 
-	ServerConfigs &server ) {
+void	Config::_extractHost( std::vector<std::string> &tokens, ServerConfigs &server ) {
 	if (tokens.size() < 2 || tokens[1].empty()) {
 		throw std::runtime_error(ERROR_MISSING_VALUE);
 	}
@@ -15,8 +14,7 @@ void	Config::_extractHost( std::vector<std::string> &tokens,
 	server.host = tokens[1];
 }
 
-void	Config::_extractPort( std::vector<std::string> &tokens, 
-	ServerConfigs &server ) {
+void	Config::_extractPort( std::vector<std::string> &tokens, ServerConfigs &server ) {
 	if (tokens.size() < 2 || tokens[1].empty()) {
 		throw std::runtime_error(ERROR_MISSING_VALUE);
 	}
@@ -33,16 +31,14 @@ void	Config::_extractPort( std::vector<std::string> &tokens,
 	}
 }
 
-void	Config::_extractServerName( std::vector<std::string> &tokens, 
-	ServerConfigs &server ) {
+void	Config::_extractServerName( std::vector<std::string> &tokens, ServerConfigs &server ) {
 	if (tokens.size() < 2 || tokens[1].empty()) {
 		throw std::runtime_error(ERROR_MISSING_VALUE);
 	}
 	server.serverName = tokens[1];
 }
 
-void	Config::_extractLimitBodySize( std::vector<std::string> &tokens, 
-	ServerConfigs &server ) {
+void	Config::_extractLimitBodySize( std::vector<std::string> &tokens, ServerConfigs &server ) {
 	if (tokens.size() < 2 || tokens[1].empty()) {
 		throw std::runtime_error(ERROR_MISSING_VALUE);
 	}
@@ -58,8 +54,7 @@ void	Config::_extractLimitBodySize( std::vector<std::string> &tokens,
 	}
 }
 
-void	Config::_extractErrorPages( std::vector<std::string> &tokens,
-	ServerConfigs &server ) {
+void	Config::_extractErrorPages( std::vector<std::string> &tokens, ServerConfigs &server ) {
 	if (tokens.size() < 3 || tokens[1].empty() || tokens[2].empty()) {
 		throw std::runtime_error(ERROR_MISSING_VALUE);
 	}
