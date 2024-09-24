@@ -147,8 +147,8 @@ void	Config::_parseServerBlock( const std::string &serverBlock ) {
 			throw std::runtime_error(ERROR_DUPLICATE_SERVER_KEY);
 		} else { serverKeys.insert(tokens[0]); }
 
-		if (tokens[0] == "host") { _extractHost(tokens, server); }
-		else if (tokens[0] == "listen") { _extractPort(tokens, server); }
+		if (tokens[0] == "listen") { _extractPort(tokens, server); }
+		else if (tokens[0] == "host") { _extractHost(tokens, server); }
 		else if (tokens[0] == "server_name") { _extractServerName(tokens, server); }
 		else if (tokens[0] == "limit_body_size") { _extractLimitBodySize(tokens, server); }
 		else if (tokens[0] == "error_page") { _extractErrorPages(tokens, server); }
