@@ -13,7 +13,7 @@ namespace ServerExtraction {
 		long long portValue;
 		if (stringPort >> portValue) {
 			if (portValue > std::numeric_limits<unsigned short>::max() || 
-				portValue < 1024) {
+				portValue < 0) {
 				throw std::runtime_error(ERROR_INVALID_PORT);
 			}
 			server.port = static_cast<unsigned short>(portValue);
