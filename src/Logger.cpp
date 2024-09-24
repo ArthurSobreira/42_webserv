@@ -13,9 +13,6 @@ Logger::Logger( const std::string &debugLog, const std::string &logAccess,
 	if (!_debugLog.is_open() || !_logAccess.is_open() || !_logError.is_open())
 		ft_error(ERROR_OPEN_LOG_FILE, __FUNCTION__, __FILE__, __LINE__, 
 			std::runtime_error(ERROR_OPEN_LOG_FILE));
-	this->logDebug(LOG_INFO, "Starting debug log...", true);
-	this->logAccess(LOG_INFO, "Starting access log...", true);
-	this->logError(LOG_INFO, "Starting error log...", true);
 }
 
 /* Destructor Method */
