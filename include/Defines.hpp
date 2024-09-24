@@ -52,12 +52,14 @@
 # define ERROR_EMPTY_CONFIG_FILE "Config File Is Empty!"
 # define ERROR_INVALID_SERVER "Invalid Server Block!"
 # define ERROR_INVALID_LOCATION "Invalid Location Block!"
-# define ERROR_INVALID_LINE "Line must end with a semicolon ';' !"
-# define ERROR_MISSING_VALUE "Missing value in configuration file!"
+# define ERROR_INVALID_LINE "Line Must End With a Semicolon ';' !"
 # define ERROR_INVALID_HOST "Server: Invalid Host Address!"
 # define ERROR_INVALID_PORT "Server: Invalid Port Number!"
 # define ERROR_INVALID_LIMIT_BODY_SIZE "Server: Invalid Limit Body Size!"
 # define ERROR_INVALID_ERROR_PAGE "Server: Invalid Error Page!"
 # define ERROR_INVALID_KEY "Server: Invalid Key in Configuration File!"
+# define ERROR_MISSING_VALUE "Missing Value In Configuration File!"
+# define ERROR_DUPLICATE_SERVER_KEY "Duplicate Server Key In Configuration File!"
+# define ERROR_DUPLICATE_LOCATION_KEY "Duplicate Location Key In Configuration File!"
 
 #endif
