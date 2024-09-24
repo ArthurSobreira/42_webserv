@@ -7,7 +7,7 @@
 #include "Utils.hpp"
 
 int epoll_fd;
-
+void addToEpoll(int sockfd);
 // std::string getHttpError(int status_code)
 // {
 // 	switch (status_code)
@@ -56,11 +56,13 @@ int epoll_fd;
 // 	return header.str();
 // }
 
-Request clientServerAccept(int sockfd, Logger &logger){
+Request clientServerAccept(int sockfd, Logger &logger)
+{
 	sockaddrIn cli_addr;
 	socklen_t clilen = sizeof(cli_addr);
 	Request request;
-	int newsockfd = accept(sockfd, (sockAddr*)&cli_addr, &clilen);
+	int newsockfd = accept(sockfd, (sockAddr *)&cli_addr, &clilen);
+	addToEpoll(newsockfd);
 	if (newsockfd < 0)
 	{
 		logger.logError(LOG_ERROR, "Error on accept");
@@ -77,17 +79,19 @@ Request clientServerAccept(int sockfd, Logger &logger){
 	}
 
 	std::string str(buffer);
-	if(!request.parseRequest(str)){
-		request.requestIsValid = false;
+	if (!request.parseRequest(str))
+	{
+		request.setRequestIsValid(false);
 		logger.logError(LOG_ERROR, "Error parsing request");
 	}
-	log << "Request received: " << request.method << " " << request.uri << " " << request.http_version;
+	log << "Request received: " << request.getMethod() << " " << request.getUri() << " " << request.getHttpVersion();
 	logger.logDebug(LOG_DEBUG, log.str());
-	request.client_socket = newsockfd;
-	access_log << inetNtop(cli_addr.sin_addr.s_addr) << " - -  \"" << request.method << " " << request.uri << " " << request.http_version << "\" ";
+	request.setClientSocket(newsockfd);
+	access_log << inetNtop(cli_addr.sin_addr.s_addr) << " - -  \"" << request.getMethod() << " " << request.getUri() << " " << request.getHttpVersion() << "\" ";
 	logger.logAccess(LOG_INFO, access_log.str());
-	request.requestIsValid = true;
-	return request;	
+	logger.logDebug(LOG_DEBUG, request.getMethod(), true);
+	request.setRequestIsValid(true);
+	return request;
 }
 
 // std::string requestHandler(t_request &request, Logger &logger)
@@ -140,7 +144,7 @@ Request clientServerAccept(int sockfd, Logger &logger){
 // 	close(sockfd);
 // }
 
-void createServer(int &sockfd, const int &port, const uint32_t &ip, int &backlog, Logger &logger)
+void createServer(int &sockfd, const unsigned short &port, const uint32_t &ip, int &backlog, Logger &logger)
 {
 	sockaddrIn serv_addr;
 	std::ostringstream log;
@@ -159,29 +163,10 @@ void createServer(int &sockfd, const int &port, const uint32_t &ip, int &backlog
 		close(sockfd);
 		ft_error("Error listening on socket", __FUNCTION__, __FILE__, __LINE__, std::runtime_error("Error listening on socket"));
 	}
-	log<<"Server created on "<<inetNtop(ip)<<":"<<port;
+	log << "Server created on " << inetNtop(ip) << ":" << port;
 	logger.logDebug(LOG_DEBUG, log.str(), true);
 }
 
-void populateServersAndPorts(std::string config_file_path, std::vector<uint32_t> &servers, std::vector<int> &ports, Logger &logger)
-{
-	(void) config_file_path;
-	std::string server1 = "127.0.0.1";
-	std::string server2 = "192.168.18.4";
-	uint32_t ip1;
-	uint32_t ip2;
-	
-	int porta1 = 13000;
-	int porta2 = 13001;
-	if (!inetPton(server1, ip1, logger))
-		ft_error("Error converting IP to binary format", __FUNCTION__, __FILE__, __LINE__, std::runtime_error("Error converting IP to binary format"));
-	if (!inetPton(server2, ip2, logger))
-		ft_error("Error converting IP to binary format", __FUNCTION__, __FILE__, __LINE__, std::runtime_error("Error converting IP to binary format"));
-	servers.push_back(ip1);
-	servers.push_back(ip2);
-	ports.push_back(porta1);
-	ports.push_back(porta2);
-}
 
 void initializeEpoll()
 {
@@ -202,23 +187,22 @@ void addToEpoll(int sockfd)
 	}
 }
 
-void initializeServers(const std::vector<uint32_t>& servers, const std::vector<int>& ports, std::vector<int> &fds, Logger& logger)
+void initializeServers(const std::vector<ServerConfigs> &servers, std::vector<int> &fds, Logger &logger)
 {
 	for (size_t i = 0; i < servers.size(); ++i)
 	{
 		int sockfd = -1;
 		int backlog = SOMAXCONN;
-		const uint32_t ip = servers[i];
-		createServer(sockfd, ports[i], ip, backlog, logger);
+		const uint32_t ip = INADDR_ANY;
+		createServer(sockfd, servers[i].port, ip, backlog, logger);
 		fds.push_back(sockfd);
 		addToEpoll(sockfd);
 	}
 }
 
-
-void startEventLoop(Logger& logger)
+void startEventLoop(Logger &logger)
 {
-	struct epoll_event events[MAX_EVENTS];
+	epollEvent events[MAX_EVENTS];
 	Request request;
 	Response response;
 
@@ -246,12 +230,13 @@ void startEventLoop(Logger& logger)
 	}
 }
 
-void cleanup(std::vector<int>& fds)
+void cleanup(std::vector<int> &fds)
 {
 	for (size_t i = 0; i < fds.size(); ++i)
 		close(fds[i]);
 	close(epoll_fd);
 }
+
 
 void signals(int sig)
 {
@@ -270,27 +255,22 @@ int main(int argc, char **argv)
 	}
 	signal(SIGINT, signals);
 	signal(SIGQUIT, signals);
-
 	const std::string config_file_path = argv[1];
-	std::vector<uint32_t> servers;
-	std::vector<int> ports;
 	std::vector<int> fds;
 	Logger logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE);
-
 	try
 	{
 		Config config(config_file_path, logger);
 
 		initializeEpoll();
-		populateServersAndPorts(config_file_path, servers, ports, logger);
-		initializeServers(servers, ports,fds, logger);
-		
+		initializeServers(config.getServers(), fds, logger);
 		startEventLoop(logger);
 		cleanup(fds);
 	}
 	catch (const std::exception &e)
 	{
 		logger.logError(LOG_ERROR, e.what(), true);
+		cleanup(fds);
 		return EXIT_FAILURE;
 	}
 
