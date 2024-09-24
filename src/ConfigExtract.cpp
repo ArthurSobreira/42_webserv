@@ -49,7 +49,7 @@ namespace ServerExtraction {
 		size_t	limitBodySizeMB;
 		if (stringSize >> limitBodySizeMB) {
 			server.limitBodySize = limitBodySizeMB * 1024 * 1024;
-			if (limitBodySizeMB < 0) {
+			if (tokens[1][0] == '-') {
 				throw std::runtime_error(ERROR_INVALID_LIMIT_BODY_SIZE);
 			}
 		} else {
