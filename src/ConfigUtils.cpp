@@ -120,4 +120,38 @@ namespace ConfigUtils {
 			std::cout << std::endl;
 		}
 	}
+
+	bool hostIsValid(std::vector<ServerConfigs> &servers) {
+		std::vector<int> bytes;
+		for (size_t i = 0; i < servers.size(); ++i)
+		{
+			if (!inetPton(servers[i].host))
+				return false;
+			std::istringstream stream(servers[i].host);
+			std::string segment;
+			int fd = -1;
+			uint32_t ip;
+			while (std::getline(stream, segment, '.'))
+			{
+				int byte;
+				std::istringstream str(segment);
+				str >> byte;
+				bytes.push_back(byte);
+			}
+			ip = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+
+			createSocket(fd, AF_INET, SOCK_STREAM);
+			sockaddrIn serv_addr;
+			serv_addr.sin_family = AF_INET;
+			serv_addr.sin_addr.s_addr = ip;
+			serv_addr.sin_port = htons(servers[i].port);
+			if (bind(fd, (sockAddr *)&serv_addr, sizeof(serv_addr)) < 0)
+			{
+				close(fd);
+				return false;
+			}
+			close(fd);
+		}
+		return true;
+	}
 }

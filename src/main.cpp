@@ -148,7 +148,7 @@ void createServer(int &sockfd, const unsigned short &port, const uint32_t &ip, i
 {
 	sockaddrIn serv_addr;
 	std::ostringstream log;
-	if (!createSocket(sockfd, AF_INET, SOCK_STREAM, logger))
+	if (!createSocket(sockfd, AF_INET, SOCK_STREAM))
 		ft_error("Error creating socket", __FUNCTION__, __FILE__, __LINE__, std::runtime_error("Error creating socket"));
 	int opt = 1;
 	if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
@@ -166,7 +166,6 @@ void createServer(int &sockfd, const unsigned short &port, const uint32_t &ip, i
 	log << "Server created on " << inetNtop(ip) << ":" << port;
 	logger.logDebug(LOG_DEBUG, log.str(), true);
 }
-
 
 void initializeEpoll()
 {
@@ -236,7 +235,6 @@ void cleanup(std::vector<int> &fds)
 		close(fds[i]);
 	close(epoll_fd);
 }
-
 
 void signals(int sig)
 {

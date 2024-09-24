@@ -4,8 +4,9 @@
 #include "Logger.hpp"
 #include "Utils.hpp"
 
-bool createSocket(int &sockfd, int domain, int protocol, Logger &logger)
+bool createSocket(int &sockfd, int domain, int protocol)
 {
+	Logger logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE);
 	sockfd = socket(domain, protocol, 0);
 	if (sockfd < 0)
 	{

@@ -80,6 +80,7 @@ namespace ConfigUtils {
 	std::string	trimServerBlock( const std::string &serverBlock );
 	std::string	shortToString( const short &value );
 	void	printServerStruct( const ServerConfigs &server );
+	bool	hostIsValid(std::vector<ServerConfigs> &servers);
 }
 
 /* Server Extraction Functions */
