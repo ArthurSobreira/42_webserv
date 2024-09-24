@@ -56,11 +56,9 @@ std::string Response::getBody() const {
 	return body;
 }
 
-
-
 void Response::responseTratament(Request &request, Logger &logger){
 	std::ostringstream log;
-	if(!request.requestIsValid){
+	if(!request.getIsRequestValid()){
 		logger.logError("ERROR", "Error parsing request");
 		std::string bodyr = readFile("static/405.html");
 		this->setStatus(405, "Method Not Allowed");
@@ -68,7 +66,7 @@ void Response::responseTratament(Request &request, Logger &logger){
 		this->setBody(bodyr);
 		return ;
 	}
-	std::string path = "static" + request.uri;
+	std::string path = "static" + request.getUri();
 	if (path[path.size() - 1] == '/')
 		path += "index.html";
 	std::string bodyr;
@@ -82,7 +80,7 @@ void Response::responseTratament(Request &request, Logger &logger){
 		this->setHeader("Content-Type", getContentType("static/404.html"));
 		return ;
 	}
-	if(S_ISDIR(status.st_mode) && request.allow_directory_listing)
+	if(S_ISDIR(status.st_mode) && request.getIsAllowDirectoryListing())
 	{
 		bodyr = listDirectory(path);
 		this->setStatus(200, "OK");
