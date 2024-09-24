@@ -82,7 +82,7 @@ namespace ConfigUtils {
 	short	getServerCount( const std::string &fileName );
 	void	validateLocationBrackets( const std::string &serverBlock );
 	std::string	trimServerBlock( const std::string &serverBlock );
-	std::string shortToString( const short &value );
+	std::string	shortToString( const short &value );
 	void	printServerStruct( const ServerConfigs &server );
 }
 
