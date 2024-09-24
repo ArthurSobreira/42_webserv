@@ -131,7 +131,7 @@ void	Config::_parseServerBlock( const std::string &serverBlock ) {
 		}
 		std::istringstream tokenStream(line);
 		std::string token;
-		std::vector<std::string> tokens;
+		stringVector tokens;
 
 		while (tokenStream >> token) {
 			if (!token.empty() && token[token.size() - 1] == ';') {
@@ -147,11 +147,11 @@ void	Config::_parseServerBlock( const std::string &serverBlock ) {
 			throw std::runtime_error(ERROR_DUPLICATE_SERVER_KEY);
 		} else { serverKeys.insert(tokens[0]); }
 
-		if (tokens[0] == "listen") { _extractPort(tokens, server); }
-		else if (tokens[0] == "host") { _extractHost(tokens, server); }
-		else if (tokens[0] == "server_name") { _extractServerName(tokens, server); }
-		else if (tokens[0] == "limit_body_size") { _extractLimitBodySize(tokens, server); }
-		else if (tokens[0] == "error_page") { _extractErrorPages(tokens, server); }
+		if (tokens[0] == "listen") { ServerExtraction::port(tokens, server); }
+		else if (tokens[0] == "host") { ServerExtraction::host(tokens, server); }
+		else if (tokens[0] == "server_name") { ServerExtraction::serverName(tokens, server); }
+		else if (tokens[0] == "limit_body_size") { ServerExtraction::limitBodySize(tokens, server); }
+		else if (tokens[0] == "error_page") { ServerExtraction::errorPages(tokens, server); }
 		else if (tokens[0] == "location") {
 			if (tokens[1].empty() || tokens.size() != 2 || tokens[1] != "[") { 
 				throw std::runtime_error(ERROR_INVALID_LOCATION);
@@ -214,7 +214,7 @@ void	Config::_parseLocationBlock( const std::string &locationBlock, LocationConf
 		}
 		std::istringstream tokenStream(line);
 		std::string token;
-		std::vector<std::string> tokens;
+		stringVector tokens;
 
 		while (tokenStream >> token) {
 			if (!token.empty() && token[token.size() - 1] == ';') {
