@@ -69,7 +69,6 @@ void Config::_parseConfigFile( std::ifstream &configFile ) {
 	std::string line;
 	std::string serverBlock;
 	int braceCount = 0;
-	int	serverIndex = 0;
 	bool insideServerBlock = false;
 
 	while (std::getline(configFile, line)) {
@@ -109,9 +108,8 @@ void Config::_parseConfigFile( std::ifstream &configFile ) {
 					continue;
 				}
 				insideServerBlock = false;
-				_parseServerBlock(serverBlock, serverIndex);
+				_parseServerBlock(serverBlock);
 				serverBlock.clear();
-				serverIndex++;
 				braceCount = 0;
 			}
 		}
@@ -196,14 +194,12 @@ void	Config::_extractErrorPages( std::vector<std::string> &tokens,
 	server.errorPages[errorCode] = fileName;
 }
 
-void	Config::_parseServerBlock( const std::string &serverBlock, int serverIndex ) {
+void	Config::_parseServerBlock( const std::string &serverBlock ) {
 	std::string	trimmedBlock = ConfigUtils::trimServerBlock(serverBlock);
 	std::istringstream serverStream(trimmedBlock);
 	ServerConfigs server;
 	std::string line;
 
-	_logger.logDebug(LOG_DEBUG, "Server index: " 
-			+ ConfigUtils::shortToString(serverIndex), true);
 	_logger.logDebug(LOG_DEBUG, "Trimmed block: \n" + trimmedBlock, true);
 
 	ConfigUtils::validateLocationBrackets(trimmedBlock);
@@ -272,5 +268,5 @@ void	Config::_parseServerBlock( const std::string &serverBlock, int serverIndex 
 
 	}
 	_servers.push_back(server);
-	ConfigUtils::printServerStruct(getServers()[serverIndex]);
+	ConfigUtils::printServerStruct(getServers()[0]);
 }
