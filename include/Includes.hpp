@@ -7,11 +7,13 @@
 #include <sstream>	 // Stream de strings
 #include <fstream>	 // Manipulação de arquivos
 #include <map>		 // Containers de mapa associativo
+#include <set>		 // Containers de conjunto
 #include <vector>	 // Containers de vetor
 #include <stdexcept> // Manipulação de exceções
 #include <algorithm> // Funções de algoritmo padrão
 #include <ctime>	 // Manipulação de tempo
-#include <cassert>  // Macros de asserção
+#include <cassert>   // Macros de asserção
+#include <limits>	 // Limites numéricos
 
 // C headers
 #include <cstring> // Manipulação de strings em C (ex: strlen, strcpy)
@@ -48,15 +50,5 @@
 
 // Process control functions (waitpid, kill)
 #include <sys/wait.h> // waitpid
-
-// // Custom project headers (headers próprios do projeto)
-// #include "Config.hpp"	// Classe para leitura e armazenamento de configurações
-// #include "Defines.hpp"	// Definições de constantes e macros
-// #include "HttpError.hpp"   // Classe para tratamento de erros HTTP
-// #include "Logger.hpp" 	// Classe para gerenciamento de logs
-// #include "Request.hpp"	   // Declarações para o tratamento de requisições
-// #include "Response.hpp"	   // Declarações para o tratamento de respostas
-// #include "Server.hpp"	   // Declarações da classe do servidor
-// #include "Utils.hpp"	   // Funções utilitárias e macros
 
 #endif

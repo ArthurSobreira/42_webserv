@@ -54,6 +54,14 @@ class Config {
 		short _serverCount;
 		Logger &_logger;
 
+		/* Private Methods */
+		void _parseConfigFile( std::ifstream &configFile );
+		void _parseServerBlock( const std::string &serverBlock );
+		void _parseLocationStream( std::istringstream &serverStream, 
+			ServerConfigs &server );
+		void _parseLocationBlock( const std::string &locationBlock, 
+			LocationConfigs &location );
+
 	public:
 		/* Constructor Method */
 		Config( const std::string &fileName,
@@ -64,9 +72,35 @@ class Config {
 
 		/* Public Methods */
 		std::vector<ServerConfigs> getServers( void ) const;
-		void _parseConfigFile( std::ifstream &configFile );
-		void _parseServerBlock( const std::string &serverBlock, 
-			int serverIndex );
 };
+
+/* Config Utils Functions */
+namespace ConfigUtils {
+	short	getServerCount( const std::string &fileName );
+	std::string	trimServerBlock( const std::string &serverBlock );
+	std::string	shortToString( const short &value );
+	void	printServerStruct( const ServerConfigs &server );
+}
+
+/* Server Extraction Functions */
+namespace ServerExtraction {
+	void	port( stringVector &tokens, ServerConfigs &server );
+	void	host( stringVector &tokens, ServerConfigs &server );
+	void	serverName( stringVector &tokens, ServerConfigs &server );
+	void	limitBodySize( stringVector &tokens, ServerConfigs &server );
+	void	errorPages( stringVector &tokens, ServerConfigs &server );
+}
+
+/* Location Extraction Functions */
+namespace LocationExtraction {
+	void	methods( stringVector &tokens, LocationConfigs &location );
+	void	locationPath( stringVector &tokens, LocationConfigs &location );
+	void	root( stringVector &tokens, LocationConfigs &location );
+	void	index( stringVector &tokens, LocationConfigs &location );
+	void	redirect( stringVector &tokens, LocationConfigs &location );
+	void	uploadPath( stringVector &tokens, LocationConfigs &location );
+	void	autoindex( stringVector &tokens, LocationConfigs &location );
+	void	uploadEnabled( stringVector &tokens, LocationConfigs &location );
+}
 
 #endif

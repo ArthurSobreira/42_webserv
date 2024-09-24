@@ -6,6 +6,7 @@
 class Logger;
 
 typedef std::map<std::string, std::string> errorMap;
+typedef std::vector<std::string> stringVector;
 typedef struct sockaddr_in sockaddrIn;
 typedef struct epoll_event epollEvent;
 typedef struct sockaddr sockAddr;

@@ -3,6 +3,7 @@
 #include "Utils.hpp"
 #include "Logger.hpp"
 
+/* Constructor Method */
 Logger::Logger( const std::string &debugLog, const std::string &logAccess, 
 	const std::string &logError )
 	: _debugLog(debugLog.c_str(), std::ios::out | std::ios::app), 
@@ -17,6 +18,7 @@ Logger::Logger( const std::string &debugLog, const std::string &logAccess,
 	this->logError(LOG_INFO, "Starting error log...", true);
 }
 
+/* Destructor Method */
 Logger::~Logger( void ) {
 	if (_debugLog.is_open())
 		_debugLog.close();
@@ -26,6 +28,7 @@ Logger::~Logger( void ) {
 		_logError.close();
 }
 
+/* Public Methods */
 void Logger::logDebug( const std::string &severity,
 			const std::string &message, bool tty ) {
 	if (_debugLog.is_open())
@@ -57,6 +60,7 @@ void Logger::logError( const std::string &severity,
 				<< severity << message << std::endl;
 }
 
+/* Private Methods */
 std::string Logger::_currentDateTime( void ) const {
 	time_t now = time(0);
 	struct tm tstruct;

@@ -43,17 +43,23 @@
 # define DEFAULT_HOST "127.0.0.1"
 # define DEFAULT_SERVER_NAME "localhost"
 # define DEFAULT_LIMIT_BODY_SIZE 1048576
-# define DEFAULT_ERROR_403 "static/403.html"
-# define DEFAULT_ERROR_404 "static/404.html"
+# define DEFAULT_ERROR_403 "./static/403.html"
+# define DEFAULT_ERROR_404 "./static/404.html"
 
 /* Error Macros */
 # define ERROR_OPEN_LOG_FILE "Could Not Open Log File!"
 # define ERROR_OPEN_CONFIG_FILE "Could Not Opening Config File!"
-# define ERROR_NOT_CONFIG_FILE "Config File Not Passed!"
 # define ERROR_EMPTY_CONFIG_FILE "Config File Is Empty!"
 # define ERROR_INVALID_SERVER "Invalid Server Block!"
-# define ERROR_EXTRA_CLOSE_BRACE "Extra closing brace '}' detected!"
-# define ERROR_UNCLOSED_BLOCK "Unclosed server block detected!"
 # define ERROR_INVALID_LOCATION "Invalid Location Block!"
+# define ERROR_INVALID_LINE "Line Must End With a Semicolon ';' !"
+# define ERROR_INVALID_HOST "Server: Invalid Host Address!"
+# define ERROR_INVALID_PORT "Server: Invalid Port Number!"
+# define ERROR_INVALID_LIMIT_BODY_SIZE "Server: Invalid Limit Body Size!"
+# define ERROR_INVALID_ERROR_PAGE "Server: Invalid Error Page!"
+# define ERROR_INVALID_KEY "Server: Invalid Key in Configuration File!"
+# define ERROR_MISSING_VALUE "Missing Value In Configuration File!"
+# define ERROR_DUPLICATE_SERVER_KEY "Duplicate Server Key In Configuration File!"
+# define ERROR_DUPLICATE_LOCATION_KEY "Duplicate Location Key In Configuration File!"
 
 #endif
