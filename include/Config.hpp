@@ -54,19 +54,11 @@ class Config {
 		short _serverCount;
 		Logger &_logger;
 
-	public:
-		/* Constructor Method */
-		Config( const std::string &fileName,
-			Logger &logger );
-
-		/* Destructor Method */
-		~Config( void );
-
-		/* Public Methods */
-		std::vector<ServerConfigs> getServers( void ) const;
+		/* Private Methods */
 		void _parseConfigFile( std::ifstream &configFile );
-		void _parseServerBlock( const std::string &serverBlock, 
-			int serverIndex );
+		void _parseServerBlock( const std::string &serverBlock );
+
+		/* Extract Methods */
 		void _extractHost( std::vector<std::string> &tokens, 
 			ServerConfigs &server );
 		void _extractPort( std::vector<std::string> &tokens, 
@@ -77,6 +69,17 @@ class Config {
 			ServerConfigs &server );
 		void _extractErrorPages( std::vector<std::string> &tokens,
 			ServerConfigs &server );
+
+	public:
+		/* Constructor Method */
+		Config( const std::string &fileName,
+			Logger &logger );
+
+		/* Destructor Method */
+		~Config( void );
+
+		/* Public Methods */
+		std::vector<ServerConfigs> getServers( void ) const;
 };
 
 namespace ConfigUtils {
