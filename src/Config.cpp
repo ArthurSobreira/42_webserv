@@ -233,5 +233,4 @@ void	Config::_parseLocationBlock( const std::string &locationBlock, LocationConf
 		_logger.logDebug(LOG_DEBUG, "tokens[1]: " + tokens[1], true);
 		location.index = "index.coisas";
 	}
-
 }
