@@ -14,7 +14,7 @@ Logger::Logger( const std::string &debugLog, const std::string &logAccess,
 		ft_error(ERROR_OPEN_LOG_FILE, __FUNCTION__, __FILE__, __LINE__, 
 			std::runtime_error(ERROR_OPEN_LOG_FILE));
 
-	static int start = 0;
+	static short start = 0;
 
 	if (start++ == 0) {
 		this->logDebug(LOG_INFO, "Starting debug log...", true);
