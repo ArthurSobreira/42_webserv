@@ -47,7 +47,7 @@
 # define DEFAULT_ERROR_403 "./static/403.html"
 # define DEFAULT_ERROR_404 "./static/404.html"
 
-/* File Error */
+/* File Error Macros */
 # define ERROR_OPEN_LOG_FILE "Could Not Open Log File!"
 # define ERROR_OPEN_CONFIG_FILE "Could Not Opening Config File!"
 # define ERROR_EMPTY_CONFIG_FILE "Config File Is Empty!"
