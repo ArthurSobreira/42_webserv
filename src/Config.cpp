@@ -226,7 +226,7 @@ void	Config::_parseLocationBlock( const std::string &locationBlock, LocationConf
 		} else { locationKeys.insert(tokens[0]); }
 
 		if (tokens[0] == "methods") { LocationExtraction::methods(tokens, location); }
-		// else if (tokens[0] == "location_path") { LocationExtraction::locationPath(tokens, location); }
+		else if (tokens[0] == "location_path") { LocationExtraction::locationPath(tokens, location); }
 		// else if (tokens[0] == "root") { LocationExtraction::root(tokens, location); }
 		// else if (tokens[0] == "index") { LocationExtraction::index(tokens, location); }
 		// else if (tokens[0] == "redirect") { LocationExtraction::redirect(tokens, location); }
