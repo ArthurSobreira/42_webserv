@@ -13,7 +13,7 @@ namespace ServerExtraction {
 		long long portValue;
 		if (stringPort >> portValue) {
 			if (portValue > std::numeric_limits<unsigned short>::max() || 
-				portValue < 0) {
+				portValue < 1024) {
 				throw std::runtime_error(ERROR_INVALID_PORT);
 			}
 			server.port = static_cast<unsigned short>(portValue);
@@ -26,11 +26,10 @@ namespace ServerExtraction {
 		if (tokens.size() < 2 || tokens[1].empty()) {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
 		}
-		Logger _logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE);
-		if (!inetPton(tokens[1])) {
+		server.host = tokens[1];
+		if (!ConfigUtils::hostIsValid(server)) {
 			throw std::runtime_error(ERROR_INVALID_HOST);
 		}
-		server.host = tokens[1];
 	}
 
 	void	serverName( stringVector &tokens, ServerConfigs &server ) {
