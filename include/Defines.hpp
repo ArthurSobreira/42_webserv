@@ -8,6 +8,9 @@
 # define MAX_EVENTS 64
 
 /* Colors Macros */
+# define COLORIZE(color, text) \
+	(std::string(color) + text + "\033[0m")
+
 # define RESET "\033[0m"
 # define BLACK "\033[30m"
 # define GRAY "\033[90m"
@@ -18,8 +21,6 @@
 # define MAGENTA "\033[35m"
 # define CYAN "\033[36m"
 # define WHITE "\033[37m"
-# define COLORIZE(color, text) \
-	color << text << RESET
 
 /* Logger Macros */
 # define LOG_DEBUG "[DEBUG] "
