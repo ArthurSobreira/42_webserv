@@ -102,10 +102,12 @@ namespace ConfigUtils {
 		return (true);
 	}
 
-	std::string	shortToString( const short &value ) {
-		std::stringstream ss;
-		ss << value;
-		return (ss.str());
+	bool	isRepeatedMethod( std::vector<httpMethod> &methodsVector, 
+		httpMethod method ) {
+		if (std::find(methodsVector.begin(), methodsVector.end(), method) 
+			!= methodsVector.end()) {
+			return true;
+		} else { return false; }
 	}
 
 	void	printServerStruct( const ServerConfigs &server ) {
