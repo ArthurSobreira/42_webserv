@@ -78,9 +78,10 @@ class Config {
 namespace ConfigUtils {
 	short	getServerCount( const std::string &fileName );
 	std::string	trimServerBlock( const std::string &serverBlock );
-	std::string	shortToString( const short &value );
-	void	printServerStruct( const ServerConfigs &server );
 	bool	hostIsValid( ServerConfigs &server );
+	bool	isRepeatedMethod( std::vector<httpMethod> &methodsVector, 
+		httpMethod method );
+	void	printServerStruct( const ServerConfigs &server );
 }
 
 /* Server Extraction Functions */
