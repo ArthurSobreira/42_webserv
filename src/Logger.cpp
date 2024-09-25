@@ -41,7 +41,7 @@ void Logger::logDebug( const std::string &severity,
 				<< severity << message << std::endl;
 	if (tty && _isTerminal(std::cout))
 		std::cout << COLORIZE(GRAY, _currentDateTime()) << " - " 
-				<< severity << message << std::endl;
+				<< _colSeverity(severity) << message << std::endl;
 }
 
 void Logger::logAccess( const std::string &severity,
@@ -51,7 +51,7 @@ void Logger::logAccess( const std::string &severity,
 				<< severity << message << std::endl;
 	if (tty && _isTerminal(std::cout))
 		std::cout << COLORIZE(GRAY, _currentDateTime()) << " - "
-				<< severity << message << std::endl;
+				<< _colSeverity(severity) << message << std::endl;
 }
 
 void Logger::logError( const std::string &severity,
@@ -62,10 +62,16 @@ void Logger::logError( const std::string &severity,
 				<< severity << message << std::endl;
 	if (tty && _isTerminal(std::cerr))
 		std::cerr << COLORIZE(GRAY, _currentDateTime()) << " - "
-				<< severity << message << std::endl;
+				<< _colSeverity(severity) << message << std::endl;
 }
 
 /* Private Methods */
+bool Logger::_isTerminal( std::ostream &os ) const {
+	if (&os == &std::cout || &os == &std::cerr)
+		return (isatty(fileno(stdout)));
+	return false;
+}
+
 std::string Logger::_currentDateTime( void ) const {
 	time_t now = time(0);
 	struct tm tstruct;
@@ -75,8 +81,10 @@ std::string Logger::_currentDateTime( void ) const {
 	return buf;
 }
 
-bool Logger::_isTerminal( std::ostream &os ) const {
-	if (&os == &std::cout || &os == &std::cerr)
-		return (isatty(fileno(stdout)));
-	return false;
+std::string Logger::_colSeverity( const std::string &severity ) const {
+	if (severity == LOG_DEBUG) { return COLORIZE(CYAN, severity); }
+	else if (severity == LOG_INFO) { return COLORIZE(GREEN, severity); }
+	else if (severity == LOG_WARN) { return COLORIZE(YELLOW, severity); }
+	else if (severity == LOG_ERROR) { return COLORIZE(RED, severity); }
+	return severity;
 }
