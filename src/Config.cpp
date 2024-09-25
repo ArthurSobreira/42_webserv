@@ -142,7 +142,7 @@ void	Config::_parseServerBlock( const std::string &serverBlock ) {
 
 		if (tokens[0] != "error_page" && tokens[0] != "location" &&
 			serverKeys.find(tokens[0]) != serverKeys.end()) {
-			throw std::runtime_error(ERROR_DUPLICATE_SERVER_KEY);
+			throw std::runtime_error(ERROR_DUPLICATE_KEY);
 		} else { serverKeys.insert(tokens[0]); }
 
 		if (tokens[0] == "listen") { ServerExtraction::port(tokens, server); }
@@ -222,14 +222,14 @@ void	Config::_parseLocationBlock( const std::string &locationBlock, LocationConf
 		if (tokens.empty()) { continue; }
 
 		if (locationKeys.find(tokens[0]) != locationKeys.end()) {
-			throw std::runtime_error(ERROR_DUPLICATE_LOCATION_KEY);
+			throw std::runtime_error(ERROR_DUPLICATE_KEY);
 		} else { locationKeys.insert(tokens[0]); }
 
-		if (tokens[0] == "location_path") { LocationExtraction::locationPath(tokens, location); }
+		if (tokens[0] == "methods") { LocationExtraction::methods(tokens, location); }
+		// else if (tokens[0] == "location_path") { LocationExtraction::locationPath(tokens, location); }
 		// else if (tokens[0] == "root") { LocationExtraction::root(tokens, location); }
 		// else if (tokens[0] == "index") { LocationExtraction::index(tokens, location); }
 		// else if (tokens[0] == "redirect") { LocationExtraction::redirect(tokens, location); }
-		// else if (tokens[0] == "methods") { LocationExtraction::methods(tokens, location); }
 		// else if (tokens[0] == "autoindex") { LocationExtraction::autoindex(tokens, location); }
 		// else if (tokens[0] == "upload") { LocationExtraction::upload(tokens, location); }
 		// else if (tokens[0] == "cgi") { LocationExtraction::cgi(tokens, location); }
