@@ -46,10 +46,8 @@ Config::Config( const std::string &fileName, Logger &logger )
 	}
 
 	if (configFile.is_open()) {
-		_logger.logDebug(LOG_DEBUG, "Config file: " + fileName, true);
 		_serverCount = ConfigUtils::getServerCount(fileName);
-		_logger.logDebug(LOG_DEBUG, "Server count: " 
-				+ ConfigUtils::shortToString(_serverCount), true);
+		_logger.logDebug(LOG_DEBUG, "Starting to parse " + fileName, true);
 		_parseConfigFile(configFile);
 		configFile.close();
 		return ;
