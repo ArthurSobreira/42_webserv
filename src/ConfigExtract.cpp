@@ -77,10 +77,24 @@ namespace ServerExtraction {
 
 /* Location Extraction Functions */
 namespace LocationExtraction {
-	void	locationPath( stringVector &tokens, LocationConfigs &location ) {
+	void	methods( stringVector &tokens, LocationConfigs &location ) {
 		if (tokens.size() < 2 || tokens[1].empty()) {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
 		}
-		location.locationPath = tokens[1];
+		stringVector::iterator it;
+
+		location.methods.clear();
+		for (it = tokens.begin() + 1; it != tokens.end(); ++it) {
+			if (*it == "GET" && 
+				!ConfigUtils::isRepeatedMethod(location.methods, GET)) {
+				location.methods.push_back(GET);
+			} else if (*it == "POST" && 
+				!ConfigUtils::isRepeatedMethod(location.methods, POST)) {
+				location.methods.push_back(POST);
+			} else if (*it == "DELETE" && 
+				!ConfigUtils::isRepeatedMethod(location.methods, DELETE)) {
+				location.methods.push_back(DELETE);
+			} else { throw std::runtime_error(ERROR_INVALID_METHOD); }
+		}
 	}
 }
