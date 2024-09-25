@@ -97,4 +97,11 @@ namespace LocationExtraction {
 			} else { throw std::runtime_error(ERROR_INVALID_METHOD); }
 		}
 	}
+
+	void	locationPath( stringVector &tokens, LocationConfigs &location ) {
+		if (tokens.size() < 2 || tokens[1].empty()) {
+			throw std::runtime_error(ERROR_MISSING_VALUE);
+		}
+		location.locationPath = tokens[1];
+	}
 }
