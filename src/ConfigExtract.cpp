@@ -2,6 +2,7 @@
 #include "Defines.hpp"
 #include "Logger.hpp"
 #include "Config.hpp"
+#include <filesystem>
 
 /* Server Extraction Functions */
 namespace ServerExtraction {
@@ -35,8 +36,7 @@ namespace ServerExtraction {
 	void	serverName( stringVector &tokens, ServerConfigs &server ) {
 		if (tokens.size() < 2 || tokens[1].empty()) {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
-		}
-		server.serverName = tokens[1];
+		} else { server.serverName = tokens[1]; }
 	}
 
 	void	limitBodySize( stringVector &tokens, ServerConfigs &server ) {
@@ -103,6 +103,16 @@ namespace LocationExtraction {
 		if (tokens.size() < 2 || tokens[1].empty()) {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
 		}
-		location.locationPath = tokens[1];
+		Logger logger(LOG_ERROR_FILE, LOG_ERROR_FILE, LOG_ERROR_FILE);
+
+		std::string completePath = location.root + tokens[1];
+		struct stat info;
+
+		logger.logDebug(LOG_DEBUG, "Location Path: " + completePath, true);
+
+		if (stat(completePath.c_str(), &info) != 0 || 
+			!(info.st_mode & S_IFDIR)) {
+			throw std::runtime_error(ERROR_INVALID_LOCATION_PATH);
+		} else { location.locationPath = tokens[1]; }
 	}
 }
