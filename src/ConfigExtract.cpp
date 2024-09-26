@@ -85,6 +85,7 @@ namespace LocationExtraction {
 
 		location.methods.clear();
 		for (it = tokens.begin() + 1; it != tokens.end(); ++it) {
+			std::transform(it->begin(), it->end(), it->begin(), ::toupper);
 			if (*it == "GET" && 
 				!ConfigUtils::isRepeatedMethod(location.methods, GET)) {
 				location.methods.push_back(GET);
