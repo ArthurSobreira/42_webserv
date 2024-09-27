@@ -110,6 +110,21 @@ namespace ConfigUtils {
 		} else { return false; }
 	}
 
+	bool	directoryExists( const std::string &path ) {
+		struct stat info;
+		if (stat(path.c_str(), &info) != 0 || !(info.st_mode & S_IFDIR)) {
+			return false;
+		} else { return true; }
+	}
+
+	void	formatPath( std::string &path ) {
+		if (path[0] == '/') {
+			path = "." + path;
+		} else if (path[0] != '.' && path[1] != '/') {
+			path = "./" + path;
+		}
+	}
+
 	void	printServerStruct( const ServerConfigs &server ) {
 		std::cout << "              Server Configs " << std::endl;
 		std::cout << "=========================================" << std::endl;
