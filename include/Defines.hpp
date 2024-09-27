@@ -69,5 +69,6 @@
 /* Location Extraction Error */
 # define ERROR_INVALID_METHOD "Location: Invalid HTTP Method!"
 # define ERROR_INVALID_LOCATION_PATH "Location: Invalid Location Path!"
+# define ERROR_INVALID_ROOT "Location: Invalid Root Path!"
 
 #endif
