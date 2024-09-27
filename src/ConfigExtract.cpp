@@ -114,4 +114,16 @@ namespace LocationExtraction {
 			location.rootSet = true;	
 		}
 	}
+
+	void	index( stringVector &tokens, LocationConfigs &location ) {
+		if (tokens.size() < 2 || tokens[1].empty()) {
+			throw std::runtime_error(ERROR_MISSING_VALUE);
+		} else { location.index = tokens[1]; }
+	}
+
+	void	redirect( stringVector &tokens, LocationConfigs &location ) {
+		if (tokens.size() < 2 || tokens[1].empty()) {
+			throw std::runtime_error(ERROR_MISSING_VALUE);
+		} else { location.redirect = tokens[1]; }
+	}
 }
