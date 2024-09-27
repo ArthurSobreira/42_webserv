@@ -125,6 +125,18 @@ namespace ConfigUtils {
 		}
 	}
 
+	void	validateFullLocationPath( LocationConfigs &location ) {
+		std::string effectiveRoot;
+		if (location.rootSet) { 
+			effectiveRoot = location.root; 
+		} else { effectiveRoot = DEFAULT_ROOT; }
+		
+		std::string fullPath = effectiveRoot + location.locationPath;
+		if (!ConfigUtils::directoryExists(fullPath)) {
+			throw std::runtime_error(ERROR_INVALID_LOCATION_PATH);
+		}
+	}
+
 	void	printServerStruct( const ServerConfigs &server ) {
 		std::cout << "              Server Configs " << std::endl;
 		std::cout << "=========================================" << std::endl;
