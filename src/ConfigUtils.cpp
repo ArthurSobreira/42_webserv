@@ -119,7 +119,9 @@ namespace ConfigUtils {
 
 	void	formatPath( std::string &path ) {
 		if (path[0] == '/') {
-			path = "." + path;
+			if (!ConfigUtils::directoryExists(path)) { 
+				path = "." + path;
+			}
 		} else if (path[0] != '.' && path[1] != '/') {
 			path = "./" + path;
 		}
