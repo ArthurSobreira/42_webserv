@@ -229,8 +229,8 @@ void	Config::_parseLocationBlock( const std::string &locationBlock, LocationConf
 		if (tokens[0] == "methods") { LocationExtraction::methods(tokens, location); }
 		else if (tokens[0] == "location_path") { LocationExtraction::locationPath(tokens, location); }
 		else if (tokens[0] == "root") { LocationExtraction::root(tokens, location); }
-		// else if (tokens[0] == "index") { LocationExtraction::index(tokens, location); }
-		// else if (tokens[0] == "redirect") { LocationExtraction::redirect(tokens, location); }
+		else if (tokens[0] == "index") { LocationExtraction::index(tokens, location); }
+		else if (tokens[0] == "redirect") { LocationExtraction::redirect(tokens, location); }
 		// else if (tokens[0] == "autoindex") { LocationExtraction::autoindex(tokens, location); }
 		// else if (tokens[0] == "upload") { LocationExtraction::upload(tokens, location); }
 		// else if (tokens[0] == "cgi") { LocationExtraction::cgi(tokens, location); }
