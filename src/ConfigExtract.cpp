@@ -61,13 +61,9 @@ namespace ServerExtraction {
 		}
 		std::string	errorCode = tokens[1];
 		std::string	fileName = tokens[2];
-		if (fileName[0] == '/') {
-			fileName = "." + fileName;
-		} else if (fileName[0] != '.' && fileName[1] != '/') {
-			fileName = "./" + fileName;
-		}
-
+		ConfigUtils::formatPath(fileName);
 		std::ifstream file(fileName.c_str());
+
 		if (!file.is_open() || file.fail()) {
 			throw std::runtime_error(ERROR_INVALID_ERROR_PAGE);
 		}
@@ -102,17 +98,20 @@ namespace LocationExtraction {
 	void	locationPath( stringVector &tokens, LocationConfigs &location ) {
 		if (tokens.size() < 2 || tokens[1].empty()) {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
-		}
-		Logger logger(LOG_ERROR_FILE, LOG_ERROR_FILE, LOG_ERROR_FILE);
-
-		std::string completePath = location.root + tokens[1];
-		struct stat info;
-
-		logger.logDebug(LOG_DEBUG, "Location Path: " + completePath, true);
-
-		if (stat(completePath.c_str(), &info) != 0 || 
-			!(info.st_mode & S_IFDIR)) {
-			throw std::runtime_error(ERROR_INVALID_LOCATION_PATH);
 		} else { location.locationPath = tokens[1]; }
+	}
+
+	void	root( stringVector &tokens, LocationConfigs &location ) {
+		if (tokens.size() < 2 || tokens[1].empty()) {
+			throw std::runtime_error(ERROR_MISSING_VALUE);
+		}
+		std::string	rootPath = tokens[1];
+		ConfigUtils::formatPath(rootPath);
+		if (!ConfigUtils::directoryExists(rootPath)) {
+			throw std::runtime_error(ERROR_INVALID_ROOT);
+		} else { 
+			location.root = rootPath;
+			location.rootSet = true;	
+		}
 	}
 }
