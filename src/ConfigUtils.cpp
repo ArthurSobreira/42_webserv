@@ -1,6 +1,8 @@
 #include "Includes.hpp"
 #include "Defines.hpp"
 #include "Config.hpp"
+#include "Logger.hpp"
+#include "Server.hpp"
 
 namespace ConfigUtils {
 	short	getServerCount( const std::string &fileName ) {
@@ -123,6 +125,7 @@ namespace ConfigUtils {
 
 	bool hostIsValid(std::vector<ServerConfigs> &servers) {
 		std::vector<int> bytes;
+		Logger logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE);
 		for (size_t i = 0; i < servers.size(); ++i)
 		{
 			if (!inetPton(servers[i].host))
@@ -140,7 +143,7 @@ namespace ConfigUtils {
 			}
 			ip = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
 
-			createSocket(fd, AF_INET, SOCK_STREAM);
+			createSocket(fd, AF_INET, SOCK_STREAM, logger);
 			sockaddrIn serv_addr;
 			serv_addr.sin_family = AF_INET;
 			serv_addr.sin_addr.s_addr = ip;
