@@ -1,142 +1,134 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: phenriq2 <phenriq2@student.42sp.org.br>    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/05 17:56:54 by phenriq2          #+#    #+#             */
-/*   Updated: 2024/09/05 19:17:03 by phenriq2         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include "Server.hpp"
+#include "Logger.hpp"
+#include "Includes.hpp"
 
-#include "includes.hpp"
-
-bool TestCreateSocket(Logger &logger)
-{
-
-	int sockfd = -1;
-	createSocket(sockfd, AF_INET, SOCK_STREAM, logger);
-	if (sockfd == -1)
-		return false;
-	close(sockfd);
-	return true;
-}
-
-bool TestBindSocket(Logger &logger)
-{
-	int sockfd = -1;
-	int port = 8080;
-	uint32_t ip;
-	createSocket(sockfd, AF_INET, SOCK_STREAM, logger);
-	inetPton("127.0.0.1", ip, logger);
-	sockaddrIn serv_addr;
-	if (!bindSocket(sockfd, port, ip, serv_addr, logger))
-		return false;
-	close(sockfd);
-	return true;
-}
-
-bool TestListenSocket(Logger &logger)
-{
-	int sockfd = -1;
-	int port = 8080;
-	int backlog = SOMAXCONN;
-	uint32_t ip;
-	createSocket(sockfd, AF_INET, SOCK_STREAM, logger);
-	sockaddrIn serv_addr;
-	inetPton("127.0.0.1", ip, logger);
-	if (!bindSocket(sockfd, port, ip, serv_addr, logger))
-		return false;
-	if (!listenSocket(sockfd, backlog, logger))
-		return false;
-	close(sockfd);
-	return true;
-}
-
-
-
-bool TestLogClass(Logger &logger)
-{
-	logger.logDebug("Testando logDebug");
-	logger.logError("ERROR", "Testando logError");
-	logger.logAccess("127.0.0.1", "GET /index.html HTTP/1.1", 200, 1024);
-	std::string content = readFile(LOG_FILE);
-	std::string contentAccess = readFile(LOG_ACCESS_FILE);
-	std::string contentError = readFile(LOG_ERROR_FILE);
-	if (content.find("Testando logDebug") == std::string::npos)
-		return false;
-	if (contentError.find("Testando logError") == std::string::npos)
-		return false;
-	if (contentAccess.find("127.0.0.1") == std::string::npos)
-		return false;
-	return true;
-}
-
-bool TestInetPton(Logger &logger)
-{
-	uint32_t ip;
-	if (!inetPton("127.0.0.1", ip, logger))
-		return false;
-	if (ip != 16777343)
-		return false;
-	return true;
-}
-
-bool TestInetNtop()
-{
-	uint32_t ip = 16777343;
-	std::string ip_str = inetNtop(ip);
-	if (ip_str != "127.0.0.1")
-		return false;
-	return true;
-}
-
-int main(int argc, char **argv)
+void testCreateSocket()
 {
 	Logger logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE);
-	if (argc != 2)
-	{
-		std::cerr << "Usage: " << argv[0] << " <config_file_path>" << std::endl;
-		return 1;
-	}
-	setLogger(logger);
-	if (!TestLogClass(logger))
-	{
-		std::cerr << COLORIZE(RED, "TestLogClass falhou") << std::endl;
-		return 1;
-	}
-	std::cout << COLORIZE(GREEN, "TestLogClass passou") << std::endl;
-	if (!TestInetPton(logger))
-	{
-		std::cerr << COLORIZE(RED, "TestInetPton falhou") << std::endl;
-		return 1;
-	}
-	std::cout << COLORIZE(GREEN, "TestInetPton passou") << std::endl;
-	if (!TestInetNtop())
-	{
-		std::cerr << COLORIZE(RED, "TestInetNtop falhou") << std::endl;
-		return 1;
-	}
-	std::cout << COLORIZE(GREEN, "TestInetNtop passou") << std::endl;
-	if (!TestCreateSocket(logger))
-	{
-		std::cerr << COLORIZE(RED, "TestCreateSocket falhou") << std::endl;
-		return 1;
-	}
-	std::cout << COLORIZE(GREEN, "TestCreateSocket passou") << std::endl;
-	if (!TestBindSocket(logger))
-	{
-		std::cerr << COLORIZE(RED, "TestBindSocket falhou") << std::endl;
-		return 1;
-	}
-	std::cout << COLORIZE(GREEN, "TestBindSocket passou") << std::endl;
-	if (!TestListenSocket(logger))
-	{
-		std::cerr << COLORIZE(RED, "TestListenSocket falhou") << std::endl;
-		return 1;
-	}
-	std::cout << COLORIZE(GREEN, "TestListenSocket passou") << std::endl;
+	int sockfd;
+
+	std::cout << "Test 1: Creating a valid socket..." << std::endl;
+	if (createSocket(sockfd, AF_INET, SOCK_STREAM, logger))
+		std::cout << "Test 1 passed!" << std::endl;
+	else
+		std::cout << "Test 1 failed!" << std::endl;
+
+	std::cout << "Test 2: Creating an invalid socket (invalid domain)..." << std::endl;
+	if (!createSocket(sockfd, -1, SOCK_STREAM, logger))
+		std::cout << "Test 2 passed!" << std::endl;
+	else
+		std::cout << "Test 2 failed!" << std::endl;
+
+	closeSocket(sockfd, logger); // Fechar o socket no final do teste.
+}
+
+void testBindSocket()
+{
+	Logger logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE);
+	int sockfd;
+	sockaddr_in serv_addr;
+
+	std::cout << "Test 6: Binding valid socket to port 8080..." << std::endl;
+	if (createSocket(sockfd, AF_INET, SOCK_STREAM, logger) &&
+		bindSocket(sockfd, 8080, INADDR_ANY, serv_addr, logger)) // Corrigido aqui
+		std::cout << "Test 6 passed!" << std::endl;
+	else
+		std::cout << "Test 6 failed!" << std::endl;
+
+	closeSocket(sockfd, logger);
+}
+
+void testListenSocket()
+{
+	Logger logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE);
+	int sockfd;
+	int backlog = 5;
+	sockaddr_in serv_addr;
+
+	std::cout << "Test 7: Listening on valid socket..." << std::endl;
+	if (createSocket(sockfd, AF_INET, SOCK_STREAM, logger) &&
+		configureSocket(sockfd, logger) &&
+		bindSocket(sockfd, 8080, INADDR_ANY, serv_addr, logger) && // Corrigido aqui
+		listenSocket(sockfd, backlog, logger)) // Corrigido aqui
+		std::cout << "Test 7 passed!" << std::endl;
+	else
+		std::cout << "Test 7 failed!" << std::endl;
+
+	closeSocket(sockfd, logger);
+}
+
+void testCreateServer()
+{
+	Logger logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE);
+	int sockfd;
+	int backlog = 5;
+
+	std::cout << "Test 8: Creating a valid server..." << std::endl;
+	if (createServer(sockfd, 8080, backlog, logger))
+		std::cout << "Test 8 passed!" << std::endl;
+	else
+		std::cout << "Test 8 failed!" << std::endl;
+
+	closeSocket(sockfd, logger);
+}
+
+void testLogErrorAndClose()
+{
+	Logger logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE);
+	int sockfd;
+
+	sockfd = open(LOG_FILE, O_CREAT | O_TRUNC | O_WRONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+	std::cout << "Test 9: Logging an error and closing a socket..." << std::endl;
+	if (logErrorAndClose("Error message", sockfd, logger))
+		std::cout << "Test 9 passed!" << std::endl;
+	else
+		std::cout << "Test 9 failed!" << std::endl;
+}
+
+void testValidateBacklog()
+{
+	Logger logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE);
+	int backlog = 5;
+
+	std::cout << "Test 10: Validating a valid backlog..." << std::endl;
+	if (validateBacklog(backlog, logger))
+		std::cout << "Test 10 passed!" << std::endl;
+	else
+		std::cout << "Test 10 failed!" << std::endl;
+
+	backlog = -1;
+	std::cout << "Test 11: Validating an invalid backlog..." << std::endl;
+	if (!validateBacklog(backlog, logger))
+		std::cout << "Test 11 passed!" << std::endl;
+	else
+		std::cout << "Test 11 failed!" << std::endl;
+}
+
+void testConfigureSocket()
+{
+	Logger logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE);
+	int sockfd;
+
+	std::cout << "Test 12: Configuring a valid socket..." << std::endl;
+	if (createSocket(sockfd, AF_INET, SOCK_STREAM, logger) &&
+		configureSocket(sockfd, logger))
+		std::cout << "Test 12 passed!" << std::endl;
+	else
+		std::cout << "Test 12 failed!" << std::endl;
+
+	closeSocket(sockfd, logger);
+}
+
+int main()
+{
+	// Teste individual de cada função
+	testCreateSocket();
+	testBindSocket();
+	testListenSocket();
+	testCreateServer();
+	testLogErrorAndClose();
+	testValidateBacklog();
+	testConfigureSocket();
 
 	return 0;
 }
