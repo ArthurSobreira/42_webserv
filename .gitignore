@@ -61,4 +61,5 @@ logs/
 
 # Executables
 webserv
+testes
 *.out
