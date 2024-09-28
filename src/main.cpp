@@ -1,10 +1,10 @@
 #include "Includes.hpp"
-#include "Defines.hpp"
 #include "Config.hpp"
 #include "Request.hpp"
 #include "Response.hpp"
 #include "Logger.hpp"
 #include "Utils.hpp"
+#include "Server.hpp"
 
 int epoll_fd;
 void addToEpoll(int sockfd);
@@ -144,29 +144,6 @@ Request clientServerAccept(int sockfd, Logger &logger)
 // 	close(sockfd);
 // }
 
-void createServer(int &sockfd, const unsigned short &port, const uint32_t &ip, int &backlog, Logger &logger)
-{
-	sockaddrIn serv_addr;
-	std::ostringstream log;
-	if (!createSocket(sockfd, AF_INET, SOCK_STREAM))
-		ft_error("Error creating socket", __FUNCTION__, __FILE__, __LINE__, std::runtime_error("Error creating socket"));
-	int opt = 1;
-	if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
-		ft_error("Erro ao definir opção de socket", __FUNCTION__, __FILE__, __LINE__, std::runtime_error(strerror(errno)));
-	if (!bindSocket(sockfd, port, ip, serv_addr, logger))
-	{
-		close(sockfd);
-		ft_error("Error binding socket", __FUNCTION__, __FILE__, __LINE__, std::runtime_error("Error binding socket"));
-	}
-	if (!listenSocket(sockfd, backlog, logger))
-	{
-		close(sockfd);
-		ft_error("Error listening on socket", __FUNCTION__, __FILE__, __LINE__, std::runtime_error("Error listening on socket"));
-	}
-	log << "Server created on " << inetNtop(ip) << ":" << port;
-	logger.logDebug(LOG_DEBUG, log.str(), true);
-}
-
 void initializeEpoll()
 {
 	epoll_fd = epoll_create1(0);
@@ -177,7 +154,7 @@ void initializeEpoll()
 }
 void addToEpoll(int sockfd)
 {
-	struct epoll_event event;
+	epollEvent event;
 	event.events = EPOLLIN;
 	event.data.fd = sockfd;
 	if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, sockfd, &event) == -1)
@@ -188,12 +165,17 @@ void addToEpoll(int sockfd)
 
 void initializeServers(const std::vector<ServerConfigs> &servers, std::vector<int> &fds, Logger &logger)
 {
+	std::ostringstream log;
 	for (size_t i = 0; i < servers.size(); ++i)
 	{
 		int sockfd = -1;
 		int backlog = SOMAXCONN;
-		const uint32_t ip = INADDR_ANY;
-		createServer(sockfd, servers[i].port, ip, backlog, logger);
+		if(!createServer(sockfd, servers[i].port, backlog, logger))
+		{
+			log << "Error creating server on port " << servers[i].port;
+			logger.logError(LOG_ERROR, log.str(), true);
+			continue;
+		}
 		fds.push_back(sockfd);
 		addToEpoll(sockfd);
 	}
