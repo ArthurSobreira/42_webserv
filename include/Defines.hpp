@@ -72,5 +72,6 @@
 # define ERROR_INVALID_ROOT "Location: Invalid Root Path!"
 # define ERROR_INVALID_UPLOAD_PATH "Location: Invalid Upload Path!"
 # define ERROR_INVALID_AUTOINDEX "Location: Invalid Autoindex Value!"
+# define ERROR_INVALID_UPLOAD_ENABLED "Location: Invalid Upload Enabled Value!"
 
 #endif
