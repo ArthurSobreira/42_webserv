@@ -129,4 +129,15 @@ namespace LocationExtraction {
 			location.redirectSet = true;
 		}
 	}
+
+	void	uploadPath( stringVector &tokens, LocationConfigs &location ) {
+		if (tokens.size() < 2 || tokens[1].empty()) {
+			throw std::runtime_error(ERROR_MISSING_VALUE);
+		}
+		std::string	uploadPath = tokens[1];
+		ConfigUtils::formatPath(uploadPath);
+		if (!ConfigUtils::directoryExists(uploadPath)) {
+			throw std::runtime_error(ERROR_INVALID_UPLOAD_PATH);
+		} else { location.uploadPath = uploadPath; }
+	}
 }
