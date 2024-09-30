@@ -12,25 +12,23 @@ namespace ServerExtraction {
 		}
 		std::stringstream stringPort(tokens[1]);
 		long long portValue;
+
 		if (stringPort >> portValue) {
 			if (portValue > std::numeric_limits<unsigned short>::max() || 
 				portValue < 1024) {
 				throw std::runtime_error(ERROR_INVALID_PORT);
 			}
 			server.port = static_cast<unsigned short>(portValue);
-		} else {
-			throw std::runtime_error(ERROR_INVALID_PORT);
-		}
+		} else { throw std::runtime_error(ERROR_INVALID_PORT); }
 	}
 
 	void	host( stringVector &tokens, ServerConfigs &server ) {
 		if (tokens.size() < 2 || tokens[1].empty()) {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
 		}
-		server.host = tokens[1];
 		if (!ConfigUtils::hostIsValid(server)) {
 			throw std::runtime_error(ERROR_INVALID_HOST);
-		}
+		} else { server.host = tokens[1]; }
 	}
 
 	void	serverName( stringVector &tokens, ServerConfigs &server ) {
@@ -45,14 +43,13 @@ namespace ServerExtraction {
 		}
 		std::stringstream stringSize(tokens[1]);
 		size_t	limitBodySizeMB;
+
 		if (stringSize >> limitBodySizeMB) {
 			server.limitBodySize = limitBodySizeMB * 1024 * 1024;
 			if (tokens[1][0] == '-') {
 				throw std::runtime_error(ERROR_INVALID_LIMIT_BODY_SIZE);
 			}
-		} else {
-			throw std::runtime_error(ERROR_INVALID_LIMIT_BODY_SIZE);
-		}
+		} else { throw std::runtime_error(ERROR_INVALID_LIMIT_BODY_SIZE); }
 	}
 
 	void	errorPages( stringVector &tokens, ServerConfigs &server ) {
@@ -66,8 +63,7 @@ namespace ServerExtraction {
 
 		if (!file.is_open() || file.fail()) {
 			throw std::runtime_error(ERROR_INVALID_ERROR_PAGE);
-		}
-		server.errorPages[errorCode] = fileName;
+		} else { server.errorPages[errorCode] = fileName; }
 	}
 }
 
@@ -78,8 +74,8 @@ namespace LocationExtraction {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
 		}
 		stringVector::iterator it;
-
 		location.methods.clear();
+
 		for (it = tokens.begin() + 1; it != tokens.end(); ++it) {
 			std::transform(it->begin(), it->end(), it->begin(), ::toupper);
 			if (*it == "GET" && 
@@ -107,6 +103,7 @@ namespace LocationExtraction {
 		}
 		std::string	rootPath = tokens[1];
 		ConfigUtils::formatPath(rootPath);
+
 		if (!ConfigUtils::directoryExists(rootPath)) {
 			throw std::runtime_error(ERROR_INVALID_ROOT);
 		} else { 
@@ -133,11 +130,9 @@ namespace LocationExtraction {
 	void	uploadPath( stringVector &tokens, LocationConfigs &location ) {
 		if (tokens.size() < 2 || tokens[1].empty()) {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
+		} else {
+			ConfigUtils::formatPath(tokens[1]);
+			location.uploadPath = tokens[1];
 		}
-		std::string	uploadPath = tokens[1];
-		ConfigUtils::formatPath(uploadPath);
-		if (!ConfigUtils::directoryExists(uploadPath)) {
-			throw std::runtime_error(ERROR_INVALID_UPLOAD_PATH);
-		} else { location.uploadPath = uploadPath; }
 	}
 }
