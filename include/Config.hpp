@@ -30,6 +30,7 @@ struct LocationConfigs {
 	bool autoindex;
 	bool uploadEnabled;
 	bool rootSet;
+	bool redirectSet;
 	CGIConfigs cgiConfig;
 
 	/* Struct Constructor */
