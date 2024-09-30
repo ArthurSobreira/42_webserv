@@ -70,5 +70,6 @@
 # define ERROR_INVALID_METHOD "Location: Invalid HTTP Method!"
 # define ERROR_INVALID_LOCATION_PATH "Location: Invalid Location Path!"
 # define ERROR_INVALID_ROOT "Location: Invalid Root Path!"
+# define ERROR_INVALID_UPLOAD_PATH "Location: Invalid Upload Path!"
 
 #endif
