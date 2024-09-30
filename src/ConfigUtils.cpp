@@ -175,6 +175,8 @@ namespace ConfigUtils {
 			std::cout << "\tupload_path: " << it->uploadPath << std::endl;
 			std::cout << "\tautoindex: " << it->autoindex << std::endl;
 			std::cout << "\tupload_enabled: " << it->uploadEnabled << std::endl;
+			std::cout << "\troot_set: " << it->rootSet << std::endl;
+			std::cout << "\tredirect_set: " << it->redirectSet << std::endl;
 			std::cout << "\tCGI path: " << it->cgiConfig.cgiPath << std::endl;
 			std::cout << "\tCGI extension: " << it->cgiConfig.cgiExtension << std::endl;
 			std::cout << "\tCGI enabled: " << it->cgiConfig.cgiEnabled << std::endl;
