@@ -232,10 +232,12 @@ void	Config::_parseLocationBlock( const std::string &locationBlock, LocationConf
 		else if (tokens[0] == "root") { LocationExtraction::root(tokens, location); }
 		else if (tokens[0] == "index") { LocationExtraction::index(tokens, location); }
 		else if (tokens[0] == "redirect") { LocationExtraction::redirect(tokens, location); }
+		else if (tokens[0] == "upload_path") { LocationExtraction::uploadPath(tokens, location); }
 		// else if (tokens[0] == "autoindex") { LocationExtraction::autoindex(tokens, location); }
 		// else if (tokens[0] == "upload") { LocationExtraction::upload(tokens, location); }
 		// else if (tokens[0] == "cgi") { LocationExtraction::cgi(tokens, location); }
 		// else { throw std::runtime_error(ERROR_INVALID_KEY); }
 	}
+	ConfigUtils::createUploadFolder(location.uploadPath);
 	ConfigUtils::validateFullLocationPath(location);
 }
