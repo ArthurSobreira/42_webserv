@@ -128,6 +128,8 @@ namespace ConfigUtils {
 	}
 
 	void	validateFullLocationPath( LocationConfigs &location ) {
+		if (location.redirectSet) { return ; }
+
 		std::string effectiveRoot;
 		if (location.rootSet) { 
 			effectiveRoot = location.root; 
