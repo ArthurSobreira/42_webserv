@@ -20,6 +20,7 @@ LocationConfigs::LocationConfigs( void ) {
 	autoindex = false;
 	uploadEnabled = false;
 	rootSet = false;
+	redirectSet = false;
 	cgiConfig = CGIConfigs();
 }
 
