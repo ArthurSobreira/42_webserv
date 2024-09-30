@@ -135,4 +135,26 @@ namespace LocationExtraction {
 			location.uploadPath = tokens[1];
 		}
 	}
+
+	void	autoindex( stringVector &tokens, LocationConfigs &location ) {
+		if (tokens.size() < 2 || tokens[1].empty()) {
+			throw std::runtime_error(ERROR_MISSING_VALUE);
+		}
+		if (tokens[1] == "on") {
+			location.autoindex = true;
+		} else if (tokens[1] == "off") {
+			location.autoindex = false;
+		} else { throw std::runtime_error(ERROR_INVALID_AUTOINDEX); }
+	}
+
+	void	uploadEnabled( stringVector &tokens, LocationConfigs &location ) {
+		if (tokens.size() < 2 || tokens[1].empty()) {
+			throw std::runtime_error(ERROR_MISSING_VALUE);
+		}
+		if (tokens[1] == "on") {
+			location.uploadEnabled = true;
+		} else if (tokens[1] == "off") {
+			location.uploadEnabled = false;
+		} else { throw std::runtime_error(ERROR_INVALID_UPLOAD_ENABLED); }
+	}
 }
