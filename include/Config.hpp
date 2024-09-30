@@ -109,6 +109,9 @@ namespace LocationExtraction {
 	void	uploadPath( stringVector &tokens, LocationConfigs &location );
 	void	autoindex( stringVector &tokens, LocationConfigs &location );
 	void	uploadEnabled( stringVector &tokens, LocationConfigs &location );
+	void	cgiPath( stringVector &tokens, LocationConfigs &location );
+	void	cgiExtension( stringVector &tokens, LocationConfigs &location );
+	void	cgiEnabled( stringVector &tokens, LocationConfigs &location );
 }
 
 #endif
