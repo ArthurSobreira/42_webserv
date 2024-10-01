@@ -43,6 +43,10 @@
 # define DEFAULT_ERROR_403 "./static/403.html"
 # define DEFAULT_ERROR_404 "./static/404.html"
 
+/* CGI Macros */
+# define EXTENSION_PHP ".php"
+# define EXTENSION_PY ".py"
+
 /* File Error Macros */
 # define ERROR_OPEN_LOG_FILE "Could Not Open Log File!"
 # define ERROR_OPEN_CONFIG_FILE "Could Not Opening Config File!"
@@ -69,5 +73,6 @@
 # define ERROR_INVALID_UPLOAD_PATH "Location: Invalid Upload Path!"
 # define ERROR_INVALID_AUTOINDEX "Location: Invalid Autoindex Value!"
 # define ERROR_INVALID_UPLOAD_ENABLED "Location: Invalid Upload Enabled Value!"
+# define ERROR_INVALID_CGI_PATH "Location: Invalid CGI Path!"
 
 #endif
