@@ -30,7 +30,7 @@
 
 /* Default CGI Configs */
 # define DEFAULT_CGI_PATH "cgi-bin"
-# define DEFAULT_CGI_EXT ".py"
+# define DEFAULT_CGI_EXT ""
 
 /* Default Location Configs */
 # define DEFAULT_LOCATION_PATH "/"
