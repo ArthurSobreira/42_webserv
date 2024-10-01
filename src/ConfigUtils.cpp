@@ -136,7 +136,8 @@ namespace ConfigUtils {
 	}
 
 	void	validateFullLocationPath( LocationConfigs &location ) {
-		if (location.redirectSet) { return ; }
+		if (location.cgiConfig.cgiEnabled) { return ; }
+		if (location.redirectSet ) { return ; }
 
 		std::string effectiveRoot;
 		if (location.rootSet) { 
