@@ -140,10 +140,9 @@ namespace LocationExtraction {
 		if (tokens.size() < 2 || tokens[1].empty()) {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
 		}
+		std::transform(tokens[1].begin(), tokens[1].end(), tokens[1].begin(), ::tolower);
 		if (tokens[1] == "on") {
 			location.autoindex = true;
-		} else if (tokens[1] == "off") {
-			location.autoindex = false;
 		} else { throw std::runtime_error(ERROR_INVALID_AUTOINDEX); }
 	}
 
@@ -153,8 +152,6 @@ namespace LocationExtraction {
 		}
 		if (tokens[1] == "on") {
 			location.uploadEnabled = true;
-		} else if (tokens[1] == "off") {
-			location.uploadEnabled = false;
 		} else { throw std::runtime_error(ERROR_INVALID_UPLOAD_ENABLED); }
 	}
 
