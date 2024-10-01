@@ -4,8 +4,8 @@
 
 /* Struct CGIConfigs Constructor */
 CGIConfigs::CGIConfigs( void ) {
-	cgiPath = DEFAULT_CGI_PATH;
-	cgiExtension = DEFAULT_CGI_EXT;
+	cgiPath = DEFAULT_EMPTY;
+	cgiExtension = DEFAULT_EMPTY;
 	cgiEnabled = false;
 }
 
@@ -15,7 +15,7 @@ LocationConfigs::LocationConfigs( void ) {
 	locationPath = DEFAULT_LOCATION_PATH;
 	root = DEFAULT_ROOT;
 	index = DEFAULT_INDEX;
-	redirect = DEFAULT_REDIRECT;
+	redirect = DEFAULT_EMPTY;
 	uploadPath = DEFAULT_UPLOAD_PATH;
 	autoindex = false;
 	uploadEnabled = false;
@@ -235,9 +235,8 @@ void	Config::_parseLocationBlock( const std::string &locationBlock, LocationConf
 		else if (tokens[0] == "upload_path") { LocationExtraction::uploadPath(tokens, location); }
 		else if (tokens[0] == "autoindex") { LocationExtraction::autoindex(tokens, location); }
 		else if (tokens[0] == "upload_enabled") { LocationExtraction::uploadEnabled(tokens, location); }
-		// else if (tokens[0] == "cgi_path") { LocationExtraction::cgiPath(tokens, location); }
-		// else if (tokens[0] == "cgi_extension") { LocationExtraction::cgiExtension(tokens, location); }
-		// else if (tokens[0] == "cgi_enabled") { LocationExtraction::cgiEnabled(tokens, location); }
+		else if (tokens[0] == "cgi_path") { LocationExtraction::cgiPath(tokens, location); }
+		else if (tokens[0] == "cgi_extension") { LocationExtraction::cgiExtension(tokens, location); }
 		else { throw std::runtime_error(ERROR_INVALID_KEY); }
 	}
 	ConfigUtils::createUploadFolder(location.uploadPath);
