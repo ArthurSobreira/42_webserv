@@ -157,4 +157,19 @@ namespace LocationExtraction {
 			location.uploadEnabled = false;
 		} else { throw std::runtime_error(ERROR_INVALID_UPLOAD_ENABLED); }
 	}
+
+	void	cgiPath( stringVector &tokens, LocationConfigs &location ) {
+		if (tokens.size() < 2 || tokens[1].empty()) {
+			throw std::runtime_error(ERROR_MISSING_VALUE);
+		} 
+		std::string	cgiPath = tokens[1];
+		size_t	lastDot = cgiPath.find_last_of('.');
+
+		if (lastDot != std::string::npos && 
+			(cgiPath.substr(lastDot) == EXTENSION_PHP || 
+			cgiPath.substr(lastDot) == EXTENSION_PY)) {
+			location.cgiConfig.cgiEnabled = true;
+			location.cgiConfig.cgiPath = cgiPath;
+		} else { throw std::runtime_error(ERROR_INVALID_CGI_PATH); }
+	}
 }
