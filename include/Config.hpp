@@ -85,8 +85,9 @@ namespace ConfigUtils {
 		httpMethod method );
 	bool	directoryExists( const std::string &path );
 	void	formatPath( std::string &path );
-	void	createUploadFolder( std::string &uploadPath );
 	void	validateFullLocationPath( LocationConfigs &location );
+	void	validateFullCGIPath( LocationConfigs &location );
+	void	createUploadFolder( std::string &uploadPath );
 	void	printServerStruct( const ServerConfigs &server );
 }
 
