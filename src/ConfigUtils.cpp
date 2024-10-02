@@ -117,6 +117,13 @@ namespace ConfigUtils {
 		} else { return true; }
 	}
 
+	bool	fileExists( const std::string &path ) {
+		struct stat info;
+		if (stat(path.c_str(), &info) != 0 || !(info.st_mode & S_IFREG)) {
+			return false;
+		} else { return true; }
+	}
+
 	void	formatPath( std::string &path ) {
 		if (path[0] == '/') {
 			if (!ConfigUtils::directoryExists(path)) { 
@@ -124,14 +131,6 @@ namespace ConfigUtils {
 			}
 		} else if (path[0] != '.' && path[1] != '/') {
 			path = "./" + path;
-		}
-	}
-
-	void	createUploadFolder( std::string &uploadPath ) {
-		if (!ConfigUtils::directoryExists(uploadPath)) {
-			if (mkdir(uploadPath.c_str(), 0777) == -1 && errno != EEXIST) {
-				throw std::runtime_error(ERROR_INVALID_UPLOAD_PATH);
-			}
 		}
 	}
 
@@ -147,6 +146,34 @@ namespace ConfigUtils {
 		std::string fullPath = effectiveRoot + location.locationPath;
 		if (!ConfigUtils::directoryExists(fullPath)) {
 			throw std::runtime_error(ERROR_INVALID_LOCATION_PATH);
+		}
+	}
+
+	void	validateFullCGIPath( LocationConfigs &location ) {
+		if (!location.cgiConfig.cgiEnabled) { return ; }
+
+		std::string cgiPath = location.cgiConfig.cgiPath;
+		size_t	lastDot = cgiPath.find_last_of('.');
+		if (cgiPath.substr(lastDot) != location.cgiConfig.cgiExtension) {
+			throw std::runtime_error(ERROR_INVALID_CGI_EXTENSION);
+		}
+
+		std::string effectiveRoot;
+		if (location.rootSet) { 
+			effectiveRoot = location.root; 
+		} else { effectiveRoot = DEFAULT_ROOT; }
+
+		std::string fullPath = effectiveRoot + "/" + cgiPath;
+		if (!ConfigUtils::fileExists(fullPath)) {
+			throw std::runtime_error(ERROR_INVALID_CGI_PATH);
+		}
+	}
+
+	void	createUploadFolder( std::string &uploadPath ) {
+		if (!ConfigUtils::directoryExists(uploadPath)) {
+			if (mkdir(uploadPath.c_str(), 0777) == -1 && errno != EEXIST) {
+				throw std::runtime_error(ERROR_INVALID_UPLOAD_PATH);
+			}
 		}
 	}
 
