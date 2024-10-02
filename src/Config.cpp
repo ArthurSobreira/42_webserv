@@ -239,6 +239,7 @@ void	Config::_parseLocationBlock( const std::string &locationBlock, LocationConf
 		else if (tokens[0] == "cgi_extension") { LocationExtraction::cgiExtension(tokens, location); }
 		else { throw std::runtime_error(ERROR_INVALID_KEY); }
 	}
-	ConfigUtils::createUploadFolder(location.uploadPath);
 	ConfigUtils::validateFullLocationPath(location);
+	ConfigUtils::validateFullCGIPath(location);
+	ConfigUtils::createUploadFolder(location.uploadPath);
 }
