@@ -169,4 +169,16 @@ namespace LocationExtraction {
 			location.cgiConfig.cgiPath = cgiPath;
 		} else { throw std::runtime_error(ERROR_INVALID_CGI_PATH); }
 	}
+
+	void	cgiExtension( stringVector &tokens, LocationConfigs &location ) {
+		if (tokens.size() < 2 || tokens[1].empty()) {
+			throw std::runtime_error(ERROR_MISSING_VALUE);
+		}
+		std::string	cgiExtension = tokens[1];
+
+		if (cgiExtension == EXTENSION_PHP || cgiExtension == EXTENSION_PY) {
+			location.cgiConfig.cgiEnabled = true;
+			location.cgiConfig.cgiExtension = cgiExtension;
+		} else { throw std::runtime_error(ERROR_INVALID_CGI_EXTENSION); }
+	}
 }
