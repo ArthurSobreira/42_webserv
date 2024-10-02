@@ -74,5 +74,6 @@
 # define ERROR_INVALID_AUTOINDEX "Location: Invalid Autoindex Value!"
 # define ERROR_INVALID_UPLOAD_ENABLED "Location: Invalid Upload Enabled Value!"
 # define ERROR_INVALID_CGI_PATH "Location: Invalid CGI Path!"
+# define ERROR_INVALID_CGI_EXTENSION "Location: Invalid CGI Extension!"
 
 #endif
