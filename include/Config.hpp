@@ -84,7 +84,7 @@ namespace ConfigUtils {
 	bool	isRepeatedMethod( std::vector<httpMethod> &methodsVector, 
 		httpMethod method );
 	bool	directoryExists( const std::string &path );
-	bool	fileExists( const std::string &path )
+	bool	fileExists( const std::string &path );
 	void	formatPath( std::string &path );
 	void	validateFullLocationPath( LocationConfigs &location );
 	void	validateFullCGIPath( LocationConfigs &location );
