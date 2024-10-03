@@ -2,10 +2,12 @@
 #define DEFINES_HPP
 
 /* Server Macros */
-# define MAX_EVENTS 64
 # define LOG_FILE "logs/debug.log"
 # define LOG_ACCESS_FILE "logs/access.log"
 # define LOG_ERROR_FILE "logs/error.log"
+# define MAX_EVENTS 64
+# define MIN_PORT_NUMBER 0
+# define MAX_PORT_NUMBER 65535
 
 /* Colors Macros */
 # define COLORIZE(color, text) \

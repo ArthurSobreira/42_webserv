@@ -1,6 +1,8 @@
 #include "Includes.hpp"
 #include "Defines.hpp"
 #include "Config.hpp"
+#include "Logger.hpp"
+#include "Server.hpp"
 
 namespace ConfigUtils {
 	short	getServerCount( const std::string &fileName ) {
