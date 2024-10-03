@@ -29,6 +29,8 @@ struct LocationConfigs {
 	std::string uploadPath;
 	bool autoindex;
 	bool uploadEnabled;
+	bool rootSet;
+	bool redirectSet;
 	CGIConfigs cgiConfig;
 
 	/* Struct Constructor */
@@ -78,9 +80,16 @@ class Config {
 namespace ConfigUtils {
 	short	getServerCount( const std::string &fileName );
 	std::string	trimServerBlock( const std::string &serverBlock );
-	std::string	shortToString( const short &value );
+	bool	hostIsValid( ServerConfigs &server );
+	bool	isRepeatedMethod( std::vector<httpMethod> &methodsVector, 
+		httpMethod method );
+	bool	directoryExists( const std::string &path );
+	bool	fileExists( const std::string &path );
+	void	formatPath( std::string &path );
+	void	validateFullLocationPath( LocationConfigs &location );
+	void	validateFullCGIPath( LocationConfigs &location );
+	void	createUploadFolder( std::string &uploadPath );
 	void	printServerStruct( const ServerConfigs &server );
-	bool	hostIsValid(std::vector<ServerConfigs> &servers);
 }
 
 /* Server Extraction Functions */
@@ -102,6 +111,8 @@ namespace LocationExtraction {
 	void	uploadPath( stringVector &tokens, LocationConfigs &location );
 	void	autoindex( stringVector &tokens, LocationConfigs &location );
 	void	uploadEnabled( stringVector &tokens, LocationConfigs &location );
+	void	cgiPath( stringVector &tokens, LocationConfigs &location );
+	void	cgiExtension( stringVector &tokens, LocationConfigs &location );
 }
 
 #endif
