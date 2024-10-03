@@ -220,24 +220,22 @@ void cleanup(std::vector<int> &fds)
 
 void signals(int sig)
 {
-	if (sig == SIGINT || sig == SIGQUIT || sig == SIGTERM)
-	{
+	if (sig == SIGINT || sig == SIGQUIT || sig == SIGTERM) {
 		throw std::runtime_error("bye bye");
 	}
 }
 
 int main(int argc, char **argv)
 {
-	if (argc != 2)
-	{
-		std::cerr << "Usage: " << argv[0] << " <config_file_path>" << std::endl;
+	Logger logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE);
+	if (argc != 2) {
+		logger.logError(LOG_ERROR, ERROR_NOT_CONFIG_FILE, true);
 		return EXIT_FAILURE;
 	}
 	signal(SIGINT, signals);
 	signal(SIGQUIT, signals);
 	const std::string config_file_path = argv[1];
 	std::vector<int> fds;
-	Logger logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE);
 	try
 	{
 		Config config(config_file_path, logger);
