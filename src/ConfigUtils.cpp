@@ -75,6 +75,7 @@ namespace ConfigUtils {
 	}
 
 	bool hostIsValid( ServerConfigs &server ) {
+		Logger logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE);
 		std::istringstream stream(server.host);
 		std::vector<int> bytes;
 		std::string segment;
@@ -91,7 +92,7 @@ namespace ConfigUtils {
 		}
 		ip = htonl((bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3]);
 
-		createSocket(fd, AF_INET, SOCK_STREAM);
+		createSocket(fd, AF_INET, SOCK_STREAM, logger);
 		sockaddrIn serv_addr;
 		serv_addr.sin_family = AF_INET;
 		serv_addr.sin_addr.s_addr = ip;
