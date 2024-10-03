@@ -74,10 +74,10 @@ void Response::responseTratament(Request &request, Logger &logger){
 	if (stat(path.c_str(), &status) != 0)
 	{
 		logger.logError("ERROR", "File not found");
-		bodyr = readFile("static/404.html");
+		bodyr = readFile("static/errors/404.html");
 		this->setStatus(404, "Not Found");
 		this->setBody(bodyr);
-		this->setHeader("Content-Type", getContentType("static/404.html"));
+		this->setHeader("Content-Type", getContentType("static/errors/404.html"));
 		return ;
 	}
 	if(S_ISDIR(status.st_mode) && request.getIsAllowDirectoryListing())
@@ -85,16 +85,16 @@ void Response::responseTratament(Request &request, Logger &logger){
 		bodyr = listDirectory(path);
 		this->setStatus(200, "OK");
 		this->setBody(bodyr);
-		this->setHeader("Content-Type", getContentType("static/404.html"));
+		this->setHeader("Content-Type", getContentType("static/errors/404.html"));
 		return ;
 	}
 	if(access(path.c_str(), R_OK) != 0)
 	{
 		logger.logError("ERROR", "File not readable");
-		bodyr = readFile("static/403.html");
+		bodyr = readFile("static/errors/403.html");
 		this->setStatus(403, "Forbidden");
 		this->setBody(bodyr);
-		this->setHeader("Content-Type", getContentType("static/403.html")); 
+		this->setHeader("Content-Type", getContentType("static/errors/403.html")); 
 		return ;
 	}
 	bodyr = readFile(path);
