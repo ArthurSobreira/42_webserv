@@ -53,6 +53,7 @@ class Config {
 		std::vector<ServerConfigs> _servers;
 		short _serverCount;
 		Logger &_logger;
+		std::map<int, const ServerConfigs*> socketConfigMap;
 
 		/* Private Methods */
 		void _parseConfigFile( std::ifstream &configFile );
@@ -72,6 +73,10 @@ class Config {
 
 		/* Public Methods */
 		std::vector<ServerConfigs> getServers( void ) const;
+		std::map<int, const ServerConfigs*> getSocketConfigMap( void ) const;
+		void setSocketConfigMap( const int &socket, const ServerConfigs *config );
+		const ServerConfigs *getServerConfig( const int &socket );
+		
 };
 
 /* Config Utils Functions */
