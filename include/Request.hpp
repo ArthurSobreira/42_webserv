@@ -1,10 +1,13 @@
-
 #ifndef REQUEST_HPP_
 #define REQUEST_HPP_
 
 #include "Includes.hpp"
+#include <map>
+#include <string>
+#include <sstream>
+#include <set>
 
-// Class declaration
+// Classe Request para parsing de requisições HTTP
 class Request
 {
 private:
@@ -18,9 +21,9 @@ private:
 	std::string body;
 
 public:
-	// Método para parsear a requisição do cliente
-	bool parseRequest(const std::string &raw_request);
 	Request();
+	bool parseRequest(const std::string &raw_request);
+	bool isComplete(const std::string &raw_request) const;
 	// Getters
 	std::string getMethod() const { return method; }
 	std::string getUri() const { return uri; }
@@ -30,6 +33,8 @@ public:
 	bool getIsAllowDirectoryListing() const { return allow_directory_listing; }
 	std::map<std::string, std::string> getHeaders() const { return headers; }
 	std::string getBody() const { return body; }
+	std::string getHeader(const std::string &key) const;
+	bool keepAlive() const;
 
 	// Setters
 	void setMethod(const std::string &m) { method = m; }
@@ -40,7 +45,10 @@ public:
 	void setAllowDirectoryListing(bool allow) { allow_directory_listing = allow; }
 	void setHeaders(const std::map<std::string, std::string> &h) { headers = h; }
 	void setBody(const std::string &b) { body = b; }
-};
 
+private:
+	bool validateMethod();
+	bool validateHttpVersion();
+};
 
 #endif // REQUEST_HPP_
