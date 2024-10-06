@@ -39,6 +39,7 @@ private:
 
     // Métodos internos auxiliares
     void setBodyWithContentType(const std::string &bodyContent, const std::string &path);
+	void handlerValidRequest(Request &request, Logger &logger);
 };
 
 #endif // RESPONSE_HPP_

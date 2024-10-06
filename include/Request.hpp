@@ -19,6 +19,7 @@ private:
 	bool allow_directory_listing;
 	std::map<std::string, std::string> headers;
 	std::string body;
+	std::string raw_request;
 
 public:
 	Request();
@@ -35,6 +36,7 @@ public:
 	std::string getBody() const { return body; }
 	std::string getHeader(const std::string &key) const;
 	bool keepAlive() const;
+	std::string getRawRequest() const { return raw_request; }
 
 	// Setters
 	void setMethod(const std::string &m) { method = m; }
@@ -45,9 +47,10 @@ public:
 	void setAllowDirectoryListing(bool allow) { allow_directory_listing = allow; }
 	void setHeaders(const std::map<std::string, std::string> &h) { headers = h; }
 	void setBody(const std::string &b) { body = b; }
+	void setRawRequest(const std::string &raw) { raw_request = raw; }
+	bool validateMethod();
 
 private:
-	bool validateMethod();
 	bool validateHttpVersion();
 };
 
