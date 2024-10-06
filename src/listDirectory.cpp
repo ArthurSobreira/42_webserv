@@ -20,7 +20,6 @@ void addHeader(std::ostringstream &oss, const std::string &title)
 void addFileEntry(std::ostringstream &oss, const std::string &dirPath, const std::string &name, const std::string &modDate, const std::string &size, std::string icon)
 {
 	std::string fullPath = dirPath + "/" + name;
-
 	oss << "<tr><td valign=\"top\"><img src=\"" << icon << "\" alt=\"[   ]\"></td>"
 		<< "<td><a href=\"" << fullPath << "\">" << name << "</a></td>"
 		<< "<td align=\"right\">" << modDate << "</td>"
@@ -48,7 +47,6 @@ std::string findImage(std::string &name)
 	{
 		name += "/";
 		return "/icons/folder.gif";
-
 	}
 	if (name.find(".html") != std::string::npos)
 		return "/icons/html.gif";
@@ -57,19 +55,41 @@ std::string findImage(std::string &name)
 	return "/icons/unknown.gif";
 }
 
+std::string resolveParentPath(const std::string &currentPath)
+{
+	if (currentPath.empty() || currentPath == "/")
+		return "/";
+
+	std::vector<std::string> parts;
+	std::stringstream ss(currentPath);
+	std::string part;
+	while (std::getline(ss, part, '/'))
+	{
+		if (!part.empty())
+			parts.push_back(part);
+	}
+
+	if (!parts.empty())
+		parts.pop_back();
+
+	std::string newPath;
+	for (size_t i = 0; i < parts.size(); ++i)
+		newPath += "/" + parts[i];
+	return newPath.empty() ? "/" : newPath;
+}
+
 std::string listDirectory(const std::string &dirPath)
 {
 	DIR *dir = opendir(dirPath.c_str());
 	if (!dir)
-	{
 		return "<p>Erro ao abrir o diretório.</p>";
-	}
 
 	std::ostringstream html;
 	addHeader(html, dirPath);
 
 	diretory *entry;
-	addFileEntry(html, dirPath, "../", "-", "-", "/icons/folder.gif");
+	addFileEntry(html, resolveParentPath(dirPath), "../", "-", "-", "/icons/folder.gif");
+
 	while ((entry = readdir(dir)) != NULL)
 	{
 		std::string name = entry->d_name;
