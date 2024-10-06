@@ -4,8 +4,8 @@
 
 /* Struct CGIConfigs Constructor */
 CGIConfigs::CGIConfigs( void ) {
-	cgiPath = DEFAULT_CGI_PATH;
-	cgiExtension = DEFAULT_CGI_EXT;
+	cgiPath = DEFAULT_EMPTY;
+	cgiExtension = DEFAULT_EMPTY;
 	cgiEnabled = false;
 }
 
@@ -15,10 +15,12 @@ LocationConfigs::LocationConfigs( void ) {
 	locationPath = DEFAULT_LOCATION_PATH;
 	root = DEFAULT_ROOT;
 	index = DEFAULT_INDEX;
-	redirect = DEFAULT_REDIRECT;
+	redirect = DEFAULT_EMPTY;
 	uploadPath = DEFAULT_UPLOAD_PATH;
 	autoindex = false;
 	uploadEnabled = false;
+	rootSet = false;
+	redirectSet = false;
 	cgiConfig = CGIConfigs();
 }
 
@@ -46,10 +48,8 @@ Config::Config( const std::string &fileName, Logger &logger )
 	}
 
 	if (configFile.is_open()) {
-		_logger.logDebug(LOG_DEBUG, "Config file: " + fileName, true);
 		_serverCount = ConfigUtils::getServerCount(fileName);
-		_logger.logDebug(LOG_DEBUG, "Server count: " 
-				+ ConfigUtils::shortToString(_serverCount), true);
+		_logger.logDebug(LOG_DEBUG, "Starting to parse " + fileName, true);
 		_parseConfigFile(configFile);
 		configFile.close();
 		return ;
@@ -156,7 +156,7 @@ void	Config::_parseServerBlock( const std::string &serverBlock ) {
 
 		if (tokens[0] != "error_page" && tokens[0] != "location" &&
 			serverKeys.find(tokens[0]) != serverKeys.end()) {
-			throw std::runtime_error(ERROR_DUPLICATE_SERVER_KEY);
+			throw std::runtime_error(ERROR_DUPLICATE_KEY);
 		} else { serverKeys.insert(tokens[0]); }
 
 		if (tokens[0] == "listen") { ServerExtraction::port(tokens, server); }
@@ -236,17 +236,22 @@ void	Config::_parseLocationBlock( const std::string &locationBlock, LocationConf
 		if (tokens.empty()) { continue; }
 
 		if (locationKeys.find(tokens[0]) != locationKeys.end()) {
-			throw std::runtime_error(ERROR_DUPLICATE_LOCATION_KEY);
+			throw std::runtime_error(ERROR_DUPLICATE_KEY);
 		} else { locationKeys.insert(tokens[0]); }
 
-		if (tokens[0] == "location_path") { LocationExtraction::locationPath(tokens, location); }
-		// else if (tokens[0] == "root") { LocationExtraction::root(tokens, location); }
-		// else if (tokens[0] == "index") { LocationExtraction::index(tokens, location); }
-		// else if (tokens[0] == "redirect") { LocationExtraction::redirect(tokens, location); }
-		// else if (tokens[0] == "methods") { LocationExtraction::methods(tokens, location); }
-		// else if (tokens[0] == "autoindex") { LocationExtraction::autoindex(tokens, location); }
-		// else if (tokens[0] == "upload") { LocationExtraction::upload(tokens, location); }
-		// else if (tokens[0] == "cgi") { LocationExtraction::cgi(tokens, location); }
-		// else { throw std::runtime_error(ERROR_INVALID_KEY); }
+		if (tokens[0] == "methods") { LocationExtraction::methods(tokens, location); }
+		else if (tokens[0] == "location_path") { LocationExtraction::locationPath(tokens, location); }
+		else if (tokens[0] == "root") { LocationExtraction::root(tokens, location); }
+		else if (tokens[0] == "index") { LocationExtraction::index(tokens, location); }
+		else if (tokens[0] == "redirect") { LocationExtraction::redirect(tokens, location); }
+		else if (tokens[0] == "upload_path") { LocationExtraction::uploadPath(tokens, location); }
+		else if (tokens[0] == "autoindex") { LocationExtraction::autoindex(tokens, location); }
+		else if (tokens[0] == "upload_enabled") { LocationExtraction::uploadEnabled(tokens, location); }
+		else if (tokens[0] == "cgi_path") { LocationExtraction::cgiPath(tokens, location); }
+		else if (tokens[0] == "cgi_extension") { LocationExtraction::cgiExtension(tokens, location); }
+		else { throw std::runtime_error(ERROR_INVALID_KEY); }
 	}
+	ConfigUtils::validateFullLocationPath(location);
+	ConfigUtils::validateFullCGIPath(location);
+	ConfigUtils::createUploadFolder(location.uploadPath);
 }

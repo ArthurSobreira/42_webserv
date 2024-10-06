@@ -13,6 +13,14 @@ Logger::Logger( const std::string &debugLog, const std::string &logAccess,
 	if (!_debugLog.is_open() || !_logAccess.is_open() || !_logError.is_open())
 		ft_error(ERROR_OPEN_LOG_FILE, __FUNCTION__, __FILE__, __LINE__, 
 			std::runtime_error(ERROR_OPEN_LOG_FILE));
+
+	static short start = 0;
+
+	if (start++ == 0) {
+		this->logDebug(LOG_INFO, "Starting debug log...", true);
+		this->logAccess(LOG_INFO, "Starting access log...", true);
+		this->logError(LOG_INFO, "Starting error log...", true);
+	}
 }
 
 /* Destructor Method */
@@ -33,7 +41,7 @@ void Logger::logDebug( const std::string &severity,
 				<< severity << message << std::endl;
 	if (tty && _isTerminal(std::cout))
 		std::cout << COLORIZE(GRAY, _currentDateTime()) << " - " 
-				<< severity << message << std::endl;
+				<< _colSeverity(severity) << message << std::endl;
 }
 
 void Logger::logAccess( const std::string &severity,
@@ -43,7 +51,7 @@ void Logger::logAccess( const std::string &severity,
 				<< severity << message << std::endl;
 	if (tty && _isTerminal(std::cout))
 		std::cout << COLORIZE(GRAY, _currentDateTime()) << " - "
-				<< severity << message << std::endl;
+				<< _colSeverity(severity) << message << std::endl;
 }
 
 void Logger::logError( const std::string &severity,
@@ -54,10 +62,16 @@ void Logger::logError( const std::string &severity,
 				<< severity << message << std::endl;
 	if (tty && _isTerminal(std::cerr))
 		std::cerr << COLORIZE(GRAY, _currentDateTime()) << " - "
-				<< severity << message << std::endl;
+				<< _colSeverity(severity) << message << std::endl;
 }
 
 /* Private Methods */
+bool Logger::_isTerminal( std::ostream &os ) const {
+	if (&os == &std::cout || &os == &std::cerr)
+		return (isatty(fileno(stdout)));
+	return false;
+}
+
 std::string Logger::_currentDateTime( void ) const {
 	time_t now = time(0);
 	struct tm tstruct;
@@ -67,8 +81,10 @@ std::string Logger::_currentDateTime( void ) const {
 	return buf;
 }
 
-bool Logger::_isTerminal( std::ostream &os ) const {
-	if (&os == &std::cout || &os == &std::cerr)
-		return (isatty(fileno(stdout)));
-	return false;
+std::string Logger::_colSeverity( const std::string &severity ) const {
+	if (severity == LOG_DEBUG) { return COLORIZE(CYAN, severity); }
+	else if (severity == LOG_INFO) { return COLORIZE(GREEN, severity); }
+	else if (severity == LOG_WARN) { return COLORIZE(YELLOW, severity); }
+	else if (severity == LOG_ERROR) { return COLORIZE(RED, severity); }
+	return severity;
 }
