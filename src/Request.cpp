@@ -6,6 +6,8 @@ Request::Request() : method(""), uri(""), http_version(""), requestIsValid(false
 bool Request::parseRequest(const std::string &raw_request)
 {
 	size_t body_start = raw_request.find("\r\n\r\n");
+	std::cout << raw_request << std::endl;
+	setRawRequest(raw_request);
 	if (body_start == std::string::npos)
 	{
 		requestIsValid = false;
