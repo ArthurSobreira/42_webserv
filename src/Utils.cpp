@@ -1,6 +1,7 @@
 #include "Includes.hpp"
 #include "Defines.hpp"
 #include "Logger.hpp"
+#include "Config.hpp"
 
 bool inetPton(const std::string &ip_str)
 {
@@ -131,4 +132,24 @@ std::string getContentType(const std::string &uri){
 	if (extension == "mp3")
 		return "audio/mpeg";
 	return "plain/text";
+}
+
+
+Config *config = NULL;
+
+void setConfig(Config &c)
+{
+	if (!config)
+		config = &c;
+}
+
+Config &getConfig()
+{
+	return *config;
+}
+
+void signals(int sig)
+{
+	if (sig == SIGINT || sig == SIGQUIT || sig == SIGTERM)
+		throw std::runtime_error("bye bye");
 }

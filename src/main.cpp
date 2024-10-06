@@ -5,224 +5,165 @@
 #include "Logger.hpp"
 #include "Utils.hpp"
 #include "Server.hpp"
+#include "EpollManager.hpp"
 
-int epoll_fd;
-void addToEpoll(int sockfd);
-// std::string getHttpError(int status_code)
-// {
-// 	switch (status_code)
-// 	{
-// 	case 200:
-// 		return "OK";
-// 	case 400:
-// 		return "Bad Request";
-// 	case 404:
-// 		return "Not Found";
-// 	case 500:
-// 		return "Internal Server Error";
-// 	default:
-// 		return "Unknown";
-// 	}
-// }
-
-// std::string getContentType(const std::string &path)
-// {
-// 	if (path.find(".html") != std::string::npos)
-// 		return "text/html";
-// 	if (path.find(".css") != std::string::npos)
-// 		return "text/css";
-// 	if (path.find(".jpg") != std::string::npos || path.find(".jpeg") != std::string::npos)
-// 		return "image/jpeg";
-// 	if (path.find(".png") != std::string::npos)
-// 		return "image/png";
-// 	if (path.find(".gif") != std::string::npos)
-// 		return "image/gif";
-// 	if (path.find(".ico") != std::string::npos)
-// 		return "image/x-icon";
-// 	if (path.find(".js") != std::string::npos)
-// 		return "application/javascript";
-// 	if (path.find(".json") != std::string::npos)
-// 		return "application/json";
-// 	return "text/plain";
-// }
-
-// std::string createHeaderRequest(const std::string &path, int status_code, int content_length)
-// {
-// 	std::ostringstream header;
-// 	header << "HTTP/1.1 " << status_code << " " << getHttpError(status_code) << "\r\n";
-// 	header << "Content-Type: " << getContentType(path) << "\r\n";
-// 	header << "Content-Length: " << content_length << "\r\n";
-// 	header << "Connection: close\r\n\r\n";
-// 	return header.str();
-// }
-
-Request clientServerAccept(int sockfd, Logger &logger)
+void handleNewConnection(int server_sockfd, int epoll_fd, Logger &logger)
 {
-	sockaddrIn cli_addr;
-	socklen_t clilen = sizeof(cli_addr);
+	sockaddrIn client_addr;
+	socklen_t client_len = sizeof(client_addr);
+
+	int client_sockfd = accept(server_sockfd, (sockAddr *)&client_addr, &client_len);
+	if (client_sockfd == -1)
+	{
+		logger.logError(LOG_ERROR, "Error accepting new connection");
+		return;
+	}
+	int flags = fcntl(client_sockfd, F_GETFL, 0);
+	fcntl(client_sockfd, F_SETFL, flags | O_NONBLOCK);
+	struct epoll_event ev;
+	ev.events = EPOLLIN | EPOLLET;
+	ev.data.fd = client_sockfd;
+	if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_sockfd, &ev) == -1)
+	{
+		logger.logError(LOG_ERROR, "Failed to add client socket to epoll");
+		close(client_sockfd);
+	}
+	else
+		logger.logDebug(LOG_DEBUG, "New client connection accepted");
+}
+
+
+bool handleClientRequest(int client_sockfd, int epoll_fd, Request &request, Logger &logger)
+{
+	char buffer[1024];
+	std::string fullRequest;
+	request.setClientSocket(client_sockfd);
+
+	while (true)
+	{
+		int n = read(client_sockfd, buffer, sizeof(buffer));
+
+		if (n == -1)
+		{
+			logger.logError(LOG_ERROR, "Error reading from client socket");
+			close(client_sockfd);
+			epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client_sockfd, NULL);
+			return false;
+		}
+		else if (n == 0)
+		{
+			logger.logDebug(LOG_DEBUG, "Client disconnected");
+			close(client_sockfd);
+			epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client_sockfd, NULL);
+			return false;
+		}
+		else
+		{
+			fullRequest.append(buffer, n);
+
+			if (request.isComplete(fullRequest))
+			{
+				if (!request.parseRequest(fullRequest))
+				{
+					logger.logError(LOG_ERROR, "Invalid HTTP request");
+					close(client_sockfd);
+					epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client_sockfd, NULL);
+					return false;
+				}
+
+				logger.logDebug(LOG_DEBUG, "Request processed");
+
+				std::string method = request.getMethod();
+				std::string uri = request.getUri();
+				std::string user_agent = request.getHeader("User-Agent");
+
+				logger.logDebug(LOG_DEBUG, "Method: " + method + ", URI: " + uri);
+				logger.logDebug(LOG_DEBUG, "User-Agent: " + user_agent);
+
+				if (!request.keepAlive())
+				{
+					logger.logDebug(LOG_DEBUG, "Closing connection after response");
+					close(client_sockfd);
+					epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client_sockfd, NULL);
+				}
+				return true;
+			}
+		}
+	}
+}
+
+void runServer(const std::vector<int> &server_fds, int epoll_fd, Logger &logger)
+{
+	struct epoll_event events[MAX_EVENTS];
 	Request request;
-	int newsockfd = accept(sockfd, (sockAddr *)&cli_addr, &clilen);
-	addToEpoll(newsockfd);
-	if (newsockfd < 0)
-	{
-		logger.logError(LOG_ERROR, "Error on accept");
-		ft_error("Error on accept", __FUNCTION__, __FILE__, __LINE__, std::runtime_error("Error on accept"));
-	}
-	std::ostringstream log, access_log;
-	char buffer[4096];
-	int n = recv(newsockfd, buffer, 4095, 0);
-	if (n < 0)
-	{
-		logger.logError(LOG_ERROR, "Error reading from socket");
-		close(newsockfd);
-		ft_error("Error reading from socket", __FUNCTION__, __FILE__, __LINE__, std::runtime_error("Error reading from socket"));
-	}
 
-	std::string str(buffer);
-	if (!request.parseRequest(str))
+	while (true)
 	{
-		request.setRequestIsValid(false);
-		logger.logError(LOG_ERROR, "Error parsing request");
-	}
-	log << "Request received: " << request.getMethod() << " " << request.getUri() << " " << request.getHttpVersion();
-	logger.logDebug(LOG_DEBUG, log.str());
-	request.setClientSocket(newsockfd);
-	access_log << inetNtop(cli_addr.sin_addr.s_addr) << " - -  \"" << request.getMethod() << " " << request.getUri() << " " << request.getHttpVersion() << "\" ";
-	logger.logAccess(LOG_INFO, access_log.str());
-	logger.logDebug(LOG_DEBUG, request.getMethod(), true);
-	request.setRequestIsValid(true);
-	return request;
-}
+		int num_fds = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
+		if (num_fds == -1)
+		{
+			logger.logError(LOG_ERROR, "epoll_wait failed");
+			break;
+		}
 
-// std::string requestHandler(t_request &request, Logger &logger)
-// {
-// 	std::ostringstream log;
-// 	if(request.method.empty() || request.uri.empty() || request.http_version.empty())
-// 	{
-// 		logger.logError("ERROR", "Error parsing request");
-// 		std::string response = readFile("static/405.html");
-// 		request.status = 405;
-// 		return response;
-// 	}
-// 	std::string path = "static" + request.uri;
-// 	if (path[path.size() - 1] == '/')
-// 		path += "index.html";
-// 	std::string response;
-// 	status status;
-// 	if (stat(path.c_str(), &status) != 0)
-// 	{
-// 		logger.logError("ERROR", "File not found");
-// 		response = readFile("static/404.html");
-// 		request.status = 404;
-// 		return response;
-// 	}
-// 	if(S_ISDIR(status.st_mode))
-// 	{
-// 		logger.logError("ERROR", "Path is a directory");
-// 		response = readFile("static/404.html");
-// 		request.status = 404;
-// 		return response;
-// 	}
-// 	if(access(path.c_str(), R_OK) != 0)
-// 	{
-// 		logger.logError("ERROR", "File not readable");
-// 		response = readFile("static/403.html");
-// 		request.status = 403;
-// 		return response;
-// 	}
-// 	response = readFile(path);
-// 	return response;
-// }
+		for (int i = 0; i < num_fds; ++i)
+		{
+			bool isServerSocket = false;
 
-// void sendResponse(int sockfd, const std::string &response, Logger &logger)
-// {
-// 	int n = send(sockfd, response.c_str(), response.size(), 0);
-// 	if (n < 0)
-// 	{
-// 		logger.logError("ERROR", "Error writing to socket");
-// 	}
-// 	close(sockfd);
-// }
+			for (size_t j = 0; j < server_fds.size(); ++j)
+			{
+				if (events[i].data.fd == server_fds[j])
+				{
+					handleNewConnection(server_fds[j], epoll_fd, logger);
+					logger.logDebug(LOG_DEBUG, "New connection accepted", true);
+					isServerSocket = true;
+					break;
+				}
+			}
 
-void initializeEpoll()
-{
-	epoll_fd = epoll_create1(0);
-	if (epoll_fd == -1)
-	{
-		throw std::runtime_error("Failed to create epoll instance");
-	}
-}
-void addToEpoll(int sockfd)
-{
-	epollEvent event;
-	event.events = EPOLLIN;
-	event.data.fd = sockfd;
-	if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, sockfd, &event) == -1)
-	{
-		throw std::runtime_error("Failed to add socket to epoll");
+			if (!isServerSocket && (events[i].events & EPOLLIN))
+			{
+				handleClientRequest(events[i].data.fd, epoll_fd, request, logger);
+				Response response;
+				response.processRequest(request, logger);
+				std::string responseFull = response.generateResponse();
+				send(request.getClientSocket(), responseFull.c_str(), responseFull.size(), 0);
+				if (!request.keepAlive())
+				{
+					close(request.getClientSocket());
+					epoll_ctl(epoll_fd, EPOLL_CTL_DEL, request.getClientSocket(), NULL);
+				}
+				break;
+			}
+		}
 	}
 }
 
-void initializeServers(const std::vector<ServerConfigs> &servers, std::vector<int> &fds, Logger &logger)
+void initializeServers(const std::vector<ServerConfigs> &servers, std::vector<int> &fds, EpollManager &epoll, Logger &logger)
 {
 	std::ostringstream log;
 	for (size_t i = 0; i < servers.size(); ++i)
 	{
 		int sockfd = -1;
 		int backlog = SOMAXCONN;
-		if(!createServer(sockfd, servers[i].port, backlog, logger))
+		if (!createServer(sockfd, servers[i].port, backlog, logger))
 		{
 			log << "Error creating server on port " << servers[i].port;
 			logger.logError(LOG_ERROR, log.str(), true);
 			continue;
 		}
 		fds.push_back(sockfd);
-		addToEpoll(sockfd);
+		getConfig().setSocketConfigMap(sockfd, &servers[i]);
+		epoll.addToEpoll(sockfd);
 	}
 }
 
-void startEventLoop(Logger &logger)
-{
-	epollEvent events[MAX_EVENTS];
-	Request request;
-	Response response;
-
-	while (true)
-	{
-		int num_events = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
-		if (num_events == -1)
-		{
-			logger.logError(LOG_ERROR, "Error on epoll_wait");
-			continue;
-		}
-		for (int i = 0; i < num_events; ++i)
-		{
-			int sockfd = events[i].data.fd;
-			request = clientServerAccept(sockfd, logger);
-			response.responseTratament(request, logger);
-			std::string responseFull = response.generateResponse();
-			send(request.getClientSocket(), responseFull.c_str(), responseFull.size(), 0);
-			close(request.getClientSocket());
-			// std::string response = requestHandler(request, logger);
-			// std::string header = createHeaderRequest(request.uri, request.status, response.size());
-			// response = header + response;
-			// sendResponse(request.client_socket, response, logger);
-		}
-	}
-}
-
-void cleanup(std::vector<int> &fds)
+void cleanup(std::vector<int> &fds, Logger &logger)
 {
 	for (size_t i = 0; i < fds.size(); ++i)
-		close(fds[i]);
-	close(epoll_fd);
-}
-
-void signals(int sig)
-{
-	if (sig == SIGINT || sig == SIGQUIT || sig == SIGTERM)
 	{
-		throw std::runtime_error("bye bye");
+		close(fds[i]);
+		logger.logDebug(LOG_DEBUG, "Socket closed", true);
 	}
 }
 
@@ -241,19 +182,89 @@ int main(int argc, char **argv)
 	try
 	{
 		Config config(config_file_path, logger);
-
-		initializeEpoll();
-		initializeServers(config.getServers(), fds, logger);
-		startEventLoop(logger);
-		cleanup(fds);
+		setConfig(config);
+		EpollManager epoll;
+		initializeServers(config.getServers(), fds, epoll, logger);
+		runServer(fds, epoll.getEpollFD(), logger);
+		cleanup(fds, logger);
 	}
 	catch (const std::exception &e)
 	{
 		logger.logError(LOG_ERROR, e.what(), true);
-		cleanup(fds);
+		cleanup(fds, logger);
+		std::string bye(e.what());
+		if (bye == "bye bye")
+			return EXIT_SUCCESS;
 		return EXIT_FAILURE;
 	}
 
-	std::cout << GREEN << "MAIN" << RESET << std::endl;
 	return EXIT_SUCCESS;
 }
+
+// void startEventLoop(Logger &logger)
+// {
+// 	epollEvent events[MAX_EVENTS];
+// 	Request request;
+// 	Response response;
+
+// 	while (true)
+// 	{
+// 		int num_events = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
+// 		if (num_events == -1)
+// 		{
+// 			logger.logError(LOG_ERROR, "Error on epoll_wait");
+// 			continue;
+// 		}
+// 		for (int i = 0; i < num_events; ++i)
+// 		{
+// 			int sockfd = events[i].data.fd;
+// 			request = clientServerAccept(sockfd, logger);
+// 			response.responseTratament(request, logger);
+// 			std::string responseFull = response.generateResponse();
+// 			send(request.getClientSocket(), responseFull.c_str(), responseFull.size(), 0);
+// 			close(request.getClientSocket());
+// 			// std::string response = requestHandler(request, logger);
+// 			// std::string header = createHeaderRequest(request.uri, request.status, response.size());
+// 			// response = header + response;
+// 			// sendResponse(request.client_socket, response, logger);
+// 		}
+// 	}
+// }
+
+// Request clientServerAccept(int sockfd, Logger &logger)
+// {
+// 	sockaddrIn cli_addr;
+// 	socklen_t clilen = sizeof(cli_addr);
+// 	Request request;
+// 	int newsockfd = accept(sockfd, (sockAddr *)&cli_addr, &clilen);
+// 	addToEpoll(newsockfd);
+// 	if (newsockfd < 0)
+// 	{
+// 		logger.logError(LOG_ERROR, "Error on accept");
+// 		ft_error("Error on accept", __FUNCTION__, __FILE__, __LINE__, std::runtime_error("Error on accept"));
+// 	}
+// 	std::ostringstream log, access_log;
+// 	char buffer[4096];
+// 	int n = recv(newsockfd, buffer, 4095, 0);
+// 	if (n < 0)
+// 	{
+// 		logger.logError(LOG_ERROR, "Error reading from socket");
+// 		close(newsockfd);
+// 		ft_error("Error reading from socket", __FUNCTION__, __FILE__, __LINE__, std::runtime_error("Error reading from socket"));
+// 	}
+
+// 	std::string str(buffer);
+// 	if (!request.parseRequest(str))
+// 	{
+// 		request.setRequestIsValid(false);
+// 		logger.logError(LOG_ERROR, "Error parsing request");
+// 	}
+// 	log << "Request received: " << request.getMethod() << " " << request.getUri() << " " << request.getHttpVersion();
+// 	logger.logDebug(LOG_DEBUG, log.str());
+// 	request.setClientSocket(newsockfd);
+// 	access_log << inetNtop(cli_addr.sin_addr.s_addr) << " - -  \"" << request.getMethod() << " " << request.getUri() << " " << request.getHttpVersion() << "\" ";
+// 	logger.logAccess(LOG_INFO, access_log.str());
+// 	logger.logDebug(LOG_DEBUG, request.getMethod(), true);
+// 	request.setRequestIsValid(true);
+// 	return request;
+// }

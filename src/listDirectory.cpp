@@ -19,8 +19,8 @@ void addHeader(std::ostringstream &oss, const std::string &title)
 
 void addFileEntry(std::ostringstream &oss, const std::string &dirPath, const std::string &name, const std::string &modDate, const std::string &size, std::string icon)
 {
-	// Adicionar o caminho do diretório ao nome do arquivo
 	std::string fullPath = dirPath + "/" + name;
+
 	oss << "<tr><td valign=\"top\"><img src=\"" << icon << "\" alt=\"[   ]\"></td>"
 		<< "<td><a href=\"" << fullPath << "\">" << name << "</a></td>"
 		<< "<td align=\"right\">" << modDate << "</td>"
@@ -36,7 +36,7 @@ void addFooter(std::ostringstream &oss)
 
 bool isDirectory(const std::string &path)
 {
-	struct stat statbuf;
+	status statbuf;
 	if (stat(path.c_str(), &statbuf) != 0)
 		return false;
 	return S_ISDIR(statbuf.st_mode);

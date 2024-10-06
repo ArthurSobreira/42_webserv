@@ -22,7 +22,7 @@ BUILD_TEST	=	./build_test
 SRCS		=	src/Config.cpp src/ConfigExtract.cpp src/ConfigUtils.cpp \
 				src/HttpError.cpp src/listDirectory.cpp src/Logger.cpp \
 				src/Request.cpp src/Response.cpp src/Server.cpp src/Utils.cpp \
-				src/main.cpp
+				src/EpoolManager.cpp src/main.cpp
 
 TEST_SRCS	=	test/main.cpp $(filter-out src/main.cpp, $(SRCS)) 
 OBJS		=	$(addprefix $(BUILD)/, $(notdir $(SRCS:.cpp=.o)))
