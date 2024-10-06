@@ -20,7 +20,7 @@ void handleNewConnection(int server_sockfd, int epoll_fd, Logger &logger)
 	}
 	int flags = fcntl(client_sockfd, F_GETFL, 0);
 	fcntl(client_sockfd, F_SETFL, flags | O_NONBLOCK);
-	struct epoll_event ev;
+	epollEvent ev;
 	ev.events = EPOLLIN | EPOLLET;
 	ev.data.fd = client_sockfd;
 	if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_sockfd, &ev) == -1)
@@ -32,8 +32,40 @@ void handleNewConnection(int server_sockfd, int epoll_fd, Logger &logger)
 		logger.logDebug(LOG_DEBUG, "New client connection accepted");
 }
 
+bool readClientData(int client_sockfd, char *buffer, std::string &fullRequest, Logger &logger)
+{
+	int n = read(client_sockfd, buffer, sizeof(buffer));
 
-bool handleClientRequest(int client_sockfd, int epoll_fd, Request &request, Logger &logger)
+	if (n == -1)
+	{
+		logger.logError(LOG_ERROR, "Error reading from client socket");
+		return false;
+	}
+	else if (n == 0)
+	{
+		logger.logDebug(LOG_DEBUG, "Client disconnected");
+		return false;
+	}
+
+	fullRequest.append(buffer, n);
+	return true;
+}
+
+bool processRequest(Request &request, const std::string &fullRequest, Logger &logger)
+{
+	if (!request.parseRequest(fullRequest))
+	{
+		logger.logError(LOG_ERROR, "Invalid HTTP request");
+		return false;
+	}
+	logger.logDebug(LOG_DEBUG, "Request processed",true);
+	logger.logDebug(LOG_DEBUG, "Method: " + request.getMethod() + ", URI: " + request.getUri() + ", HTTP Version: " + request.getHttpVersion(), true);
+	logger.logDebug(LOG_DEBUG, "User-Agent: " + request.getHeader("User-Agent"), true);
+
+	return true;
+}
+
+bool handleClientRequest(int client_sockfd, Request &request, Logger &logger)
 {
 	char buffer[1024];
 	std::string fullRequest;
@@ -41,60 +73,62 @@ bool handleClientRequest(int client_sockfd, int epoll_fd, Request &request, Logg
 
 	while (true)
 	{
-		int n = read(client_sockfd, buffer, sizeof(buffer));
-
-		if (n == -1)
-		{
-			logger.logError(LOG_ERROR, "Error reading from client socket");
-			close(client_sockfd);
-			epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client_sockfd, NULL);
+		if (!readClientData(client_sockfd, buffer, fullRequest, logger))
 			return false;
-		}
-		else if (n == 0)
+		if (request.isComplete(fullRequest))
 		{
-			logger.logDebug(LOG_DEBUG, "Client disconnected");
-			close(client_sockfd);
-			epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client_sockfd, NULL);
-			return false;
-		}
-		else
-		{
-			fullRequest.append(buffer, n);
-
-			if (request.isComplete(fullRequest))
-			{
-				if (!request.parseRequest(fullRequest))
-				{
-					logger.logError(LOG_ERROR, "Invalid HTTP request");
-					close(client_sockfd);
-					epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client_sockfd, NULL);
-					return false;
-				}
-
-				logger.logDebug(LOG_DEBUG, "Request processed");
-
-				std::string method = request.getMethod();
-				std::string uri = request.getUri();
-				std::string user_agent = request.getHeader("User-Agent");
-
-				logger.logDebug(LOG_DEBUG, "Method: " + method + ", URI: " + uri);
-				logger.logDebug(LOG_DEBUG, "User-Agent: " + user_agent);
-
-				if (!request.keepAlive())
-				{
-					logger.logDebug(LOG_DEBUG, "Closing connection after response");
-					close(client_sockfd);
-					epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client_sockfd, NULL);
-				}
-				return true;
-			}
+			if (!processRequest(request, fullRequest, logger))
+				return false;
+			if (!request.keepAlive())
+				logger.logDebug(LOG_DEBUG, "Closing connection after response");
+			return true;
 		}
 	}
 }
 
+void handleServerSocket(int server_fd, int epoll_fd, Logger &logger)
+{
+	handleNewConnection(server_fd, epoll_fd, logger);
+	logger.logDebug(LOG_DEBUG, "New connection accepted", true);
+}
+void closeConnection(int client_fd, int epoll_fd)
+{
+	close(client_fd);
+	epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client_fd, NULL);
+}
+
+void handleClientSocket(int client_fd, int epoll_fd, Request &request, Logger &logger)
+{
+	handleClientRequest(client_fd, request, logger);
+	Response response;
+	response.processRequest(request, logger);
+	std::string responseFull = response.generateResponse();
+
+	logger.logDebug(LOG_DEBUG, "Sending response to client", true);
+	ssize_t bytes_sent = send(request.getClientSocket(), responseFull.c_str(), responseFull.size(), 0);
+
+	if (bytes_sent == -1)
+	{
+		logger.logError(LOG_ERROR, "Error sending response");
+		closeConnection(client_fd, epoll_fd);
+	}
+	else if (!request.getIsRequestValid() || !request.keepAlive())
+	{
+		logger.logDebug(LOG_DEBUG, "Closing connection after response");
+		closeConnection(client_fd, epoll_fd);
+	}
+}
+
+
+
+bool isServerSocket(int fd, const std::vector<int> &server_fds)
+{
+	return std::find(server_fds.begin(), server_fds.end(), fd) != server_fds.end();
+}
+
 void runServer(const std::vector<int> &server_fds, int epoll_fd, Logger &logger)
 {
-	struct epoll_event events[MAX_EVENTS];
+	epollEvent events[MAX_EVENTS];
 	Request request;
 
 	while (true)
@@ -108,33 +142,12 @@ void runServer(const std::vector<int> &server_fds, int epoll_fd, Logger &logger)
 
 		for (int i = 0; i < num_fds; ++i)
 		{
-			bool isServerSocket = false;
+			int current_fd = events[i].data.fd;
 
-			for (size_t j = 0; j < server_fds.size(); ++j)
-			{
-				if (events[i].data.fd == server_fds[j])
-				{
-					handleNewConnection(server_fds[j], epoll_fd, logger);
-					logger.logDebug(LOG_DEBUG, "New connection accepted", true);
-					isServerSocket = true;
-					break;
-				}
-			}
-
-			if (!isServerSocket && (events[i].events & EPOLLIN))
-			{
-				handleClientRequest(events[i].data.fd, epoll_fd, request, logger);
-				Response response;
-				response.processRequest(request, logger);
-				std::string responseFull = response.generateResponse();
-				send(request.getClientSocket(), responseFull.c_str(), responseFull.size(), 0);
-				if (!request.keepAlive())
-				{
-					close(request.getClientSocket());
-					epoll_ctl(epoll_fd, EPOLL_CTL_DEL, request.getClientSocket(), NULL);
-				}
-				break;
-			}
+			if (isServerSocket(current_fd, server_fds))
+				handleServerSocket(current_fd, epoll_fd, logger);
+			else if (events[i].events & EPOLLIN)
+				handleClientSocket(current_fd, epoll_fd, request, logger);
 		}
 	}
 }
