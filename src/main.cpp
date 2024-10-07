@@ -30,6 +30,7 @@ void handleNewConnection(int server_sockfd, int epoll_fd, Logger &logger)
 	}
 	else
 		logger.logDebug(LOG_DEBUG, "New client connection accepted");
+	getConfig().setSocketServerMap(client_sockfd, server_sockfd);
 }
 
 bool readClientData(int client_sockfd, char *buffer, std::string &fullRequest, Logger &logger)
@@ -101,7 +102,7 @@ void handleClientSocket(int client_fd, int epoll_fd, Request &request, Logger &l
 {
 	handleClientRequest(client_fd, request, logger);
 	Response response;
-	response.processRequest(request, logger);
+	response.processRequest(request,getConfig().getServerConfig(getConfig().getServerSocket(client_fd)), logger);
 	std::string responseFull = response.generateResponse();
 
 	logger.logDebug(LOG_DEBUG, "Sending response to client", true);
