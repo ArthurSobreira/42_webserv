@@ -3,63 +3,63 @@
 #include <sys/stat.h>
 #include "Config.hpp"
 
-Response::Response() : status_code(200), reason_phrase("OK") {}
+Response::Response() : _status_code(200), _reason_phrase("OK"), _root("static"){}
 
 std::string Response::generateResponse() const
 {
 	std::ostringstream response_stream;
 
-	response_stream << "HTTP/1.1 " << status_code << " " << reason_phrase << "\r\n";
-	for (std::map<std::string, std::string>::const_iterator it = headers.begin(); it != headers.end(); ++it)
+	response_stream << "HTTP/1.1 " << _status_code << " " << _reason_phrase << "\r\n";
+	for (std::map<std::string, std::string>::const_iterator it = _headers.begin(); it != _headers.end(); ++it)
 	{
 		response_stream << it->first << ": " << it->second << "\r\n";
 	}
 	response_stream << "\r\n";
-	response_stream << this->body;
+	response_stream << _body;
 
 	return response_stream.str();
 }
 
 void Response::setStatus(int code, const std::string &reason)
 {
-	status_code = code;
-	reason_phrase = reason;
+	_status_code = code;
+	_reason_phrase = reason;
 }
 
 void Response::setHeader(const std::string &key, const std::string &value)
 {
-	headers[key] = value;
+	_headers[key] = value;
 }
 
 void Response::setBody(const std::string &bodyContent)
 {
-	body = bodyContent;
+	_body = bodyContent;
 	std::stringstream ss;
-	ss << body.size();
+	ss << _body.size();
 	setHeader("Content-Length", ss.str());
 }
 
 int Response::getStatusCode() const
 {
-	return status_code;
+	return _status_code;
 }
 
 std::string Response::getReasonPhrase() const
 {
-	return reason_phrase;
+	return _reason_phrase;
 }
 
 std::string Response::getHeader(const std::string &key) const
 {
-	std::map<std::string, std::string>::const_iterator it = headers.find(key);
-	if (it != headers.end())
+	std::map<std::string, std::string>::const_iterator it = _headers.find(key);
+	if (it != _headers.end())
 		return it->second;
 	return "";
 }
 
 std::string Response::getBody() const
 {
-	return body;
+	return _body;
 }
 
 void Response::setBodyWithContentType(const std::string &bodyContent, const std::string &path)
@@ -86,8 +86,9 @@ void Response::handlerValidRequest(Request &request, Logger &logger)
 	std::cout << "debbug response 11" << std::endl;
 }
 
-void Response::processRequest(Request &request, Logger &logger)
+void Response::processRequest(Request &request, const ServerConfigs* respconfig,Logger &logger)
 {
+	(void)respconfig;
 	std::string path;
 	if (!request.getIsRequestValid())
 	{
@@ -96,7 +97,7 @@ void Response::processRequest(Request &request, Logger &logger)
 		return;
 	}
 
-	if (request.getUri().find("static") != std::string::npos)
+	if (request.getUri().find(_root) != std::string::npos)
 	{
 		std::cout << "debbug response 2" << std::endl;
 		path = "./" + request.getUri();
@@ -104,7 +105,7 @@ void Response::processRequest(Request &request, Logger &logger)
 	else
 	{
 		std::cout << "debbug response 3" << std::endl;
-		path = "static" + request.getUri();
+		path = _root + request.getUri();
 	}
 	logger.logDebug(LOG_INFO, "'response' Request URI: " + path, true);
 	if (path[path.size() - 1] == '/')
@@ -139,11 +140,11 @@ void Response::processRequest(Request &request, Logger &logger)
 	handleFileResponse(path, logger);
 }
 
-void Response::handleError(int status_code, const std::string &error_page, const std::string &error_message, Logger &logger)
+void Response::handleError(int _status_code, const std::string &error_page, const std::string &error_message, Logger &logger)
 {
 	logger.logError("ERROR", error_message);
 	std::string bodyContent = readFile(error_page);
-	setStatus(status_code, error_message);
+	setStatus(_status_code, error_message);
 	setBodyWithContentType(bodyContent, error_page);
 	std::stringstream ss;
 	ss << bodyContent.size();
