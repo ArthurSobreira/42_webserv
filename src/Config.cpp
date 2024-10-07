@@ -205,7 +205,6 @@ void	Config::_parseLocationStream( std::istringstream &serverStream, ServerConfi
 					}
 				}
 			}
-
 			if (locationBracketsCount == 0) {
 				locationBracketsCount = 0;
 				insideLocationBlock = false;
