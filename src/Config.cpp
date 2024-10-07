@@ -56,6 +56,14 @@ Config::Config( const std::string &fileName, Logger &logger )
 	}
 };
 
+/* Destructor Method */
+Config::~Config( void ) {};
+
+/* Public Methods */
+std::vector<ServerConfigs> Config::getServers( void ) const {
+	return (this->_servers);
+}
+
 std::map<int,const ServerConfigs*> Config::getSocketConfigMap( void ) const {
 	return (this->_socketConfigMap);
 }
@@ -76,14 +84,7 @@ int Config::getServerSocket( const int &socket ){
 	return (this->_socketServerMap[socket]);
 }
 
-/* Destructor Method */
-Config::~Config( void ) {};
-
-/* Public Methods */
-std::vector<ServerConfigs> Config::getServers( void ) const {
-	return (this->_servers);
-}
-
+/* Private Methods */
 void Config::_parseConfigFile( std::ifstream &configFile ) {
 	std::string line;
 	std::string serverBlock;
