@@ -56,7 +56,7 @@ class Config {
 		short _serverCount;
 		Logger &_logger;
 		std::map<int, const ServerConfigs*> _socketConfigMap;
-		std::map<int,int> _socketServerMap;
+		std::map<int, int> _socketServerMap;
 
 		/* Private Methods */
 		void _parseConfigFile( std::ifstream &configFile );
@@ -68,8 +68,7 @@ class Config {
 
 	public:
 		/* Constructor Method */
-		Config( const std::string &fileName,
-			Logger &logger );
+		Config( const std::string &fileName, Logger &logger );
 
 		/* Destructor Method */
 		~Config( void );
