@@ -4,6 +4,7 @@
 #include "Includes.hpp"
 #include "Request.hpp"
 #include "Logger.hpp"
+#include "Config.hpp"
 
 class Response {
 public:
@@ -25,17 +26,18 @@ public:
     std::string generateResponse() const;
 
     // Tratamento da resposta com base na requisição
-    void processRequest(Request &request, Logger &logger);
+    void processRequest(Request &request, const ServerConfigs* respconfig, Logger &logger);
 
     // Métodos auxiliares para erros
     void handleError(int status_code, const std::string &error_page, const std::string &error_message, Logger &logger);
     void handleFileResponse(const std::string &path, Logger &logger);
 
 private:
-    int status_code;
-    std::string reason_phrase;
-    std::map<std::string, std::string> headers;
-    std::string body;
+    int _status_code;
+    std::string _reason_phrase;
+    std::map<std::string, std::string> _headers;
+    std::string _body;
+	std::string _root;
 
     // Métodos internos auxiliares
     void setBodyWithContentType(const std::string &bodyContent, const std::string &path);
