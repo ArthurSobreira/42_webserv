@@ -57,15 +57,23 @@ Config::Config( const std::string &fileName, Logger &logger )
 };
 
 std::map<int,const ServerConfigs*> Config::getSocketConfigMap( void ) const {
-	return (this->socketConfigMap);
+	return (this->_socketConfigMap);
 }
 
 void Config::setSocketConfigMap( const int &socket, const ServerConfigs *config ) {
-	this->socketConfigMap[socket] = config;
+	this->_socketConfigMap[socket] = config;
 }
 
 const ServerConfigs *Config::getServerConfig( const int &socket ) {
-	return (this->socketConfigMap[socket]);
+	return (this->_socketConfigMap[socket]);
+}
+
+void Config::setSocketServerMap( const int &socket, const int &server ){
+	this->_socketServerMap[socket] = server;
+}
+		
+int Config::getServerSocket( const int &socket ){
+	return (this->_socketServerMap[socket]);
 }
 
 /* Destructor Method */
