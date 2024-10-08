@@ -3,28 +3,23 @@
 
 #include "Includes.hpp"
 #include "Defines.hpp"
+#include "Config.hpp"
+#include "Request.hpp"
 
 class CGI {
-	// private:
-	// 	int attribute;
+	private:
+		int	_returnCode;
+		std::string	_returnbody;
+		Request		&_request;
+		CGIConfigs	&_cgiConfig;
+		std::map<std::string, std::string> _env;
 		
 	public:
 		/* Constructor Method */
-		CGI( void );
-		
-		/* Copy Constructor Method */
-		CGI( const CGI &other );
-		
-		/* Copy Assignment Operator Overload */
-		CGI &operator=( const CGI &other );
-		
+		CGI( Request &request, CGIConfigs &cgiConfig );
+
 		/* Destructor Method */
 		~CGI( void );
-		
-		/* Public Methods */
-		// int    getAttribute( void ) const;
-		// void   setAttribute( int value );
-		
 };
 
 #endif
