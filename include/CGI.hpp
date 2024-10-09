@@ -10,13 +10,16 @@ class CGI {
 	private:
 		int		_returnCode;
 		std::string	_returnbody;
-		Request		&_request;
-		CGIConfigs	&_cgiConfig;
+		std::string	_cgiPath;
+		std::string _cgiExecutable;
+		Request		_request;
+		CGIConfigs	_cgiConfig;
 		std::map<std::string, std::string> _env;
 		
 	public:
 		/* Constructor Method */
-		CGI( Request &request, CGIConfigs &cgiConfig );
+		CGI( const Request &request, 
+			const LocationConfigs &location );
 
 		/* Destructor Method */
 		~CGI( void );
