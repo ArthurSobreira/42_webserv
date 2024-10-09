@@ -86,6 +86,21 @@ int Config::getServerSocket( const int &socket ){
 	return (this->_socketServerMap[socket]);
 }
 
+const LocationConfigs *Config::getLocationConfig( const ServerConfigs &serverConfig,
+	const std::string &uri ) const {
+	const LocationConfigs* bestMatch = NULL;
+	size_t bestMatchLength = 0;
+
+	for (std::vector<LocationConfigs>::const_iterator it = serverConfig.locations.begin(); 
+		it != serverConfig.locations.end(); ++it) {
+		if (uri.find(it->locationPath) == 0 && it->locationPath.length() > bestMatchLength) {
+			bestMatch = &(*it);
+			bestMatchLength = it->locationPath.length();
+		}
+	}
+	return (bestMatch);
+}
+
 /* Private Methods */
 void Config::_parseConfigFile( std::ifstream &configFile ) {
 	std::string line;
