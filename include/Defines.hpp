@@ -48,6 +48,8 @@
 # define DEFAULT_ERROR_405 "./static/errors/405.html"
 
 /* CGI Macros */
+# define PHP_EXECUTABLE "/usr/bin/php-cgi"
+# define PYTHON_EXECUTABLE "/usr/bin/python3"
 # define EXTENSION_PHP ".php"
 # define EXTENSION_PY ".py"
 
