@@ -16,6 +16,11 @@ class CGI {
 		CGIConfigs	_cgiConfig;
 		std::map<std::string, std::string> _env;
 		
+		/* Private Methods */
+		void	_setEnvironmentVars( void );
+		std::string _getQueryString( const std::string &uri ) const;
+		std::string _getPathInfo( const std::string &uri ) const;
+
 	public:
 		/* Constructor Method */
 		CGI( const Request &request, 
@@ -23,6 +28,11 @@ class CGI {
 
 		/* Destructor Method */
 		~CGI( void );
+
+		/* Public Methods */
+		std::string	getCGIOutput( void );
+		int	getReturnCode( void ) const;
+		std::string	getReturnBody( void ) const;
 };
 
 #endif
