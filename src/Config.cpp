@@ -30,8 +30,10 @@ ServerConfigs::ServerConfigs( void ) {
 	host = DEFAULT_HOST;
 	serverName = DEFAULT_SERVER_NAME;
 	limitBodySize = DEFAULT_LIMIT_BODY_SIZE;
+	errorPages["400"] = DEFAULT_ERROR_400;
 	errorPages["403"] = DEFAULT_ERROR_403;
 	errorPages["404"] = DEFAULT_ERROR_404;
+	errorPages["405"] = DEFAULT_ERROR_405;
 }
 
 /* Constructor Method */
