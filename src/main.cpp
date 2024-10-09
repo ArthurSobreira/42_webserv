@@ -6,6 +6,7 @@
 #include "Utils.hpp"
 #include "Server.hpp"
 #include "EpollManager.hpp"
+#include "CGI.hpp"
 
 void handleNewConnection(int server_sockfd, int epoll_fd, Logger &logger)
 {
@@ -100,9 +101,23 @@ void closeConnection(int client_fd, int epoll_fd)
 
 void handleClientSocket(int client_fd, int epoll_fd, Request &request, Logger &logger)
 {
-	handleClientRequest(client_fd, request, logger);
+	if (!handleClientRequest(client_fd, request, logger)) {
+		closeConnection(client_fd, epoll_fd);
+		return;
+	}
+
 	Response response;
-	response.processRequest(request,getConfig().getServerConfig(getConfig().getServerSocket(client_fd)), logger);
+	const ServerConfigs* serverConfig = getConfig().getServerConfig(getConfig().getServerSocket(client_fd));
+	const LocationConfigs* locationConfig = getConfig().getLocationConfig(*serverConfig, request.getUri());
+
+	if (locationConfig && locationConfig->cgiConfig.cgiEnabled) {
+		CGI cgi(request, *locationConfig);
+
+		response.setStatus(200, "OK");
+		// response.setBodyWithContentType(cgiOutput, locationConfig->cgiConfig.cgiPath);
+	}
+	else { response.processRequest(request, serverConfig, logger); }
+
 	std::string responseFull = response.generateResponse();
 
 	logger.logDebug(LOG_DEBUG, "Sending response to client", true);
