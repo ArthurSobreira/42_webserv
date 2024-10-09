@@ -61,46 +61,6 @@ Config::Config( const std::string &fileName, Logger &logger )
 /* Destructor Method */
 Config::~Config( void ) {};
 
-/* Public Methods */
-std::vector<ServerConfigs> Config::getServers( void ) const {
-	return (this->_servers);
-}
-
-std::map<int,const ServerConfigs*> Config::getSocketConfigMap( void ) const {
-	return (this->_socketConfigMap);
-}
-
-void Config::setSocketConfigMap( const int &socket, const ServerConfigs *config ) {
-	this->_socketConfigMap[socket] = config;
-}
-
-const ServerConfigs *Config::getServerConfig( const int &socket ) {
-	return (this->_socketConfigMap[socket]);
-}
-
-void Config::setSocketServerMap( const int &socket, const int &server ){
-	this->_socketServerMap[socket] = server;
-}
-		
-int Config::getServerSocket( const int &socket ){
-	return (this->_socketServerMap[socket]);
-}
-
-const LocationConfigs *Config::getLocationConfig( const ServerConfigs &serverConfig,
-	const std::string &uri ) const {
-	const LocationConfigs* bestMatch = NULL;
-	size_t bestMatchLength = 0;
-
-	for (std::vector<LocationConfigs>::const_iterator it = serverConfig.locations.begin(); 
-		it != serverConfig.locations.end(); ++it) {
-		if (uri.find(it->locationPath) == 0 && it->locationPath.length() > bestMatchLength) {
-			bestMatch = &(*it);
-			bestMatchLength = it->locationPath.length();
-		}
-	}
-	return (bestMatch);
-}
-
 /* Private Methods */
 void Config::_parseConfigFile( std::ifstream &configFile ) {
 	std::string line;
@@ -279,4 +239,44 @@ void	Config::_parseLocationBlock( const std::string &locationBlock, LocationConf
 	ConfigUtils::validateFullLocationPath(location);
 	ConfigUtils::validateFullCGIPath(location);
 	ConfigUtils::createUploadFolder(location.uploadPath);
+}
+
+/* Public Methods */
+std::vector<ServerConfigs> Config::getServers( void ) const {
+	return (this->_servers);
+}
+
+std::map<int,const ServerConfigs*> Config::getSocketConfigMap( void ) const {
+	return (this->_socketConfigMap);
+}
+
+void Config::setSocketConfigMap( const int &socket, const ServerConfigs *config ) {
+	this->_socketConfigMap[socket] = config;
+}
+
+const ServerConfigs *Config::getServerConfig( const int &socket ) {
+	return (this->_socketConfigMap[socket]);
+}
+
+void Config::setSocketServerMap( const int &socket, const int &server ){
+	this->_socketServerMap[socket] = server;
+}
+		
+int Config::getServerSocket( const int &socket ){
+	return (this->_socketServerMap[socket]);
+}
+
+const LocationConfigs *Config::getLocationConfig( const ServerConfigs &serverConfig,
+	const std::string &uri ) const {
+	const LocationConfigs* bestMatch = NULL;
+	size_t bestMatchLength = 0;
+
+	for (std::vector<LocationConfigs>::const_iterator it = serverConfig.locations.begin(); 
+		it != serverConfig.locations.end(); ++it) {
+		if (uri.find(it->locationPath) == 0 && it->locationPath.length() > bestMatchLength) {
+			bestMatch = &(*it);
+			bestMatchLength = it->locationPath.length();
+		}
+	}
+	return (bestMatch);
 }
