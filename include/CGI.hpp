@@ -8,7 +8,7 @@
 
 class CGI {
 	private:
-		int	_returnCode;
+		int		_returnCode;
 		std::string	_returnbody;
 		Request		&_request;
 		CGIConfigs	&_cgiConfig;
