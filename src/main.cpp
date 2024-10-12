@@ -57,7 +57,7 @@ bool processRequest(Request &request, const std::string &fullRequest, Logger &lo
 {
 	if (!request.parseRequest(fullRequest))
 	{
-		logger.logError(LOG_ERROR, "Invalid HTTP request");
+		logger.logError(LOG_ERROR, "Invalid HTTP request", true);
 		return false;
 	}
 	logger.logDebug(LOG_DEBUG, "Request processed",true);
@@ -106,19 +106,34 @@ void handleClientSocket(int client_fd, int epoll_fd, Request &request, Logger &l
 		return;
 	}
 
-	Response response;
 	const ServerConfigs* serverConfig = getConfig().getServerConfig(getConfig().getServerSocket(client_fd));
 	const LocationConfigs* locationConfig = getConfig().getLocationConfig(*serverConfig, request.getUri());
+	std::string responseFull;
+	Response response;
 
-	if (locationConfig && locationConfig->cgiConfig.cgiEnabled) {
-		CGI cgi(request, *locationConfig);
+	logger.logDebug(LOG_DEBUG, "location.cgiConfig.cgiPath = " + 
+		locationConfig->cgiPath, true);
 
-		response.setStatus(200, "OK");
+	if (locationConfig && locationConfig->cgiEnabled) {
+		logger.logDebug(LOG_DEBUG, "Entrou no CGI", true);
+		
+		CGI cgi(request, *serverConfig, *locationConfig);
+
+		// ConfigUtils::printServerStruct(*serverConfig);
+
+
+		response.setStatus(cgi.getReturnCode(), "OK");
+
+		// response.setStatus(200, "OK");
 		// response.setBodyWithContentType(cgiOutput, locationConfig->cgiConfig.cgiPath);
+		responseFull = cgi.getReturnBody();
 	}
 	else { response.processRequest(request, serverConfig, logger); }
 
-	std::string responseFull = response.generateResponse();
+	if (responseFull.empty()) { 
+		logger.logDebug(LOG_DEBUG, "Generating response", true);
+		responseFull = response.generateResponse();
+	}
 
 	logger.logDebug(LOG_DEBUG, "Sending response to client", true);
 	ssize_t bytes_sent = send(request.getClientSocket(), responseFull.c_str(), responseFull.size(), 0);
