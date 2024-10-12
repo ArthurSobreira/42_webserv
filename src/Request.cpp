@@ -1,7 +1,7 @@
 #include "Request.hpp"
 #include <sstream>
 
-Request::Request() : method(""), uri(""), http_version(""), requestIsValid(false), allow_directory_listing(true) {}
+Request::Request() : requestIsValid(false), client_socket(-1) {}
 
 bool Request::parseRequest(const std::string &raw_request)
 {
@@ -15,7 +15,7 @@ bool Request::parseRequest(const std::string &raw_request)
 	}
 
 	std::string header_part = raw_request.substr(0, body_start);
-	body = raw_request.substr(body_start + 4);
+	setBody(raw_request.substr(body_start + 4));
 
 	std::istringstream stream(header_part);
 	stream >> method >> uri >> http_version;
@@ -36,13 +36,13 @@ bool Request::parseRequest(const std::string &raw_request)
 			std::string key = line.substr(0, pos);
 			std::string value = line.substr(pos + 2);
 			value.erase(value.find_last_not_of(" \n\r\t") + 1);
-			headers[key] = value;
+			setHeader(key, value);
 		}
 	}
 
 	if (headers.find("Content-Length") != headers.end())
 	{
-		std::istringstream content_length_stream(headers["Content-Length"]);
+		std::istringstream content_length_stream(getHeader("Content-Length"));
 		size_t content_length;
 		content_length_stream >> content_length;
 		if (body.size() != content_length)
@@ -73,14 +73,6 @@ bool Request::validateHttpVersion()
 bool Request::isComplete(const std::string &raw_request) const
 {
 	return raw_request.find("\r\n\r\n") != std::string::npos;
-}
-
-std::string Request::getHeader(const std::string &key) const
-{
-	std::map<std::string, std::string>::const_iterator it = headers.find(key);
-	if (it != headers.end())
-		return it->second;
-	return "";
 }
 
 bool Request::keepAlive() const
