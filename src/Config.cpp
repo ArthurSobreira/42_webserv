@@ -3,11 +3,11 @@
 #include "Config.hpp"
 
 /* Struct CGIConfigs Constructor */
-CGIConfigs::CGIConfigs( void ) {
-	cgiPath = DEFAULT_EMPTY;
-	cgiExtension = DEFAULT_EMPTY;
-	cgiEnabled = false;
-}
+// CGIConfigs::CGIConfigs( void ) {
+// 	cgiEnabled = false;
+// 	cgiPath = DEFAULT_EMPTY;
+// 	cgiExtension = DEFAULT_EMPTY;
+// }
 
 /* Struct LocationConfigs Constructor */
 LocationConfigs::LocationConfigs( void ) {
@@ -21,7 +21,9 @@ LocationConfigs::LocationConfigs( void ) {
 	uploadEnabled = false;
 	rootSet = false;
 	redirectSet = false;
-	cgiConfig = CGIConfigs();
+	cgiEnabled = false;
+	cgiPath = DEFAULT_EMPTY;
+	cgiExtension = DEFAULT_EMPTY;
 }
 
 /* Struct ServerConfigs Constructor */
@@ -261,7 +263,7 @@ const ServerConfigs *Config::getServerConfig( const int &socket ) {
 void Config::setSocketServerMap( const int &socket, const int &server ){
 	this->_socketServerMap[socket] = server;
 }
-		
+
 int Config::getServerSocket( const int &socket ){
 	return (this->_socketServerMap[socket]);
 }
