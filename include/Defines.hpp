@@ -82,4 +82,6 @@
 # define ERROR_INVALID_CGI_PATH "Location: Invalid CGI Path!"
 # define ERROR_INVALID_CGI_EXTENSION "Location: Invalid CGI Extension!"
 
+# define ERROR_METHOD_NOT_ALLOWED "Method Not Allowed!"
+
 #endif
