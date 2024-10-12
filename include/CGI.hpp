@@ -5,6 +5,7 @@
 #include "Defines.hpp"
 #include "Config.hpp"
 #include "Request.hpp"
+#include "Response.hpp"
 
 class CGI {
 	private:
@@ -13,24 +14,25 @@ class CGI {
 		std::string	_cgiPath;
 		std::string _cgiExecutable;
 		Request		_request;
-		CGIConfigs	_cgiConfig;
+		ServerConfigs	_serverConfig;
+		LocationConfigs	_locationConfig;
 		std::map<std::string, std::string> _env;
 		
 		/* Private Methods */
 		void	_setEnvironmentVars( void );
+		std::string	_getContentLength( void ) const;
 		std::string _getQueryString( const std::string &uri ) const;
 		std::string _getPathInfo( const std::string &uri ) const;
 
 	public:
 		/* Constructor Method */
-		CGI( const Request &request, 
+		CGI( const Request &request, const ServerConfigs &server,
 			const LocationConfigs &location );
 
 		/* Destructor Method */
 		~CGI( void );
 
 		/* Public Methods */
-		std::string	getCGIOutput( void );
 		int	getReturnCode( void ) const;
 		std::string	getReturnBody( void ) const;
 };
