@@ -11,15 +11,6 @@ typedef enum {
 	DELETE,
 } httpMethod;
 
-struct CGIConfigs {
-	std::string cgiPath;
-	std::string cgiExtension;
-	bool cgiEnabled;
-
-	/* Struct Constructor */
-	CGIConfigs( void );
-};
-
 struct LocationConfigs {
 	std::vector<httpMethod> methods;
 	std::string locationPath;
@@ -31,7 +22,9 @@ struct LocationConfigs {
 	bool uploadEnabled;
 	bool rootSet;
 	bool redirectSet;
-	CGIConfigs cgiConfig;
+	bool cgiEnabled;
+	std::string cgiPath;
+	std::string cgiExtension;
 
 	/* Struct Constructor */
 	LocationConfigs( void );
@@ -80,9 +73,8 @@ class Config {
 		const ServerConfigs *getServerConfig( const int &socket );
 		void setSocketServerMap( const int &socket, const int &server );
 		int getServerSocket( const int &socket );
-		LocationConfigs *getLocationConfig( const ServerConfigs &serverConfig, 
+		const LocationConfigs *getLocationConfig( const ServerConfigs &serverConfig, 
 			const std::string &uri ) const;
-		
 };
 
 /* Config Utils Functions */
