@@ -19,8 +19,6 @@ void handleNewConnection(int server_sockfd, int epoll_fd, Logger &logger)
 		logger.logError(LOG_ERROR, "Error accepting new connection");
 		return;
 	}
-	int flags = fcntl(client_sockfd, F_GETFL, 0);
-	fcntl(client_sockfd, F_SETFL, flags | O_NONBLOCK);
 	epollEvent ev;
 	ev.events = EPOLLIN | EPOLLET;
 	ev.data.fd = client_sockfd;
@@ -28,6 +26,7 @@ void handleNewConnection(int server_sockfd, int epoll_fd, Logger &logger)
 	{
 		logger.logError(LOG_ERROR, "Failed to add client socket to epoll");
 		close(client_sockfd);
+		return;
 	}
 	else
 		logger.logDebug(LOG_DEBUG, "New client connection accepted");
@@ -36,21 +35,33 @@ void handleNewConnection(int server_sockfd, int epoll_fd, Logger &logger)
 
 bool readClientData(int client_sockfd, char *buffer, std::string &fullRequest, Logger &logger)
 {
-	int n = read(client_sockfd, buffer, sizeof(buffer));
-
+	int n = recv(client_sockfd, buffer, 4096, MSG_DONTWAIT | MSG_NOSIGNAL);
 	if (n == -1)
 	{
-		logger.logError(LOG_ERROR, "Error reading from client socket");
-		return false;
+		if (errno == EAGAIN || errno == EWOULDBLOCK)
+		{
+			logger.logDebug(LOG_DEBUG, "No data available to read, try again later.");
+			return true;
+		}
+		else
+		{
+			logger.logError(LOG_ERROR, "Error receiving data from client socket");
+			return false;
+		}
 	}
 	else if (n == 0)
 	{
 		logger.logDebug(LOG_DEBUG, "Client disconnected");
 		return false;
 	}
-
-	fullRequest.append(buffer, n);
-	return true;
+	else
+	{
+		fullRequest.append(buffer, n);
+		std::cout << std::endl;
+		std::cout << fullRequest << std::endl;
+		std::cout << std::endl;
+		return true;
+	}
 }
 
 bool processRequest(Request &request, const std::string &fullRequest, Logger &logger)
@@ -60,7 +71,7 @@ bool processRequest(Request &request, const std::string &fullRequest, Logger &lo
 		logger.logError(LOG_ERROR, "Invalid HTTP request", true);
 		return false;
 	}
-	logger.logDebug(LOG_DEBUG, "Request processed",true);
+	logger.logDebug(LOG_DEBUG, "Request processed", true);
 	logger.logDebug(LOG_DEBUG, "Method: " + request.getMethod() + ", URI: " + request.getUri() + ", HTTP Version: " + request.getHttpVersion(), true);
 	logger.logDebug(LOG_DEBUG, "User-Agent: " + request.getHeader("User-Agent"), true);
 
@@ -69,9 +80,8 @@ bool processRequest(Request &request, const std::string &fullRequest, Logger &lo
 
 bool handleClientRequest(int client_sockfd, Request &request, Logger &logger)
 {
-	char buffer[1024];
+	char buffer[4096];
 	std::string fullRequest;
-	request.setClientSocket(client_sockfd);
 
 	while (true)
 	{
@@ -81,18 +91,14 @@ bool handleClientRequest(int client_sockfd, Request &request, Logger &logger)
 		{
 			if (!processRequest(request, fullRequest, logger))
 				return false;
-			if (!request.keepAlive())
-				logger.logDebug(LOG_DEBUG, "Closing connection after response");
+			// if (!request.keepAlive())
+			// 	logger.logDebug(LOG_DEBUG, "Closing connection after response");
+
 			return true;
 		}
 	}
 }
 
-void handleServerSocket(int server_fd, int epoll_fd, Logger &logger)
-{
-	handleNewConnection(server_fd, epoll_fd, logger);
-	logger.logDebug(LOG_DEBUG, "New connection accepted", true);
-}
 void closeConnection(int client_fd, int epoll_fd)
 {
 	close(client_fd);
@@ -140,17 +146,41 @@ void handleClientSocket(int client_fd, int epoll_fd, Request &request, Logger &l
 
 	if (bytes_sent == -1)
 	{
-		logger.logError(LOG_ERROR, "Error sending response");
+		logger.logError(LOG_ERROR, "Invalid Content-Length header");
 		closeConnection(client_fd, epoll_fd);
+		return;
 	}
-	else if (!request.getIsRequestValid() || !request.keepAlive())
+
+	std::ofstream outfile("request_body.pdf", std::ios::binary);
+	if (outfile.is_open())
 	{
-		logger.logDebug(LOG_DEBUG, "Closing connection after response");
-		closeConnection(client_fd, epoll_fd);
+		outfile.write(request.getBody().data(), request.getBody().size()); // write em vez de <<
+		outfile.close();
+		logger.logDebug(LOG_DEBUG, "Request body written to file", true);
 	}
+	else
+	{
+		logger.logError(LOG_ERROR, "Failed to open file to write request body");
+	}
+
+	// Response response;
+	// response.processRequest(request,getConfig().getServerConfig(getConfig().getServerSocket(client_fd)), logger);
+	// std::string responseFull = response.generateResponse();
+
+	logger.logDebug(LOG_DEBUG, "Sending response to client", true);
+	// ssize_t bytes_sent = send(client_fd, responseFull.c_str(), responseFull.size(), 0);
+
+	// if (bytes_sent == -1)
+	// {
+	// 	logger.logError(LOG_ERROR, "Error sending response");
+	// 	closeConnection(client_fd, epoll_fd);
+	// }
+	// else if (!request.isRequestValid() || !request.keepAlive())
+	// {
+	// 	logger.logDebug(LOG_DEBUG, "Closing connection after response");
+	closeConnection(client_fd, epoll_fd);
+	// }
 }
-
-
 
 bool isServerSocket(int fd, const std::vector<int> &server_fds)
 {
@@ -160,25 +190,32 @@ bool isServerSocket(int fd, const std::vector<int> &server_fds)
 void runServer(const std::vector<int> &server_fds, int epoll_fd, Logger &logger)
 {
 	epollEvent events[MAX_EVENTS];
-	Request request;
 
 	while (true)
 	{
 		int num_fds = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
 		if (num_fds == -1)
 		{
+			if (errno == EINTR)
+				continue;
 			logger.logError(LOG_ERROR, "epoll_wait failed");
 			break;
 		}
-
 		for (int i = 0; i < num_fds; ++i)
 		{
 			int current_fd = events[i].data.fd;
-
 			if (isServerSocket(current_fd, server_fds))
-				handleServerSocket(current_fd, epoll_fd, logger);
+				handleNewConnection(current_fd, epoll_fd, logger);
 			else if (events[i].events & EPOLLIN)
+			{
+				Request request;
 				handleClientSocket(current_fd, epoll_fd, request, logger);
+			}
+			else if (events[i].events & (EPOLLRDHUP | EPOLLHUP | EPOLLERR))
+			{
+				logger.logDebug(LOG_DEBUG, "Client disconnected or socket error");
+				close(current_fd);
+			}
 		}
 	}
 }
