@@ -1,57 +1,45 @@
-#ifndef REQUEST_HPP_
-#define REQUEST_HPP_
+#ifndef REQUEST_HPP
+#define REQUEST_HPP
 
-#include "Includes.hpp"
-#include <map>
+#include "HttpMessage.hpp"
 #include <string>
 #include <sstream>
+#include <map>
 #include <set>
+#include <iostream>
 
-// Classe Request para parsing de requisições HTTP
-class Request
+class Request : public HttpMessage
 {
-private:
-	std::string method;
-	std::string uri;
-	std::string http_version;
-	bool requestIsValid;
-	int client_socket;
-	bool allow_directory_listing;
-	std::map<std::string, std::string> headers;
-	std::string body;
-	std::string raw_request;
+	private:
+		std::string method;
+		std::string uri;
+		bool requestIsValid;
 
-public:
-	Request();
-	bool parseRequest(const std::string &raw_request);
-	bool isComplete(const std::string &raw_request) const;
-	// Getters
-	std::string getMethod() const { return method; }
-	std::string getUri() const { return uri; }
-	std::string getHttpVersion() const { return http_version; }
-	bool getIsRequestValid() const { return requestIsValid; }
-	int getClientSocket() const { return client_socket; }
-	bool getIsAllowDirectoryListing() const { return allow_directory_listing; }
-	std::map<std::string, std::string> getHeaders() const { return headers; }
-	std::string getBody() const { return body; }
-	std::string getHeader(const std::string &key) const;
-	bool keepAlive() const;
-	std::string getRawRequest() const { return raw_request; }
+	public:
+		Request();
 
-	// Setters
-	void setMethod(const std::string &m) { method = m; }
-	void setUri(const std::string &u) { uri = u; }
-	void setHttpVersion(const std::string &hv) { http_version = hv; }
-	void setRequestIsValid(bool valid) { requestIsValid = valid; }
-	void setClientSocket(int socket) { client_socket = socket; }
-	void setAllowDirectoryListing(bool allow) { allow_directory_listing = allow; }
-	void setHeaders(const std::map<std::string, std::string> &h) { headers = h; }
-	void setBody(const std::string &b) { body = b; }
-	void setRawRequest(const std::string &raw) { raw_request = raw; }
-	bool validateMethod();
+		// Função para processar e validar a requisição
+		bool parseRequest(const std::string& raw_request);
+		bool isComplete(const std::string& raw_request) const;
+		bool keepAlive() const;
 
-private:
-	bool validateHttpVersion();
+		// Getters
+		std::string getMethod() const;
+		std::string getUri() const;
+		bool isRequestValid() const;
+
+		// Setters (se necessário)
+		void setMethod(const std::string& m);
+		void setUri(const std::string& u);
+		bool validateContentLength();
+
+	private:
+		bool parseStartLine(const std::string& start_line);
+		bool parseHeaders(const std::string& header_part);
+		bool validateMethod();
+		bool validateHttpVersion();
+		std::set<std::string> createValidMethods();
+
 };
 
-#endif // REQUEST_HPP_
+#endif // REQUEST_HPP
