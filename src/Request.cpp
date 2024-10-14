@@ -1,92 +1,201 @@
 #include "Request.hpp"
-#include <sstream>
+#include "Includes.hpp"
 
-Request::Request() : method(""), uri(""), http_version(""), requestIsValid(false), allow_directory_listing(true) {}
+Request::Request() : HttpMessage(), method(""), uri(""), requestIsValid(false) {}
 
-bool Request::parseRequest(const std::string &raw_request)
-{
+bool Request::parseRequest(const std::string& raw_request) {
 	size_t body_start = raw_request.find("\r\n\r\n");
-	std::cout << raw_request << std::endl;
-	setRawRequest(raw_request);
-	if (body_start == std::string::npos)
-	{
+	if (body_start == std::string::npos) {
 		requestIsValid = false;
 		return false;
 	}
 
 	std::string header_part = raw_request.substr(0, body_start);
 	body = raw_request.substr(body_start + 4);
+	std::cout << "Body: " << body << std::endl;
 
-	std::istringstream stream(header_part);
-	stream >> method >> uri >> http_version;
-
-	if (!validateMethod() || !validateHttpVersion())
-	{
+	if (!parseStartLine(header_part)) {
 		requestIsValid = false;
 		return false;
 	}
 
-	std::string line;
-	std::getline(stream, line);
-	while (std::getline(stream, line) && line != "\r")
-	{
-		size_t pos = line.find(": ");
-		if (pos != std::string::npos)
-		{
-			std::string key = line.substr(0, pos);
-			std::string value = line.substr(pos + 2);
-			value.erase(value.find_last_not_of(" \n\r\t") + 1);
-			headers[key] = value;
-		}
+	if (!parseHeaders(header_part)) {
+		requestIsValid = false;
+		return false;
 	}
 
-	if (headers.find("Content-Length") != headers.end())
-	{
-		std::istringstream content_length_stream(headers["Content-Length"]);
-		size_t content_length;
-		content_length_stream >> content_length;
-		if (body.size() != content_length)
-		{
-			requestIsValid = false;
-			return false;
-		}
+	if (!validateContentLength()) {
+		requestIsValid = false;
+		return false;
 	}
 
 	requestIsValid = true;
 	return true;
 }
 
-bool Request::validateMethod()
+int hexstr_to_int(const std::string &hexstr)
 {
+    int value = 0;
+    for (std::string::const_iterator it = hexstr.begin(); it != hexstr.end(); ++it)
+    {
+        char c = *it;
+        value *= 16;
+        if (c >= '0' && c <= '9')
+            value += c - '0';
+        else if (c >= 'a' && c <= 'f')
+            value += c - 'a' + 10;
+        else if (c >= 'A' && c <= 'F')
+            value += c - 'A' + 10;
+        else
+            return -1;
+    }
+    return value;
+}
+
+bool processChunkedBody(std::string &raw_request, std::string &body)
+{
+	size_t pos = 0;
+
+	while (true)
+	{
+		// Encontrar o final do tamanho do chunk (linha em branco após o valor)
+		size_t chunk_size_end = raw_request.find("\r\n", pos);
+		if (chunk_size_end == std::string::npos)
+			return false;  // Cabeçalho do chunk incompleto
+
+		// Extrair o tamanho do chunk em hexadecimal
+		std::string chunk_size_hex = raw_request.substr(pos, chunk_size_end - pos);
+		int chunk_size = hexstr_to_int(chunk_size_hex);
+
+		pos = chunk_size_end + 2;  // Avançar para o início dos dados
+
+		// Se o tamanho do chunk é 0, terminamos
+		if (chunk_size == 0)
+			break;
+
+		// Verificar se os dados completos do chunk estão presentes
+		if (raw_request.size() < pos + chunk_size + 2)
+			return false;  // Ainda não recebemos todos os dados do chunk
+
+		// Adicionar os dados do chunk ao corpo
+		body.append(raw_request, pos, chunk_size);
+		pos += chunk_size + 2;  // Avançar para o próximo chunk (pulando o \r\n após o chunk)
+	}
+
+	return true;  // Todos os chunks foram processados
+}
+
+
+
+bool Request::isComplete(const std::string& raw_request) const
+{
+	// Verifica se os cabeçalhos acabaram (linha em branco entre os cabeçalhos e o corpo)
+	size_t header_end = raw_request.find("\r\n\r\n");
+	if (header_end == std::string::npos)
+		return false;  // Cabeçalhos incompletos
+
+	// Verifica se há um campo Content-Length
+	std::string content_length_str = getHeader("Content-Length");
+	if (!content_length_str.empty())
+	{
+		// Verifica se a quantidade de dados recebidos corresponde ao Content-Length
+		int content_length;
+		std::stringstream content_length_stream(content_length_str);
+		content_length_stream >> content_length;
+		if (raw_request.size() >= header_end + 4 + content_length)
+			return true;
+	}
+	// Verifica se Transfer-Encoding é chunked
+	else if (getHeader("Transfer-Encoding") == "chunked")
+	{
+		std::string body = raw_request.substr(header_end + 4);
+		std::string temp_body;  // Variável temporária para armazenar o corpo processado
+
+		// Tenta processar os chunks e verifica se o corpo está completo
+		if (processChunkedBody(body, temp_body))
+			return true;
+	}
+	// Se não há Content-Length ou Transfer-Encoding, assume que a requisição está completa
+	else
+		return true;
+	return false;  // Se nenhuma das condições foi atendida, a requisição não está completa
+}
+
+
+// Getters
+std::string Request::getMethod() const {
+	return method;
+}
+
+std::string Request::getUri() const {
+	return uri;
+}
+
+bool Request::isRequestValid() const {
+	return requestIsValid;
+}
+
+// Setters
+void Request::setMethod(const std::string& m) {
+	method = m;
+}
+
+void Request::setUri(const std::string& u) {
+	uri = u;
+}
+
+// Função para parsear a linha inicial da requisição
+bool Request::parseStartLine(const std::string& start_line) {
+	std::istringstream stream(start_line);
+	stream >> method >> uri >> http_version;
+
+	return validateMethod() && validateHttpVersion();
+}
+
+// Função para parsear e armazenar os headers
+bool Request::parseHeaders(const std::string& header_part) {
+	std::istringstream stream(header_part);
+	std::string line;
+	while (std::getline(stream, line) && line != "\r\n") {
+		size_t pos = line.find(": ");
+		if (pos != std::string::npos) {
+			std::string key = line.substr(0, pos);
+			std::string value = line.substr(pos + 2);
+			headers[key] = value;
+		}
+	}
+	return !headers.empty();
+}
+
+// Função para validar o Content-Length
+bool Request::validateContentLength() {
+	if (headers.find("Content-Length") != headers.end()) {
+		std::istringstream content_length_stream(headers["Content-Length"]);
+		size_t content_length;
+		content_length_stream >> content_length;
+		return body.size() == content_length;
+	}
+	return true;
+}
+
+// Validações específicas da Request
+bool Request::validateMethod() {
+	static const std::set<std::string> valid_methods = createValidMethods();
+	return valid_methods.find(method) != valid_methods.end();
+}
+
+bool Request::validateHttpVersion() {
+	return (http_version == "HTTP/1.1" || http_version == "HTTP/1.0");
+}
+
+std::set<std::string> Request::createValidMethods() {
 	std::set<std::string> valid_methods;
 	valid_methods.insert("GET");
 	valid_methods.insert("POST");
 	valid_methods.insert("DELETE");
-	return valid_methods.find(method) != valid_methods.end();
+	return valid_methods;
 }
 
-bool Request::validateHttpVersion()
-{
-	return (http_version == "HTTP/1.1" || http_version == "HTTP/1.0");
-}
-
-bool Request::isComplete(const std::string &raw_request) const
-{
-	return raw_request.find("\r\n\r\n") != std::string::npos;
-}
-
-std::string Request::getHeader(const std::string &key) const
-{
-	std::map<std::string, std::string>::const_iterator it = headers.find(key);
-	if (it != headers.end())
-		return it->second;
-	return "";
-}
-
-bool Request::keepAlive() const
-{
-	std::map<std::string, std::string>::const_iterator it = headers.find("Connection");
-	if (it != headers.end())
-		return (it->second == "keep-alive");
-	return (http_version == "HTTP/1.1");
+bool Request::keepAlive() const {
+	return headers.find("Connection") != headers.end() && headers.at("Connection") == "keep-alive";
 }
