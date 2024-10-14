@@ -34,6 +34,7 @@ CGI::CGI( const Request &request, const ServerConfigs &server,
 
 		_returnCode = 405;
 		codeStr = intToString(_returnCode);
+		logger.logError(LOG_WARN, ERROR_METHOD_NOT_ALLOWED, true);
 		response.handleError(_returnCode, _serverConfig.errorPages[codeStr],
 			ERROR_METHOD_NOT_ALLOWED, logger);
 		_returnbody = response.generateResponse();
@@ -42,7 +43,6 @@ CGI::CGI( const Request &request, const ServerConfigs &server,
 
 	if (_locationConfig.cgiEnabled) {
 		_cgiPath = location.root + "/" + location.cgiPath;
-		logger.logDebug(LOG_INFO, "213CGI Path: " + location.cgiPath, true);
 		if (location.cgiExtension == EXTENSION_PHP) {
 			_cgiExecutable = PHP_EXECUTABLE;
 		} else if (location.cgiExtension == EXTENSION_PY) {
@@ -51,7 +51,7 @@ CGI::CGI( const Request &request, const ServerConfigs &server,
 
 		_setEnvironmentVars();
 
-		logger.logDebug(LOG_INFO, "Complete Request: \n" + _request.getRawRequest(), true);
+		logger.logDebug(LOG_INFO, "CGI Body: " + _request.getBody(), true);
 		logger.logDebug(LOG_INFO, "CGI Path: " + _cgiPath, true);
 		logger.logDebug(LOG_INFO, "CGI Executable: " + _cgiExecutable, true);
 		logger.logDebug(LOG_INFO, "CGI SERVER_PROTOCOL: " + _env["SERVER_PROTOCOL"], true);
