@@ -35,7 +35,7 @@ class Response : public HttpMessage {
 		// Métodos internos auxiliares
 		void setBodyWithContentType(const std::string &bodyContent, const std::string &path);
 		void handlerValidRequest(Request &request, Logger &logger);
-		bool Response::validConfigWithRequest(const ServerConfigs* respconfig, const std::string &uri, const std::string &method);
+		bool validConfigWithRequest(const ServerConfigs* respconfig, const std::string &uri, const std::string &method);
 
 };
 
