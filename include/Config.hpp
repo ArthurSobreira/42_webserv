@@ -6,6 +6,7 @@
 #include "Logger.hpp"
 
 typedef enum {
+	INVALID = -1,
 	GET = 1,
 	POST,
 	DELETE,

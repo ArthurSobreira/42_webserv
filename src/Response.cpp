@@ -10,12 +10,12 @@
 // 	std::ostringstream response_stream;
 
 // 	response_stream << "HTTP/1.1 " << _status_code << " " << _reason_phrase << "\r\n";
-// 	for (std::map<std::string, std::string>::const_iterator it = _headers.begin(); it != _headers.end(); ++it)
+// 	for (std::map<std::string, std::string>::const_iterator it = headers.begin(); it != _headers.end(); ++it)
 // 	{
 // 		response_stream << it->first << ": " << it->second << "\r\n";
 // 	}
 // 	response_stream << "\r\n";
-// 	response_stream << _body;
+// 	response_stream << body;
 
 // 	return response_stream.str();
 // }
@@ -26,18 +26,6 @@
 // 	_reason_phrase = reason;
 // }
 
-// void Response::setHeader(const std::string &key, const std::string &value)
-// {
-// 	_headers[key] = value;
-// }
-
-// void Response::setBody(const std::string &bodyContent)
-// {
-// 	_body = bodyContent;
-// 	std::stringstream ss;
-// 	ss << _body.size();
-// 	setHeader("Content-Length", ss.str());
-// }
 
 // int Response::getStatusCode() const
 // {
@@ -49,19 +37,6 @@
 // 	return _reason_phrase;
 // }
 
-// std::string Response::getHeader(const std::string &key) const
-// {
-// 	std::map<std::string, std::string>::const_iterator it = _headers.find(key);
-// 	if (it != _headers.end())
-// 		return it->second;
-// 	return "";
-// }
-
-// std::string Response::getBody() const
-// {
-// 	return _body;
-// }
-
 // void Response::setBodyWithContentType(const std::string &bodyContent, const std::string &path)
 // {
 // 	setBody(bodyContent);
@@ -70,12 +45,11 @@
 
 // void Response::handlerValidRequest(Request &request, Logger &logger)
 // {
-// 	if (!request.getIsRequestValid())
+// 	if (!request.isRequestValid())
 // 	{
 // 		if (!request.validateMethod() && !request.getMethod().empty())
 // 		{
 // 			std::cout << "debbug response 9" << std::endl;
-// 			std::cout << request.getRawRequest() << std::endl;
 // 			handleError(405, "static/errors/405.html", "Method not allowed", logger);
 // 			return;
 // 		}
@@ -85,12 +59,50 @@
 // 	}
 // 	std::cout << "debbug response 11" << std::endl;
 // }
+// bool isRepeatedMethod(const std::vector<httpMethod> &methodsVector, httpMethod method)
+// {
+// 	for (std::vector<httpMethod>::const_iterator it = methodsVector.begin(); it != methodsVector.end(); ++it)
+// 	{
+// 		if (*it == method)
+// 			return true;
+// 	}
+// 	return false;
+// }
+
+// httpMethod returnMethod(std::string method)
+// {
+// 	if (method == "GET")
+// 		return GET;
+// 	if (method == "POST")
+// 		return POST;
+// 	if (method == "DELETE")
+// 		return DELETE;
+// 	return INVALID;
+// }
+
+
+// bool Response::validConfigWithRequest(const ServerConfigs* respconfig, const std::string &uri, const std::string &method)
+// {
+// 	if (respconfig->locations.empty())
+// 		return true;
+// 	for (std::vector<LocationConfigs>::const_iterator it = respconfig->locations.begin(); it != respconfig->locations.end(); ++it)
+// 	{
+// 		if (uri.find(it->locationPath) != std::string::npos)
+// 		{
+// 			if (isRepeatedMethod(it->methods, returnMethod(method)))
+// 				return true;
+// 		}
+// 	}
+// 	return false;
+
+
+// }
 
 // void Response::processRequest(Request &request, const ServerConfigs* respconfig,Logger &logger)
 // {
 // 	(void)respconfig;
 // 	std::string path;
-// 	if (!request.getIsRequestValid())
+// 	if (!request.isRequestValid())
 // 	{
 // 		std::cout << "debbug response 1" << std::endl;
 // 		handlerValidRequest(request, logger);
@@ -120,7 +132,7 @@
 // 		handleError(404, "static/errors/404.html", "File not found", logger);
 // 		return;
 // 	}
-// 	if (S_ISDIR(Status.st_mode) && request.getIsAllowDirectoryListing())
+// 	if (S_ISDIR(Status.st_mode))
 // 	{
 // 		std::cout << "debbug response 6" << std::endl;
 // 		std::string directoryListing = listDirectory(path);

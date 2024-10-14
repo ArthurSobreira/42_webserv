@@ -111,14 +111,12 @@ bool Request::isComplete(const std::string& raw_request) const
 		std::string body = raw_request.substr(header_end + 4);
 		std::string temp_body;  // Variável temporária para armazenar o corpo processado
 
-		// Tenta processar os chunks e verifica se o corpo está completo
 		if (processChunkedBody(body, temp_body))
 			return true;
 	}
-	// Se não há Content-Length ou Transfer-Encoding, assume que a requisição está completa
 	else
 		return true;
-	return false;  // Se nenhuma das condições foi atendida, a requisição não está completa
+	return false; 
 }
 
 

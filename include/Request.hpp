@@ -10,35 +10,35 @@
 
 class Request : public HttpMessage
 {
-private:
-	std::string method;
-	std::string uri;
-	bool requestIsValid;
+	private:
+		std::string method;
+		std::string uri;
+		bool requestIsValid;
 
-public:
-	Request();
+	public:
+		Request();
 
-	// Função para processar e validar a requisição
-	bool parseRequest(const std::string& raw_request);
-	bool isComplete(const std::string& raw_request) const;
-	bool keepAlive() const;
+		// Função para processar e validar a requisição
+		bool parseRequest(const std::string& raw_request);
+		bool isComplete(const std::string& raw_request) const;
+		bool keepAlive() const;
 
-	// Getters
-	std::string getMethod() const;
-	std::string getUri() const;
-	bool isRequestValid() const;
+		// Getters
+		std::string getMethod() const;
+		std::string getUri() const;
+		bool isRequestValid() const;
 
-	// Setters (se necessário)
-	void setMethod(const std::string& m);
-	void setUri(const std::string& u);
-	bool validateContentLength();
+		// Setters (se necessário)
+		void setMethod(const std::string& m);
+		void setUri(const std::string& u);
+		bool validateContentLength();
 
-private:
-	bool parseStartLine(const std::string& start_line);
-	bool parseHeaders(const std::string& header_part);
-	bool validateMethod();
-	bool validateHttpVersion();
-	std::set<std::string> createValidMethods();
+	private:
+		bool parseStartLine(const std::string& start_line);
+		bool parseHeaders(const std::string& header_part);
+		bool validateMethod();
+		bool validateHttpVersion();
+		std::set<std::string> createValidMethods();
 
 };
 
