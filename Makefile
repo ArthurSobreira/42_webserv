@@ -19,7 +19,7 @@ TESTNAME	=	testes
 BUILD		=	./build
 LOG			=	./logs
 BUILD_TEST	=	./build_test
-SRCS		=	src/Config.cpp src/ConfigExtract.cpp src/ConfigUtils.cpp \
+SRCS		=	src/CGI.cpp src/Config.cpp src/ConfigExtract.cpp src/ConfigUtils.cpp \
 				src/HttpError.cpp src/listDirectory.cpp src/Logger.cpp \
 				src/Request.cpp src/Response.cpp src/Server.cpp src/Utils.cpp \
 				src/EpoolManager.cpp src/main.cpp

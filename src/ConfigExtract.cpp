@@ -165,8 +165,8 @@ namespace LocationExtraction {
 		if (lastDot != std::string::npos && 
 			(cgiPath.substr(lastDot) == EXTENSION_PHP || 
 			cgiPath.substr(lastDot) == EXTENSION_PY)) {
-			location.cgiConfig.cgiEnabled = true;
-			location.cgiConfig.cgiPath = cgiPath;
+			location.cgiEnabled = true;
+			location.cgiPath = cgiPath;
 		} else { throw std::runtime_error(ERROR_INVALID_CGI_PATH); }
 	}
 
@@ -177,8 +177,8 @@ namespace LocationExtraction {
 		std::string	cgiExtension = tokens[1];
 
 		if (cgiExtension == EXTENSION_PHP || cgiExtension == EXTENSION_PY) {
-			location.cgiConfig.cgiEnabled = true;
-			location.cgiConfig.cgiExtension = cgiExtension;
+			location.cgiEnabled = true;
+			location.cgiExtension = cgiExtension;
 		} else { throw std::runtime_error(ERROR_INVALID_CGI_EXTENSION); }
 	}
 }

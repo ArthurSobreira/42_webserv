@@ -6,6 +6,7 @@
 #include "Utils.hpp"
 #include "Server.hpp"
 #include "EpollManager.hpp"
+#include "CGI.hpp"
 
 void handleNewConnection(int server_sockfd, int epoll_fd, Logger &logger)
 {
@@ -56,7 +57,7 @@ bool processRequest(Request &request, const std::string &fullRequest, Logger &lo
 {
 	if (!request.parseRequest(fullRequest))
 	{
-		logger.logError(LOG_ERROR, "Invalid HTTP request");
+		logger.logError(LOG_ERROR, "Invalid HTTP request", true);
 		return false;
 	}
 	logger.logDebug(LOG_DEBUG, "Request processed",true);
@@ -100,10 +101,39 @@ void closeConnection(int client_fd, int epoll_fd)
 
 void handleClientSocket(int client_fd, int epoll_fd, Request &request, Logger &logger)
 {
-	handleClientRequest(client_fd, request, logger);
+	if (!handleClientRequest(client_fd, request, logger)) {
+		closeConnection(client_fd, epoll_fd);
+		return;
+	}
+
+	const ServerConfigs* serverConfig = getConfig().getServerConfig(getConfig().getServerSocket(client_fd));
+	const LocationConfigs* locationConfig = getConfig().getLocationConfig(*serverConfig, request.getUri());
+	std::string responseFull;
 	Response response;
-	response.processRequest(request,getConfig().getServerConfig(getConfig().getServerSocket(client_fd)), logger);
-	std::string responseFull = response.generateResponse();
+
+	logger.logDebug(LOG_DEBUG, "location.cgiConfig.cgiPath = " + 
+		locationConfig->cgiPath, true);
+
+	if (locationConfig && locationConfig->cgiEnabled) {
+		logger.logDebug(LOG_DEBUG, "Entrou no CGI", true);
+		
+		CGI cgi(request, *serverConfig, *locationConfig);
+
+		// ConfigUtils::printServerStruct(*serverConfig);
+
+
+		response.setStatus(cgi.getReturnCode(), "OK");
+
+		// response.setStatus(200, "OK");
+		// response.setBodyWithContentType(cgiOutput, locationConfig->cgiConfig.cgiPath);
+		responseFull = cgi.getReturnBody();
+	}
+	else { response.processRequest(request, serverConfig, logger); }
+
+	if (responseFull.empty()) { 
+		logger.logDebug(LOG_DEBUG, "Generating response", true);
+		responseFull = response.generateResponse();
+	}
 
 	logger.logDebug(LOG_DEBUG, "Sending response to client", true);
 	ssize_t bytes_sent = send(request.getClientSocket(), responseFull.c_str(), responseFull.size(), 0);

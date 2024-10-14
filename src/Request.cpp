@@ -40,18 +40,6 @@ bool Request::parseRequest(const std::string &raw_request)
 		}
 	}
 
-	if (headers.find("Content-Length") != headers.end())
-	{
-		std::istringstream content_length_stream(headers["Content-Length"]);
-		size_t content_length;
-		content_length_stream >> content_length;
-		if (body.size() != content_length)
-		{
-			requestIsValid = false;
-			return false;
-		}
-	}
-
 	requestIsValid = true;
 	return true;
 }

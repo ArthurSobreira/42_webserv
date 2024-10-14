@@ -42,10 +42,14 @@
 # define DEFAULT_HOST "127.0.0.1"
 # define DEFAULT_SERVER_NAME "localhost"
 # define DEFAULT_LIMIT_BODY_SIZE 1048576
+# define DEFAULT_ERROR_400 "./static/errors/400.html"
 # define DEFAULT_ERROR_403 "./static/errors/403.html"
 # define DEFAULT_ERROR_404 "./static/errors/404.html"
+# define DEFAULT_ERROR_405 "./static/errors/405.html"
 
 /* CGI Macros */
+# define PHP_EXECUTABLE "/usr/bin/php-cgi"
+# define PYTHON_EXECUTABLE "/usr/bin/python3"
 # define EXTENSION_PHP ".php"
 # define EXTENSION_PY ".py"
 
@@ -77,5 +81,7 @@
 # define ERROR_INVALID_UPLOAD_ENABLED "Location: Invalid Upload Enabled Value!"
 # define ERROR_INVALID_CGI_PATH "Location: Invalid CGI Path!"
 # define ERROR_INVALID_CGI_EXTENSION "Location: Invalid CGI Extension!"
+
+# define ERROR_METHOD_NOT_ALLOWED "Method Not Allowed!"
 
 #endif

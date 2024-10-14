@@ -138,8 +138,7 @@ namespace ConfigUtils {
 	}
 
 	void	validateFullLocationPath( LocationConfigs &location ) {
-		if (location.cgiConfig.cgiEnabled) { return ; }
-		if (location.redirectSet ) { return ; }
+		if (location.cgiEnabled || location.redirectSet) { return ; }
 
 		std::string effectiveRoot;
 		if (location.rootSet) { 
@@ -153,11 +152,11 @@ namespace ConfigUtils {
 	}
 
 	void	validateFullCGIPath( LocationConfigs &location ) {
-		if (!location.cgiConfig.cgiEnabled) { return ; }
+		if (!location.cgiEnabled) { return ; }
 
-		std::string cgiPath = location.cgiConfig.cgiPath;
+		std::string cgiPath = location.cgiPath;
 		size_t	lastDot = cgiPath.find_last_of('.');
-		if (cgiPath.substr(lastDot) != location.cgiConfig.cgiExtension) {
+		if (cgiPath.substr(lastDot) != location.cgiExtension) {
 			throw std::runtime_error(ERROR_INVALID_CGI_EXTENSION);
 		}
 
@@ -216,9 +215,9 @@ namespace ConfigUtils {
 			std::cout << "\tupload_enabled: " << it->uploadEnabled << std::endl;
 			std::cout << "\troot_set: " << it->rootSet << std::endl;
 			std::cout << "\tredirect_set: " << it->redirectSet << std::endl;
-			std::cout << "\tCGI path: " << it->cgiConfig.cgiPath << std::endl;
-			std::cout << "\tCGI extension: " << it->cgiConfig.cgiExtension << std::endl;
-			std::cout << "\tCGI enabled: " << it->cgiConfig.cgiEnabled << std::endl;
+			std::cout << "\tCGI path: " << it->cgiPath << std::endl;
+			std::cout << "\tCGI extension: " << it->cgiExtension << std::endl;
+			std::cout << "\tCGI enabled: " << it->cgiEnabled << std::endl;
 			std::cout << std::endl;
 		}
 	}

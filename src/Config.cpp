@@ -3,11 +3,11 @@
 #include "Config.hpp"
 
 /* Struct CGIConfigs Constructor */
-CGIConfigs::CGIConfigs( void ) {
-	cgiPath = DEFAULT_EMPTY;
-	cgiExtension = DEFAULT_EMPTY;
-	cgiEnabled = false;
-}
+// CGIConfigs::CGIConfigs( void ) {
+// 	cgiEnabled = false;
+// 	cgiPath = DEFAULT_EMPTY;
+// 	cgiExtension = DEFAULT_EMPTY;
+// }
 
 /* Struct LocationConfigs Constructor */
 LocationConfigs::LocationConfigs( void ) {
@@ -21,7 +21,9 @@ LocationConfigs::LocationConfigs( void ) {
 	uploadEnabled = false;
 	rootSet = false;
 	redirectSet = false;
-	cgiConfig = CGIConfigs();
+	cgiEnabled = false;
+	cgiPath = DEFAULT_EMPTY;
+	cgiExtension = DEFAULT_EMPTY;
 }
 
 /* Struct ServerConfigs Constructor */
@@ -30,8 +32,10 @@ ServerConfigs::ServerConfigs( void ) {
 	host = DEFAULT_HOST;
 	serverName = DEFAULT_SERVER_NAME;
 	limitBodySize = DEFAULT_LIMIT_BODY_SIZE;
+	errorPages["400"] = DEFAULT_ERROR_400;
 	errorPages["403"] = DEFAULT_ERROR_403;
 	errorPages["404"] = DEFAULT_ERROR_404;
+	errorPages["405"] = DEFAULT_ERROR_405;
 }
 
 /* Constructor Method */
@@ -56,34 +60,10 @@ Config::Config( const std::string &fileName, Logger &logger )
 	}
 };
 
-std::map<int,const ServerConfigs*> Config::getSocketConfigMap( void ) const {
-	return (this->_socketConfigMap);
-}
-
-void Config::setSocketConfigMap( const int &socket, const ServerConfigs *config ) {
-	this->_socketConfigMap[socket] = config;
-}
-
-const ServerConfigs *Config::getServerConfig( const int &socket ) {
-	return (this->_socketConfigMap[socket]);
-}
-
-void Config::setSocketServerMap( const int &socket, const int &server ){
-	this->_socketServerMap[socket] = server;
-}
-		
-int Config::getServerSocket( const int &socket ){
-	return (this->_socketServerMap[socket]);
-}
-
 /* Destructor Method */
 Config::~Config( void ) {};
 
-/* Public Methods */
-std::vector<ServerConfigs> Config::getServers( void ) const {
-	return (this->_servers);
-}
-
+/* Private Methods */
 void Config::_parseConfigFile( std::ifstream &configFile ) {
 	std::string line;
 	std::string serverBlock;
@@ -205,7 +185,6 @@ void	Config::_parseLocationStream( std::istringstream &serverStream, ServerConfi
 					}
 				}
 			}
-
 			if (locationBracketsCount == 0) {
 				locationBracketsCount = 0;
 				insideLocationBlock = false;
@@ -262,4 +241,44 @@ void	Config::_parseLocationBlock( const std::string &locationBlock, LocationConf
 	ConfigUtils::validateFullLocationPath(location);
 	ConfigUtils::validateFullCGIPath(location);
 	ConfigUtils::createUploadFolder(location.uploadPath);
+}
+
+/* Public Methods */
+std::vector<ServerConfigs> Config::getServers( void ) const {
+	return (this->_servers);
+}
+
+std::map<int,const ServerConfigs*> Config::getSocketConfigMap( void ) const {
+	return (this->_socketConfigMap);
+}
+
+void Config::setSocketConfigMap( const int &socket, const ServerConfigs *config ) {
+	this->_socketConfigMap[socket] = config;
+}
+
+const ServerConfigs *Config::getServerConfig( const int &socket ) {
+	return (this->_socketConfigMap[socket]);
+}
+
+void Config::setSocketServerMap( const int &socket, const int &server ){
+	this->_socketServerMap[socket] = server;
+}
+
+int Config::getServerSocket( const int &socket ){
+	return (this->_socketServerMap[socket]);
+}
+
+const LocationConfigs *Config::getLocationConfig( const ServerConfigs &serverConfig,
+	const std::string &uri ) const {
+	const LocationConfigs* bestMatch = NULL;
+	size_t bestMatchLength = 0;
+
+	for (std::vector<LocationConfigs>::const_iterator it = serverConfig.locations.begin(); 
+		it != serverConfig.locations.end(); ++it) {
+		if (uri.find(it->locationPath) == 0 && it->locationPath.length() > bestMatchLength) {
+			bestMatch = &(*it);
+			bestMatchLength = it->locationPath.length();
+		}
+	}
+	return (bestMatch);
 }
