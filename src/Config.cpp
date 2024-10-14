@@ -2,13 +2,6 @@
 #include "Defines.hpp"
 #include "Config.hpp"
 
-/* Struct CGIConfigs Constructor */
-// CGIConfigs::CGIConfigs( void ) {
-// 	cgiEnabled = false;
-// 	cgiPath = DEFAULT_EMPTY;
-// 	cgiExtension = DEFAULT_EMPTY;
-// }
-
 /* Struct LocationConfigs Constructor */
 LocationConfigs::LocationConfigs( void ) {
 	methods.push_back(GET);
@@ -268,15 +261,16 @@ int Config::getServerSocket( const int &socket ){
 	return (this->_socketServerMap[socket]);
 }
 
-const LocationConfigs *Config::getLocationConfig( const ServerConfigs &serverConfig,
-	const std::string &uri ) const {
-	const LocationConfigs* bestMatch = NULL;
+const LocationConfigs Config::getLocationConfig( const ServerConfigs &serverConfig,
+	const std::string &uri, bool &locationFound ) const {
+	LocationConfigs bestMatch;
 	size_t bestMatchLength = 0;
 
 	for (std::vector<LocationConfigs>::const_iterator it = serverConfig.locations.begin(); 
 		it != serverConfig.locations.end(); ++it) {
 		if (uri.find(it->locationPath) == 0 && it->locationPath.length() > bestMatchLength) {
-			bestMatch = &(*it);
+			bestMatch = *it;
+			locationFound = true;
 			bestMatchLength = it->locationPath.length();
 		}
 	}

@@ -112,37 +112,39 @@ void handleClientSocket(int client_fd, int epoll_fd, Request &request, Logger &l
 		return;
 	}
 
-	const ServerConfigs* serverConfig = getConfig().getServerConfig(getConfig().getServerSocket(client_fd));
-	const LocationConfigs* locationConfig = getConfig().getLocationConfig(*serverConfig, request.getUri());
+	Config &config = getConfig();
+	const ServerConfigs* serverConfig = config.getServerConfig(config.getServerSocket(client_fd));
+	if (serverConfig == NULL) {
+		logger.logError(LOG_ERROR, "Server config not found");
+		closeConnection(client_fd, epoll_fd);
+		return;
+	}
+
+	logger.logDebug(LOG_ERROR, "Lembrar de arrumar tokens size na confg", true);
+
+	bool locationFound = false;
+	const LocationConfigs locationConfig = config.getLocationConfig(*serverConfig, 
+		request.getUri(), locationFound);
 	std::string responseFull;
 	Response response;
 
-	logger.logDebug(LOG_DEBUG, "location.cgiConfig.cgiPath = " + 
-		locationConfig->cgiPath, true);
+	// if (!locationFound) {
+	// 	logger.logDebug(LOG_DEBUG, "Location not found :(", true);
+	// 	response.handleError(404, serverConfig->errorPages.at("404"), "File not found", logger);
+	// }
 
-	if (locationConfig && locationConfig->cgiEnabled) {
-		logger.logDebug(LOG_DEBUG, "Entrou no CGI", true);
-		
-		CGI cgi(request, *serverConfig, *locationConfig);
-
-		// ConfigUtils::printServerStruct(*serverConfig);
-
+	if (locationConfig.cgiEnabled) {
+		CGI cgi(request, *serverConfig, locationConfig);
 
 		response.setStatus(cgi.getReturnCode(), "OK");
-
-		// response.setStatus(200, "OK");
-		// response.setBodyWithContentType(cgiOutput, locationConfig->cgiConfig.cgiPath);
 		responseFull = cgi.getReturnBody();
-	}
-	else { response.processRequest(request, serverConfig, logger); }
-
-	if (responseFull.empty()) { 
-		logger.logDebug(LOG_DEBUG, "Generating response", true);
+	} else {
+		response.processRequest(request, serverConfig, logger); 
 		responseFull = response.generateResponse();
 	}
 
 	logger.logDebug(LOG_DEBUG, "Sending response to client", true);
-	ssize_t bytes_sent = send(request.getClientSocket(), responseFull.c_str(), responseFull.size(), 0);
+	ssize_t bytes_sent = send(client_fd, responseFull.c_str(), responseFull.size(), 0);
 
 	if (bytes_sent == -1)
 	{
@@ -151,19 +153,19 @@ void handleClientSocket(int client_fd, int epoll_fd, Request &request, Logger &l
 		return;
 	}
 
-	std::ofstream outfile("request_body.pdf", std::ios::binary);
-	if (outfile.is_open())
-	{
-		outfile.write(request.getBody().data(), request.getBody().size()); // write em vez de <<
-		outfile.close();
-		logger.logDebug(LOG_DEBUG, "Request body written to file", true);
-	}
-	else
-	{
-		logger.logError(LOG_ERROR, "Failed to open file to write request body");
-	}
+	// std::ofstream outfile("request_body.pdf", std::ios::binary);
+	// if (outfile.is_open())
+	// {
+	// 	outfile.write(request.getBody().data(), request.getBody().size()); // write em vez de <<
+	// 	outfile.close();
+	// 	logger.logDebug(LOG_DEBUG, "Request body written to file", true);
+	// }
+	// else
+	// {
+	// 	logger.logError(LOG_ERROR, "Failed to open file to write request body");
+	// }
 
-	// Response response;
+	// // Response response;
 	// response.processRequest(request,getConfig().getServerConfig(getConfig().getServerSocket(client_fd)), logger);
 	// std::string responseFull = response.generateResponse();
 
@@ -257,22 +259,23 @@ int main(int argc, char **argv)
 	}
 	signal(SIGINT, signals);
 	signal(SIGQUIT, signals);
-	const std::string config_file_path = argv[1];
-	std::vector<int> fds;
 	Logger logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE);
+	std::vector<int> fdsVector;
 	try
 	{
-		Config config(config_file_path, logger);
-		setConfig(config);
+		Config config(argv[1], logger);
+		const std::vector<ServerConfigs> &servers = config.getServers();
 		EpollManager epoll;
-		initializeServers(config.getServers(), fds, epoll, logger);
-		runServer(fds, epoll.getEpollFD(), logger);
-		cleanup(fds, logger);
+		setConfig(config);
+
+		initializeServers(servers, fdsVector, epoll, logger);
+		runServer(fdsVector, epoll.getEpollFD(), logger);
+		cleanup(fdsVector, logger);
 	}
 	catch (const std::exception &e)
 	{
 		logger.logError(LOG_ERROR, e.what(), true);
-		cleanup(fds, logger);
+		cleanup(fdsVector, logger);
 		std::string bye(e.what());
 		if (bye == "bye bye")
 			return EXIT_SUCCESS;

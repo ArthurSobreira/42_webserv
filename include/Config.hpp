@@ -74,8 +74,8 @@ class Config {
 		const ServerConfigs *getServerConfig( const int &socket );
 		void setSocketServerMap( const int &socket, const int &server );
 		int getServerSocket( const int &socket );
-		const LocationConfigs *getLocationConfig( const ServerConfigs &serverConfig, 
-			const std::string &uri ) const;
+		const LocationConfigs getLocationConfig( const ServerConfigs &serverConfig,
+			const std::string &uri, bool &locationFound ) const;
 };
 
 /* Config Utils Functions */
