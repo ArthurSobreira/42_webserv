@@ -84,5 +84,6 @@
 # define ERROR_INVALID_CGI_EXTENSION "Location: Invalid CGI Extension!"
 
 # define ERROR_METHOD_NOT_ALLOWED "Method Not Allowed!"
+# define ERROR_FORBIDDEN "Forbidden File or Directory!"
 
 #endif
