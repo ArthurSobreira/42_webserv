@@ -21,6 +21,19 @@ static std::string	intToString(int value) {
 	return ss.str();
 }
 
+void	CGI::_handleCGIError( int code, const std::string &message, Logger &logger ) {
+	Response response;
+	std::string codeStr;
+
+	_returnCode = code;
+	_locationConfig.cgiEnabled = false;
+	codeStr = intToString(_returnCode);
+	logger.logError(LOG_WARN, message, true);
+	response.handleError(_returnCode, 
+		_serverConfig.errorPages[codeStr], message, logger);
+	_returnbody = response.generateResponse();
+}
+
 /* Constructor Method */
 CGI::CGI( const Request &request, const ServerConfigs &server,
 	const LocationConfigs &location ) 
@@ -28,17 +41,10 @@ CGI::CGI( const Request &request, const ServerConfigs &server,
 	_serverConfig(server), _locationConfig(location) {
 	Logger logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE);
 
-	if (!methodIsOnLocation(_locationConfig, _request.getMethod())) {
-		Response response;
-		std::string codeStr;
-
-		_returnCode = 405;
-		codeStr = intToString(_returnCode);
-		logger.logError(LOG_WARN, ERROR_METHOD_NOT_ALLOWED, true);
-		response.handleError(_returnCode, _serverConfig.errorPages[codeStr],
-			ERROR_METHOD_NOT_ALLOWED, logger);
-		_returnbody = response.generateResponse();
-		return;
+	if (access(_locationConfig.cgiPath.c_str(), R_OK) == -1) {  // Não está funcionando :(
+		_handleCGIError(404, ERROR_NOT_FOUND, logger);
+	} else if (!methodIsOnLocation(_locationConfig, _request.getMethod())) {
+		_handleCGIError(405, ERROR_METHOD_NOT_ALLOWED, logger);
 	}
 
 	if (_locationConfig.cgiEnabled) {
