@@ -85,5 +85,6 @@
 
 # define ERROR_METHOD_NOT_ALLOWED "Method Not Allowed!"
 # define ERROR_FORBIDDEN "Forbidden File or Directory!"
+# define ERROR_NOT_FOUND "File Not Found!"
 
 #endif
