@@ -130,7 +130,12 @@ void	Config::_parseServerBlock( const std::string &serverBlock ) {
 			if (!token.empty() && token[token.size() - 1] == ';') {
 				token = token.substr(0, token.size() - 1);
 			}
-			tokens.push_back(token);
+			token.erase(std::remove_if(token.begin(), token.end(), 
+				::isspace), token.end());
+
+			if (token.empty()) { 
+				continue; 
+			} else { tokens.push_back(token); }
 		}
 
 		if (tokens.empty()) { continue; }
