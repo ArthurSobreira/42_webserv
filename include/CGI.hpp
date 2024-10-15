@@ -23,6 +23,7 @@ class CGI {
 		std::string	_getContentLength( void ) const;
 		std::string _getQueryString( const std::string &uri ) const;
 		std::string _getPathInfo( const std::string &uri ) const;
+		void	_handleCGIError( int code, const std::string &message, Logger &logger );
 
 	public:
 		/* Constructor Method */
