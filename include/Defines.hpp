@@ -65,6 +65,7 @@
 # define ERROR_INVALID_KEY "Invalid Key in Configuration File!"
 # define ERROR_MISSING_VALUE "Missing Value In Configuration File!"
 # define ERROR_DUPLICATE_KEY "Duplicate Key In Configuration File!"
+# define ERROR_EXTRA_VALUE "Extra Value In Configuration File!"
 
 /* Server Extraction Error */
 # define ERROR_INVALID_PORT "Server: Invalid Port Number!"
