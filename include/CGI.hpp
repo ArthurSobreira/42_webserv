@@ -3,6 +3,7 @@
 
 #include "Includes.hpp"
 #include "Defines.hpp"
+#include "Logger.hpp"
 #include "Config.hpp"
 #include "Request.hpp"
 #include "Response.hpp"
@@ -16,6 +17,7 @@ class CGI {
 		Request		_request;
 		ServerConfigs	_serverConfig;
 		LocationConfigs	_locationConfig;
+		Logger		_logger;
 		std::map<std::string, std::string> _env;
 		
 		/* Private Methods */
@@ -23,7 +25,8 @@ class CGI {
 		std::string	_getContentLength( void ) const;
 		std::string _getQueryString( const std::string &uri ) const;
 		std::string _getPathInfo( const std::string &uri ) const;
-		void	_handleCGIError( int code, const std::string &message, Logger &logger );
+		void	_handleCGIError( int code, const std::string &message );
+		char	**_getEnvpArray( void );
 
 	public:
 		/* Constructor Method */
