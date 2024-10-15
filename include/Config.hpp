@@ -32,8 +32,8 @@ struct LocationConfigs {
 };
 
 struct ServerConfigs {
-	unsigned short	port;
-	std::string	host;
+	unsigned short port;
+	std::string host;
 	std::string serverName;
 	size_t limitBodySize;
 	errorMap errorPages;
