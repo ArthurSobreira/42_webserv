@@ -9,6 +9,8 @@ namespace ServerExtraction {
 	void	port( stringVector &tokens, ServerConfigs &server ) {
 		if (tokens.size() < 2 || tokens[1].empty()) {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
+		} else if (tokens.size() > 2) {
+			throw std::runtime_error(ERROR_EXTRA_VALUE);
 		}
 		std::stringstream stringPort(tokens[1]);
 		long long portValue;
@@ -25,6 +27,8 @@ namespace ServerExtraction {
 	void	host( stringVector &tokens, ServerConfigs &server ) {
 		if (tokens.size() < 2 || tokens[1].empty()) {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
+		} else if (tokens.size() > 2) {
+			throw std::runtime_error(ERROR_EXTRA_VALUE);
 		}
 		if (!ConfigUtils::hostIsValid(server)) {
 			throw std::runtime_error(ERROR_INVALID_HOST);
@@ -34,12 +38,16 @@ namespace ServerExtraction {
 	void	serverName( stringVector &tokens, ServerConfigs &server ) {
 		if (tokens.size() < 2 || tokens[1].empty()) {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
+		} else if (tokens.size() > 2) {
+			throw std::runtime_error(ERROR_EXTRA_VALUE);
 		} else { server.serverName = tokens[1]; }
 	}
 
 	void	limitBodySize( stringVector &tokens, ServerConfigs &server ) {
 		if (tokens.size() < 2 || tokens[1].empty()) {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
+		} else if (tokens.size() > 2) {
+			throw std::runtime_error(ERROR_EXTRA_VALUE);
 		}
 		std::stringstream stringSize(tokens[1]);
 		size_t	limitBodySizeMB;
@@ -55,6 +63,8 @@ namespace ServerExtraction {
 	void	errorPages( stringVector &tokens, ServerConfigs &server ) {
 		if (tokens.size() < 3 || tokens[1].empty() || tokens[2].empty()) {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
+		} else if (tokens.size() > 3) {
+			throw std::runtime_error(ERROR_EXTRA_VALUE);
 		}
 		std::string	errorCode = tokens[1];
 		std::string	fileName = tokens[2];
