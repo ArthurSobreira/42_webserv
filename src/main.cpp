@@ -134,6 +134,7 @@ void handleClientSocket(int client_fd, int epoll_fd, Request &request, Logger &l
 	if (locationConfig.cgiEnabled) {
 		CGI cgi(request, *serverConfig, locationConfig);
 
+		cgi.executeCGI();
 		response.setStatus(cgi.getReturnCode(), "OK");
 		responseFull = cgi.getReturnBody();
 	} else {
@@ -141,7 +142,6 @@ void handleClientSocket(int client_fd, int epoll_fd, Request &request, Logger &l
 		responseFull = response.generateResponse();
 	}
 
-	logger.logDebug(LOG_DEBUG, "Sending response to client", true);
 	ssize_t bytes_sent = send(client_fd, responseFull.c_str(), responseFull.size(), 0);
 
 	if (bytes_sent == -1)
