@@ -36,6 +36,7 @@ class CGI {
 		/* Public Methods */
 		int	getReturnCode( void ) const;
 		std::string	getReturnBody( void ) const;
+		void	executeCGI( void );
 };
 
 #endif
