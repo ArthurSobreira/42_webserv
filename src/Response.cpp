@@ -3,7 +3,7 @@
 #include "Includes.hpp"
 #include "Config.hpp"
 
-Response::Response() : _status_code(200), _reason_phrase("OK"), _root("static"){}
+Response::Response() : _status_code(200), _reason_phrase("OK"), _root("static") {}
 
 std::string Response::generateResponse() const
 {
@@ -80,44 +80,44 @@ httpMethod returnMethod(std::string method)
 	return INVALID;
 }
 
-bool Response::validConfigWithRequest(const ServerConfigs* respconfig, const std::string &uri, const std::string &method)
+bool Response::validMethod(const LocationConfigs it, const std::string &method)
 {
-	if (respconfig->locations.empty())
-		return true;
-	for (std::vector<LocationConfigs>::const_iterator it = respconfig->locations.begin(); it != respconfig->locations.end(); ++it)
-	{
-		if (uri.find(it->locationPath) != std::string::npos)
-		{
-			if (isRepeatedMethod(it->methods, returnMethod(method)))
+	
+	if (isRepeatedMethod(it.methods, returnMethod(method)))
 				return true;
-		}
-	}
 	return false;
 }
 
-void Response::processRequest(Request &request, const ServerConfigs* respconfig,Logger &logger)
+LocationConfigs Response::returnLocationConfig(const ServerConfigs *respconfig, const std::string &uri)
 {
-	(void)respconfig;
-	std::string path;
-	// if (!request.isRequestValid())
-	// {
-	// 	std::cout << "debbug response 1" << std::endl;
-	// 	handlerValidRequest(request, logger);
-	// 	return;
-	// }
+	LocationConfigs bestMatch;
+	size_t bestMatchLength = 0;
 
-	if (request.getUri().find(_root) != std::string::npos)
+	for (std::vector<LocationConfigs>::const_iterator it = respconfig->locations.begin(); it != respconfig->locations.end(); ++it)
 	{
-		std::cout << "debbug response 2" << std::endl;
-		path = "./" + request.getUri();
+		if (uri.find(it->locationPath) == 0 && it->locationPath.length() > bestMatchLength)
+		{
+			bestMatch = *it;
+			bestMatchLength = it->locationPath.length();
+		}
 	}
-	else
+
+	return bestMatch;
+}
+
+
+void Response::processRequest(Request &request, const ServerConfigs *respconfig, Logger &logger)
+{
+	LocationConfigs location = returnLocationConfig(respconfig, request.getUri());
+	std::string path = location.root + request.getUri();
+	if (!validMethod(location, request.getMethod()))
 	{
-		std::cout << "debbug response 3" << std::endl;
-		path = _root + request.getUri();
+		std::cout << "debbug response 1" << std::endl;
+		handleError(405, respconfig->errorPages.at("405"), "Method not allowed", logger);
+		return;
 	}
 	logger.logDebug(LOG_INFO, "'response' Request URI: " + path, true);
-	if (path[path.size() - 1] == '/')
+	if (path[path.size() - 1] == '/' && !location.autoindex)
 	{
 		std::cout << "debbug response 4" << std::endl;
 		path += "index.html";
@@ -126,23 +126,21 @@ void Response::processRequest(Request &request, const ServerConfigs* respconfig,
 	if (stat(path.c_str(), &Status) != 0)
 	{
 		std::cout << "debbug response 5" << std::endl;
-		handleError(404, "static/errors/404.html", "File not found", logger);
+		handleError(404, respconfig->errorPages.at("404"), "File not found", logger);
 		return;
 	}
 	if (S_ISDIR(Status.st_mode))
 	{
 		std::cout << "debbug response 6" << std::endl;
 		std::string directoryListing = listDirectory(path);
-
 		setBodyWithContentType(directoryListing, "directory.html");
 		setStatus(200, "OK");
 		return;
 	}
-
 	if (access(path.c_str(), R_OK) != 0)
 	{
 		std::cout << "debbug response 7" << std::endl;
-		handleError(403, "static/errors/403.html", "File not readable", logger);
+		handleError(403, respconfig->errorPages.at("403"), "File not readable", logger);
 		return;
 	}
 	std::cout << "debbug response 8" << std::endl;
