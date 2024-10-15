@@ -26,7 +26,7 @@ class CGI {
 		std::string _getQueryString( const std::string &uri ) const;
 		std::string _getPathInfo( const std::string &uri ) const;
 		void	_handleCGIError( int code, const std::string &message );
-		char	**_getEnvpArray( void );
+		char	**_generateEnvp( void );
 
 	public:
 		/* Constructor Method */
