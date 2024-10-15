@@ -120,8 +120,6 @@ void handleClientSocket(int client_fd, int epoll_fd, Request &request, Logger &l
 		return;
 	}
 
-	logger.logDebug(LOG_ERROR, "Lembrar de arrumar tokens size na confg", true);
-
 	bool locationFound = false;
 	const LocationConfigs locationConfig = config.getLocationConfig(*serverConfig, 
 		request.getUri(), locationFound);
