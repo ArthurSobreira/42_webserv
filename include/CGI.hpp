@@ -22,11 +22,11 @@ class CGI {
 		
 		/* Private Methods */
 		void	_setEnvironmentVars( void );
+		char	**_generateEnvp( void );
 		std::string	_getContentLength( void ) const;
 		std::string _getQueryString( const std::string &uri ) const;
 		std::string _getPathInfo( const std::string &uri ) const;
 		void	_handleCGIError( int code, const std::string &message );
-		char	**_generateEnvp( void );
 
 	public:
 		/* Constructor Method */
