@@ -30,11 +30,11 @@ bool Request::parseRequest(const std::string &raw_request)
 		return false;
 	}
 
-	if (!validateContentLength())
-	{
-		std::cout << "debbug 04" << std::endl;
-		return false;
-	}
+	// if (!validateContentLength())
+	// {
+	// 	std::cout << "debbug 04" << std::endl;
+	// 	return false;
+	// }
 
 	requestIsValid = true;
 	return true;
@@ -98,35 +98,38 @@ bool processChunkedBody(std::string &raw_request, std::string &body)
 
 bool Request::isComplete(const std::string &raw_request) const
 {
-	std::cout << "Raw request: " << raw_request.size() << std::endl;
 	size_t header_end = raw_request.find("\r\n\r\n");
 	if (header_end == std::string::npos)
 		return false; // Cabeçalhos incompletos
 
-	// Verifica se há um campo Content-Length
+	std::string body_part = raw_request.substr(header_end + 4);
 	std::string content_length_str = getHeader("Content-Length");
+
 	if (!content_length_str.empty())
 	{
-		// Verifica se a quantidade de dados recebidos corresponde ao Content-Length
 		int content_length;
 		std::stringstream content_length_stream(content_length_str);
 		content_length_stream >> content_length;
+
+		std::cout << "Content-Length: " << content_length << std::endl;
+		std::cout << "Body size: " << body_part.size() << std::endl;
+
+		// Verifica se a quantidade de dados recebidos corresponde ao Content-Length
 		if (raw_request.size() >= header_end + 4 + content_length)
 		{
-			std::cout << COLORIZE("debbug request 989", GREEN) << std::endl;
+			std::cout << COLORIZE("debug request 989", GREEN) << std::endl;
 			return true;
 		}
 	}
 	// Verifica se Transfer-Encoding é chunked
 	else if (getHeader("Transfer-Encoding") == "chunked")
 	{
-		std::string body = raw_request.substr(header_end + 4);
-		std::string temp_body; // Variável temporária para armazenar o corpo processado
-
-		if (processChunkedBody(body, temp_body))
+		std::string temp_body;
+		if (processChunkedBody(body_part, temp_body))
 			return true;
 	}
-	return false;
+
+	return false; // A requisição ainda não está completa
 }
 
 // Getters

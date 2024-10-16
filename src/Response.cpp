@@ -105,17 +105,52 @@ LocationConfigs Response::returnLocationConfig(const ServerConfigs *respconfig, 
 	return bestMatch;
 }
 
+bool isValidContentType(const std::string &contentType)
+{
+	// Lista de Content-Types permitidos
+	std::set<std::string> validTypes;
+	validTypes.insert("image/jpeg");
+	validTypes.insert("image/png");
+	validTypes.insert("image/gif");
+	validTypes.insert("audio/mpeg");
+	validTypes.insert("audio/wav");
+	validTypes.insert("application/pdf");
+	validTypes.insert("text/plain");
+	validTypes.insert("text/html");
+	validTypes.insert("text/css");
+	validTypes.insert("text/javascript");
+	return validTypes.find(contentType) != validTypes.end();
+}
+
 void Response::postHandler(std::string path, const LocationConfigs &location, const Request &request, const ServerConfigs *respconfig, Logger &logger)
 {
 	(void)path;
-	(void)location;
-	(void)respconfig;
-	(void)logger;
-	std::cout << request.getRawRequest() << std::endl;
+	std::string contentType = request.getHeader("Content-Type");
+	if (!isValidContentType(contentType))
+	{
+		handleError(415, respconfig->errorPages.at("415"), "Unsupported Media Type", logger);
+		return;
+	}
+	std::string pathl = location.uploadPath;
+	pathl += "teste.png";
 
+	std::ofstream outFile(pathl.c_str(), std::ios::out | std::ios::trunc);
+	if (!outFile)
+	{
+		handleError(500, respconfig->errorPages.at("500"), "Internal Server Error", logger);
+		return;
+	}
+
+	outFile << request.getBody();
+	outFile.close();
+
+	// Configurar a resposta de sucesso
+	setStatus(201, "Created");
+	setBodyWithContentType("Resource created successfully", "text/plain");
+	logger.logDebug(LOG_INFO, "Resource created at: " + path);
 }
 
-void Response::getHandler(std::string path,const LocationConfigs &location, const ServerConfigs *respconfig, Logger &logger)
+void Response::getHandler(std::string path, const LocationConfigs &location, const ServerConfigs *respconfig, Logger &logger)
 {
 	status Status;
 
