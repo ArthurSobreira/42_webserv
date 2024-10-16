@@ -29,6 +29,7 @@ ServerConfigs::ServerConfigs( void ) {
 	errorPages["403"] = DEFAULT_ERROR_403;
 	errorPages["404"] = DEFAULT_ERROR_404;
 	errorPages["405"] = DEFAULT_ERROR_405;
+	errorPages["500"] = DEFAULT_ERROR_500;
 }
 
 /* Constructor Method */
