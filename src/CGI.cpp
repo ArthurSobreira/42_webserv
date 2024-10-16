@@ -1,4 +1,3 @@
-
 #include "CGI.hpp"
 
 namespace CGIUtils {
@@ -26,32 +25,20 @@ namespace CGIUtils {
 /* Constructor Method */
 CGI::CGI( const Request &request, const ServerConfigs &server,
 	const LocationConfigs &location ) 
-	: _returnCode(200), _returnbody(DEFAULT_EMPTY), _request(request), 
-	_serverConfig(server), _locationConfig(location),
+	: _returnCode(200), _returnMsg("OK"), _returnbody(DEFAULT_EMPTY), 
+	_request(request), _serverConfig(server), _locationConfig(location), 
 	_logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE) {
 
 	if (_locationConfig.cgiEnabled) {
 		_cgiPath = location.root + "/" + location.cgiPath;
-		if (location.cgiExtension == EXTENSION_PHP) {
-			_cgiExecutable = PHP_EXECUTABLE;
-		} else if (location.cgiExtension == EXTENSION_PY) {
-			_cgiExecutable = PYTHON_EXECUTABLE;
-		}
-		this->_setEnvironmentVars();
+		_cgiExecutable = _getExecutable(location.cgiExtension);
 
-		_logger.logDebug(LOG_INFO, "CGI Body: " + _request.getBody(), true);
-		_logger.logDebug(LOG_INFO, "CGI Path: " + _cgiPath, true);
-		_logger.logDebug(LOG_INFO, "CGI Executable: " + _cgiExecutable, true);
-		_logger.logDebug(LOG_INFO, "CGI SERVER_PROTOCOL: " + _env["SERVER_PROTOCOL"], true);
-		_logger.logDebug(LOG_INFO, "CGI REQUEST_METHOD: " + _env["REQUEST_METHOD"], true);
-		_logger.logDebug(LOG_INFO, "CGI REQUEST_URI: " + _env["REQUEST_URI"], true);
-		_logger.logDebug(LOG_INFO, "CGI SCRIPT_NAME: " + _env["SCRIPT_NAME"], true);
-		_logger.logDebug(LOG_INFO, "CGI SCRIPT_FILENAME: " + _env["SCRIPT_FILENAME"], true);
-		_logger.logDebug(LOG_INFO, "CGI PATH_INFO: " + _env["PATH_INFO"], true);
-		_logger.logDebug(LOG_INFO, "CGI QUERY_STRING: " + _env["QUERY_STRING"], true);
-		_logger.logDebug(LOG_INFO, "CGI RAW_REQUEST: " + _env["RAW_REQUEST"], true);
-		_logger.logDebug(LOG_INFO, "CGI CONTENT_LENGTH: " + _env["CONTENT_LENGTH"], true);
-		_logger.logDebug(LOG_INFO, "CGI CONTENT_TYPE: " + _env["CONTENT_TYPE"], true);
+		if (access(_cgiPath.c_str(), X_OK) == -1) {
+			_handleCGIError(403, ERROR_FORBIDDEN);
+		} else if (!CGIUtils::methodIsOnLocation(_locationConfig, 
+			_request.getMethod())) {
+			_handleCGIError(405, ERROR_METHOD_NOT_ALLOWED);
+		} else { this->_setEnvironmentVars(); }
 	}
 }
 
@@ -103,6 +90,12 @@ std::string CGI::_getContentLength( void ) const {
 	else { return DEFAULT_EMPTY; }
 }
 
+std::string	CGI::_getExecutable( const std::string &extension ) {
+	if (extension == EXTENSION_PHP) { return PHP_EXECUTABLE; }
+	else if (extension == EXTENSION_PY) { return PYTHON_EXECUTABLE; }
+	return (DEFAULT_EMPTY);
+}
+
 std::string	CGI::_getQueryString( const std::string &uri ) const {
 	std::size_t pos = uri.find('?');
 	if (pos != std::string::npos) { 
@@ -131,12 +124,12 @@ void	CGI::_handleCGIError( int code, const std::string &message ) {
 	std::string codeStr;
 
 	_returnCode = code;
-	_locationConfig.cgiEnabled = false;
+	_returnMsg = message;
 	codeStr = CGIUtils::intToString(_returnCode);
 	_logger.logError(LOG_ERROR, message, true);
 	response.handleError(_returnCode, 
 		_serverConfig.errorPages[codeStr], message, _logger);
-	_returnbody = response.generateResponse();
+	_returnbody = response.getBody();
 }
 
 /* Public Methods */
@@ -148,13 +141,13 @@ std::string	CGI::getReturnBody( void ) const {
 	return (_returnbody);
 }
 
+std::string	CGI::getReturnMsg( void ) const {
+	return (_returnMsg);
+}
+
 void	CGI::executeCGI( void ) {
-	if (access(_cgiPath.c_str(), X_OK) == -1) {
-		_handleCGIError(403, ERROR_FORBIDDEN);
-	} else if (!CGIUtils::methodIsOnLocation(_locationConfig, 
-		_request.getMethod())) {
-		_handleCGIError(405, ERROR_METHOD_NOT_ALLOWED);
-	}
+	if (getReturnCode() != 200) { return ; }
+
 	char **envp = _generateEnvp();
 	int	pipefd[2];
 	int status;
