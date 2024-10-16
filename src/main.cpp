@@ -33,7 +33,7 @@ void handleNewConnection(int server_sockfd, int epoll_fd, Logger &logger)
 	getConfig().setSocketServerMap(client_sockfd, server_sockfd);
 }
 
-bool readClientData(int client_sockfd, char *buffer, std::string &fullRequest, Logger &logger)
+bool readClientData(int client_sockfd, char *buffer, std::stringstream &fullRequest, Logger &logger)
 {
 	int n = recv(client_sockfd, buffer, 4096, MSG_DONTWAIT | MSG_NOSIGNAL);
 	if (n == -1)
@@ -56,10 +56,7 @@ bool readClientData(int client_sockfd, char *buffer, std::string &fullRequest, L
 	}
 	else
 	{
-		fullRequest.append(buffer, n);
-		std::cout << std::endl;
-		std::cout << fullRequest << std::endl;
-		std::cout << std::endl;
+		fullRequest.write(buffer, n);
 		return true;
 	}
 }
@@ -81,18 +78,18 @@ bool processRequest(Request &request, const std::string &fullRequest, Logger &lo
 bool handleClientRequest(int client_sockfd, Request &request, Logger &logger)
 {
 	char buffer[4096];
-	std::string fullRequest;
-
+	std::stringstream fullRequest;
 	while (true)
 	{
 		if (!readClientData(client_sockfd, buffer, fullRequest, logger))
 			return false;
-		if (request.isComplete(fullRequest))
+		if (request.isComplete(fullRequest.str()))
 		{
-			if (!processRequest(request, fullRequest, logger))
+			if (!processRequest(request, fullRequest.str(), logger))
+			{
+
 				return false;
-			// if (!request.keepAlive())
-			// 	logger.logDebug(LOG_DEBUG, "Closing connection after response");
+			}
 
 			return true;
 		}
@@ -107,14 +104,16 @@ void closeConnection(int client_fd, int epoll_fd)
 
 void handleClientSocket(int client_fd, int epoll_fd, Request &request, Logger &logger)
 {
-	if (!handleClientRequest(client_fd, request, logger)) {
+	if (!handleClientRequest(client_fd, request, logger))
+	{
 		closeConnection(client_fd, epoll_fd);
 		return;
 	}
 
 	Config &config = getConfig();
-	const ServerConfigs* serverConfig = config.getServerConfig(config.getServerSocket(client_fd));
-	if (serverConfig == NULL) {
+	const ServerConfigs *serverConfig = config.getServerConfig(config.getServerSocket(client_fd));
+	if (serverConfig == NULL)
+	{
 		logger.logError(LOG_ERROR, "Server config not found");
 		closeConnection(client_fd, epoll_fd);
 		return;
@@ -123,8 +122,8 @@ void handleClientSocket(int client_fd, int epoll_fd, Request &request, Logger &l
 	logger.logDebug(LOG_ERROR, "Lembrar de arrumar tokens size na confg", true);
 
 	bool locationFound = false;
-	const LocationConfigs locationConfig = config.getLocationConfig(*serverConfig, 
-		request.getUri(), locationFound);
+	const LocationConfigs locationConfig = config.getLocationConfig(*serverConfig,
+																	request.getUri(), locationFound);
 	std::string responseFull;
 	Response response;
 
@@ -133,13 +132,16 @@ void handleClientSocket(int client_fd, int epoll_fd, Request &request, Logger &l
 	// 	response.handleError(404, serverConfig->errorPages.at("404"), "File not found", logger);
 	// }
 
-	if (locationConfig.cgiEnabled) {
+	if (locationConfig.cgiEnabled)
+	{
 		CGI cgi(request, *serverConfig, locationConfig);
 
 		response.setStatus(cgi.getReturnCode(), "OK");
 		responseFull = cgi.getReturnBody();
-	} else {
-		response.processRequest(request, serverConfig, logger); 
+	}
+	else
+	{
+		response.processRequest(request, serverConfig, logger);
 		responseFull = response.generateResponse();
 	}
 

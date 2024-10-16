@@ -24,5 +24,7 @@ std::string getContentType(const std::string &uri);
 std::string listDirectory(const std::string &dirPath);
 void setConfig(Config &c);
 Config &getConfig();
+bool isDirectory(const std::string &path);
+
 
 #endif

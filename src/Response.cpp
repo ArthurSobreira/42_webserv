@@ -82,9 +82,9 @@ httpMethod returnMethod(std::string method)
 
 bool Response::validMethod(const LocationConfigs it, const std::string &method)
 {
-	
+
 	if (isRepeatedMethod(it.methods, returnMethod(method)))
-				return true;
+		return true;
 	return false;
 }
 
@@ -105,24 +105,27 @@ LocationConfigs Response::returnLocationConfig(const ServerConfigs *respconfig, 
 	return bestMatch;
 }
 
-
-void Response::processRequest(Request &request, const ServerConfigs *respconfig, Logger &logger)
+void Response::postHandler(std::string path, const LocationConfigs &location, const Request &request, const ServerConfigs *respconfig, Logger &logger)
 {
-	LocationConfigs location = returnLocationConfig(respconfig, request.getUri());
-	std::string path = location.root + request.getUri();
-	if (!validMethod(location, request.getMethod()))
-	{
-		std::cout << "debbug response 1" << std::endl;
-		handleError(405, respconfig->errorPages.at("405"), "Method not allowed", logger);
-		return;
-	}
-	logger.logDebug(LOG_INFO, "'response' Request URI: " + path, true);
+	(void)path;
+	(void)location;
+	(void)respconfig;
+	(void)logger;
+	std::cout << request.getRawRequest() << std::endl;
+
+}
+
+void Response::getHandler(std::string path,const LocationConfigs &location, const ServerConfigs *respconfig, Logger &logger)
+{
+	status Status;
+
+	if (isDirectory(path) && path[path.size() - 1] != '/')
+		path += "/";
 	if (path[path.size() - 1] == '/' && !location.autoindex)
 	{
 		std::cout << "debbug response 4" << std::endl;
 		path += "index.html";
 	}
-	status Status;
 	if (stat(path.c_str(), &Status) != 0)
 	{
 		std::cout << "debbug response 5" << std::endl;
@@ -145,6 +148,36 @@ void Response::processRequest(Request &request, const ServerConfigs *respconfig,
 	}
 	std::cout << "debbug response 8" << std::endl;
 	handleFileResponse(path, logger);
+}
+
+void Response::processRequest(Request &request, const ServerConfigs *respconfig, Logger &logger)
+{
+	LocationConfigs location = returnLocationConfig(respconfig, request.getUri());
+	std::string path = location.root + request.getUri();
+	if (!validMethod(location, request.getMethod()))
+	{
+		std::cout << "debbug response 1" << std::endl;
+		handleError(405, respconfig->errorPages.at("405"), "Method not allowed", logger);
+		return;
+	}
+	switch (returnMethod(request.getMethod()))
+	{
+	case GET:
+		std::cout << "debbug response 2" << std::endl;
+		getHandler(path, location, respconfig, logger);
+		break;
+	case POST:
+		std::cout << "debbug response 3" << std::endl;
+		postHandler(path, location, request, respconfig, logger);
+		break;
+	case DELETE:
+		std::cout << "debbug response 4" << std::endl;
+		break;
+	default:
+		handleError(400, respconfig->errorPages.at("400"), "Bad Request", logger);
+		break;
+	}
+	logger.logDebug(LOG_INFO, "'response' Request URI: " + path, true);
 }
 
 void Response::handleError(int _status_code, const std::string &error_page, const std::string &error_message, Logger &logger)
