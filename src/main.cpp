@@ -135,7 +135,7 @@ void handleClientSocket(int client_fd, int epoll_fd, Request &request, Logger &l
 		CGI cgi(request, *serverConfig, locationConfig);
 
 		cgi.executeCGI();
-		response.setStatus(cgi.getReturnCode(), "OK");
+		response.setStatus(cgi.getReturnCode(), cgi.getReturnMsg());
 		response.setBody(cgi.getReturnBody());
 		responseFull = response.generateResponse();
 	} else {
