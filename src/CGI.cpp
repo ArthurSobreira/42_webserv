@@ -20,6 +20,13 @@ namespace CGIUtils {
 		ss << value;
 		return ss.str();
 	}
+
+	void	deleteEnvp(char **envp) {
+		for (int i = 0; envp[i] != NULL; ++i) {
+			delete[] envp[i];
+		}
+		delete[] envp;
+	}
 }
 
 /* Constructor Method */
@@ -145,50 +152,68 @@ std::string	CGI::getReturnMsg( void ) const {
 	return (_returnMsg);
 }
 
+void	CGI::_waitChild( pid_t pid, int &status, std::clock_t start ) {
+	if (!waitpid(pid, &status, WNOHANG)) {
+		while (double(std::clock() - start) / CLOCKS_PER_SEC <= 2.0) {
+			if (waitpid(pid, &status, WNOHANG))
+				break ;
+		}
+		if (!waitpid(pid, &status, WNOHANG)) {
+			kill(pid, SIGKILL);
+			waitpid(pid, &status, 0);
+			_handleCGIError(500, ERROR_CGI_EXECUTION);
+		}
+	}
+}
+
 void	CGI::executeCGI( void ) {
 	if (getReturnCode() != 200) { return ; }
 
+	std::clock_t start = std::clock();
 	char **envp = _generateEnvp();
+	char *argv[] = { 
+			const_cast<char *>(_cgiExecutable.c_str()), 
+			const_cast<char *>(_cgiPath.c_str()), NULL 
+		};
 	int	pipefd[2];
-	int status;
+	int status = 0;
 
 	if (pipe(pipefd) == -1) {
-		_handleCGIError(500, "Error creating pipe");
+		_handleCGIError(500, ERORR_CREATE_PIPE);
 		return ;
 	}
 	pid_t pid = fork();
 	if (pid == -1) {
-		_handleCGIError(500, "Error forking process");
+		_handleCGIError(500, ERROR_CREATE_FORK);
 		return ;
 	} else if (pid == 0) {
-		char *argv[] = { const_cast<char *>(_cgiExecutable.c_str()), 
-			const_cast<char *>(_cgiPath.c_str()), NULL };
-
 		close(pipefd[0]);
 		dup2(pipefd[1], STDOUT_FILENO);
 		close(pipefd[1]);
 
-		if (execve(_cgiExecutable.c_str(), argv, envp) == -1) { // caso php não exista isso não funciona
-			_handleCGIError(500, "Error executing CGI script");
+		if (execve(_cgiExecutable.c_str(), argv, envp) == -1) {
 			exit(EXIT_FAILURE);
 		}
 	} else {
-		close(pipefd[1]);
-		char buffer[4096];
-		size_t bytes_read;
+		_waitChild(pid, status, start);
 
-		while ((bytes_read = read(pipefd[0], buffer, 4096)) > 0) {
-			_returnbody.append(buffer, bytes_read);
+		if (getReturnCode() == 200){
+			close(pipefd[1]);
+			char buffer[4096];
+			size_t bytes_read;
+
+			while ((bytes_read = read(pipefd[0], buffer, 4096)) > 0) {
+				_returnbody.append(buffer, bytes_read);
+			}
+			close(pipefd[0]);
 		}
-		waitpid(pid, &status, 0);
-		if (WIFEXITED(status)) {
-			// _returnCode = WEXITSTATUS(status);  // naõ tenho certeza se está correto
+		
+		if (WIFEXITED(status) && WEXITSTATUS(status) != 0) {
+			_handleCGIError(500, ERROR_CGI_EXECUTION);
+		} else {
 			_returnCode = 200;
+			_returnMsg = "OK";
 		}
-		close(pipefd[0]);
 	}
-	for (int i = 0; envp[i] != NULL; ++i) {
-		delete[] envp[i];
-	}
-	delete[] envp;
+	CGIUtils::deleteEnvp(envp);
 }
