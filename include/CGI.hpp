@@ -24,6 +24,7 @@ class CGI {
 		void	_setEnvironmentVars( void );
 		char	**_generateEnvp( void );
 		std::string	_getContentLength( void ) const;
+		std::string	_getExecutable( const std::string &extension );
 		std::string _getQueryString( const std::string &uri ) const;
 		std::string _getPathInfo( const std::string &uri ) const;
 		void	_handleCGIError( int code, const std::string &message );
