@@ -84,8 +84,12 @@
 # define ERROR_INVALID_CGI_PATH "Location: Invalid CGI Path!"
 # define ERROR_INVALID_CGI_EXTENSION "Location: Invalid CGI Extension!"
 
+/* Request Error Macros */
 # define ERROR_METHOD_NOT_ALLOWED "Method Not Allowed!"
 # define ERROR_FORBIDDEN "Forbidden File or Directory!"
 # define ERROR_NOT_FOUND "File Not Found!"
+# define ERORR_CREATE_PIPE "Error Creating Pipe!"
+# define ERROR_CREATE_FORK "Error Creating Fork!"
+# define ERROR_CGI_EXECUTION "Error Executing CGI Script!"
 
 #endif
