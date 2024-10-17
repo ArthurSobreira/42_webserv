@@ -32,7 +32,7 @@ namespace CGIUtils {
 /* Constructor Method */
 CGI::CGI( const Request &request, const ServerConfigs &server,
 	const LocationConfigs &location ) 
-	: _returnCode(200), _returnMsg("OK"), _returnbody(DEFAULT_EMPTY), 
+	: _returnCode(200), _reasonPhrase("OK"), _returnBody(DEFAULT_EMPTY), 
 	_request(request), _serverConfig(server), _locationConfig(location), 
 	_logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE) {
 
@@ -130,13 +130,29 @@ void	CGI::_handleCGIError( int code, const std::string &message ) {
 	Response response;
 	std::string codeStr;
 
+	_returnBody.clear();
 	_returnCode = code;
-	_returnMsg = message;
+	_reasonPhrase = message;
 	codeStr = CGIUtils::intToString(_returnCode);
 	_logger.logError(LOG_ERROR, message, true);
 	response.handleError(_returnCode, 
 		_serverConfig.errorPages[codeStr], message, _logger);
-	_returnbody = response.getBody();
+	_returnBody = response.getBody();
+}
+
+bool	CGI::_waitChild( pid_t pid, int &status, std::clock_t start ) {
+	if (!waitpid(pid, &status, WNOHANG)) {
+		while (double(std::clock() - start) / CLOCKS_PER_SEC <= 2.0) {
+			if (waitpid(pid, &status, WNOHANG))
+				break ;
+		}
+		if (!waitpid(pid, &status, WNOHANG)) {
+			kill(pid, SIGKILL);
+			status = TIMEOUT_ERROR;
+			return (false);
+		}
+	}
+	return (true);
 }
 
 /* Public Methods */
@@ -145,25 +161,11 @@ int	CGI::getReturnCode( void ) const {
 }
 
 std::string	CGI::getReturnBody( void ) const {
-	return (_returnbody);
+	return (_returnBody);
 }
 
-std::string	CGI::getReturnMsg( void ) const {
-	return (_returnMsg);
-}
-
-void	CGI::_waitChild( pid_t pid, int &status, std::clock_t start ) {
-	if (!waitpid(pid, &status, WNOHANG)) {
-		while (double(std::clock() - start) / CLOCKS_PER_SEC <= 2.0) {
-			if (waitpid(pid, &status, WNOHANG))
-				break ;
-		}
-		if (!waitpid(pid, &status, WNOHANG)) {
-			kill(pid, SIGKILL);
-			waitpid(pid, &status, 0);
-			_handleCGIError(500, ERROR_CGI_EXECUTION);
-		}
-	}
+std::string	CGI::getReasonPhrase( void ) const {
+	return (_reasonPhrase);
 }
 
 void	CGI::executeCGI( void ) {
@@ -195,15 +197,14 @@ void	CGI::executeCGI( void ) {
 			exit(EXIT_FAILURE);
 		}
 	} else {
-		_waitChild(pid, status, start);
-
-		if (getReturnCode() == 200){
+		if (_waitChild(pid, status, start)) {
 			close(pipefd[1]);
 			char buffer[4096];
 			size_t bytes_read;
 
 			while ((bytes_read = read(pipefd[0], buffer, 4096)) > 0) {
-				_returnbody.append(buffer, bytes_read);
+				_returnBody.append(buffer, bytes_read);
+				_logger.logDebug(LOG_DEBUG, "Body => " + _returnBody, true);
 			}
 			close(pipefd[0]);
 		}
@@ -212,7 +213,7 @@ void	CGI::executeCGI( void ) {
 			_handleCGIError(500, ERROR_CGI_EXECUTION);
 		} else {
 			_returnCode = 200;
-			_returnMsg = "OK";
+			_reasonPhrase = "OK";
 		}
 	}
 	CGIUtils::deleteEnvp(envp);
