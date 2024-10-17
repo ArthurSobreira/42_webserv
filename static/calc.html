@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CGI Calculator Test</title>
+    <link rel="stylesheet" href="css/calc.css">
+</head>
+<body>
+    <form action="/calculator" method="GET">
+        <label for="num1">Number 1:</label>
+        <input type="text" id="num1" name="num1" required>
+
+        <label for="num2">Number 2:</label>
+        <input type="text" id="num2" name="num2" required>
+
+        <label for="operation">Operation:</label>
+        <select id="operation" name="operation">
+            <option value="add">Add</option>
+            <option value="sub">Subtract</option>
+            <option value="mul">Multiply</option>
+            <option value="div">Divide</option>
+        </select>
+
+        <input type="submit" value="Calculate">
+    </form>
+</body>
+</html>
