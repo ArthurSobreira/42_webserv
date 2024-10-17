@@ -53,6 +53,7 @@
 # define PYTHON_EXECUTABLE "/usr/bin/python3"
 # define EXTENSION_PHP ".php"
 # define EXTENSION_PY ".py"
+# define TIMEOUT_ERROR 256
 
 /* File Error Macros */
 # define ERROR_OPEN_LOG_FILE "Could Not Open Log File!"
