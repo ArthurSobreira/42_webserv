@@ -2,7 +2,7 @@
 
 def main() -> None:
 	while(True):
-		print("Hello World")
+		print("Cool Things")
 
 if __name__ == "__main__":
 	main()
