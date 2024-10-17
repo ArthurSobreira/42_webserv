@@ -11,7 +11,7 @@
 class CGI {
 	private:
 		int		_returnCode;
-		std::string _returnMsg; // mudar para reason phrase
+		std::string _reasonPhrase; // mudar para reason phrase
 		std::string	_returnbody;
 		std::string	_cgiPath;
 		std::string _cgiExecutable;
@@ -42,7 +42,7 @@ class CGI {
 		/* Public Methods */
 		int	getReturnCode( void ) const;
 		std::string	getReturnBody( void ) const;
-		std::string	getReturnMsg( void ) const;
+		std::string	getReasonPhrase( void ) const;
 		void	executeCGI( void );
 };
 
