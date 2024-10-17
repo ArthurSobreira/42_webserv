@@ -12,7 +12,7 @@ class CGI {
 	private:
 		int		_returnCode;
 		std::string _reasonPhrase; // mudar para reason phrase
-		std::string	_returnbody;
+		std::string	_returnBody;
 		std::string	_cgiPath;
 		std::string _cgiExecutable;
 		Request		_request;
@@ -29,7 +29,7 @@ class CGI {
 		std::string _getQueryString( const std::string &uri ) const;
 		std::string _getPathInfo( const std::string &uri ) const;
 		void	_handleCGIError( int code, const std::string &message );
-		void	_waitChild( pid_t pid, int &status, std::clock_t start );
+		bool	_waitChild( pid_t pid, int &status, std::clock_t start );
 
 	public:
 		/* Constructor Method */
