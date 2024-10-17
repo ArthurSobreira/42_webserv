@@ -1,34 +1,5 @@
 #include "CGI.hpp"
 
-namespace CGIUtils {
-	bool	methodIsOnLocation( LocationConfigs &location, 
-		const std::string &method ) {
-		std::vector<httpMethod> methods = location.methods;
-
-		if (methods.empty()) { return true; }
-		for (std::vector<httpMethod>::iterator it = methods.begin(); 
-			it != methods.end(); ++it) {
-			if (*it == GET && method == "GET") { return true; }
-			if (*it == POST && method == "POST") { return true; }
-			if (*it == DELETE && method == "DELETE") { return true; }
-		}
-		return (false);
-	}
-
-	std::string	intToString(int value) {
-		std::stringstream ss;
-		ss << value;
-		return ss.str();
-	}
-
-	void	deleteEnvp(char **envp) {
-		for (int i = 0; envp[i] != NULL; ++i) {
-			delete[] envp[i];
-		}
-		delete[] envp;
-	}
-}
-
 /* Constructor Method */
 CGI::CGI( const Request &request, const ServerConfigs &server,
 	const LocationConfigs &location ) 
@@ -155,6 +126,17 @@ bool	CGI::_waitChild( pid_t pid, int &status, std::clock_t start ) {
 	return (true);
 }
 
+void	CGI::_readReturnBody( int pipefd[2] ) {
+	close(pipefd[1]);
+	char buffer[4096];
+	size_t bytes_read;
+
+	while ((bytes_read = read(pipefd[0], buffer, 4096)) > 0) {
+		_returnBody.append(buffer, bytes_read);
+	}
+	close(pipefd[0]);
+}
+
 /* Public Methods */
 int	CGI::getReturnCode( void ) const {
 	return (_returnCode);
@@ -174,9 +156,9 @@ void	CGI::executeCGI( void ) {
 	std::clock_t start = std::clock();
 	char **envp = _generateEnvp();
 	char *argv[] = { 
-			const_cast<char *>(_cgiExecutable.c_str()), 
-			const_cast<char *>(_cgiPath.c_str()), NULL 
-		};
+		const_cast<char *>(_cgiExecutable.c_str()), 
+		const_cast<char *>(_cgiPath.c_str()), NULL 
+	};
 	int	pipefd[2];
 	int status = 0;
 
@@ -197,17 +179,7 @@ void	CGI::executeCGI( void ) {
 			exit(EXIT_FAILURE);
 		}
 	} else {
-		if (_waitChild(pid, status, start)) {
-			close(pipefd[1]);
-			char buffer[4096];
-			size_t bytes_read;
-
-			while ((bytes_read = read(pipefd[0], buffer, 4096)) > 0) {
-				_returnBody.append(buffer, bytes_read);
-				_logger.logDebug(LOG_DEBUG, "Body => " + _returnBody, true);
-			}
-			close(pipefd[0]);
-		}
+		if (_waitChild(pid, status, start)) { _readReturnBody(pipefd); }
 		
 		if (WIFEXITED(status) && WEXITSTATUS(status) != 0) {
 			_handleCGIError(500, ERROR_CGI_EXECUTION);
