@@ -11,7 +11,7 @@
 class CGI {
 	private:
 		int		_returnCode;
-		std::string _reasonPhrase; // mudar para reason phrase
+		std::string _reasonPhrase;
 		std::string	_returnBody;
 		std::string	_cgiPath;
 		std::string _cgiExecutable;
@@ -30,6 +30,7 @@ class CGI {
 		std::string _getPathInfo( const std::string &uri ) const;
 		void	_handleCGIError( int code, const std::string &message );
 		bool	_waitChild( pid_t pid, int &status, std::clock_t start );
+		void	_readReturnBody( int pipefd[2] );
 
 	public:
 		/* Constructor Method */
@@ -45,5 +46,12 @@ class CGI {
 		std::string	getReasonPhrase( void ) const;
 		void	executeCGI( void );
 };
+
+namespace CGIUtils {
+	bool	methodIsOnLocation( LocationConfigs &location, 
+		const std::string &method );
+	std::string	intToString(int value);
+	void	deleteEnvp(char **envp);
+}
 
 #endif
