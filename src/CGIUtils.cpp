@@ -1,6 +1,7 @@
 #include "Includes.hpp"
 #include "Defines.hpp"
 #include "Config.hpp"
+#include "Request.hpp"
 
 namespace CGIUtils {
 	bool	methodIsOnLocation( LocationConfigs &location, 
@@ -13,6 +14,22 @@ namespace CGIUtils {
 			if (*it == GET && method == "GET") { return true; }
 			if (*it == POST && method == "POST") { return true; }
 			if (*it == DELETE && method == "DELETE") { return true; }
+		}
+		return (false);
+	}
+
+	bool	isUploadRequest(const Request &request) {
+		if (request.getMethod() == "POST") {
+			std::string contentType = request.getHeader("Content-Type");
+			if (contentType.find("multipart/form-data") != std::string::npos) {
+				return (true);
+			}
+	
+			std::string contentDisposition = 
+				request.getHeader("Content-Disposition");
+			if (contentDisposition.find("filename=") != std::string::npos) {
+				return (true);
+			}
 		}
 		return (false);
 	}
