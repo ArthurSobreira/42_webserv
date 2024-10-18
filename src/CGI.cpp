@@ -127,13 +127,15 @@ bool	CGI::_waitChild( pid_t pid, int &status, std::clock_t start ) {
 }
 
 void	CGI::_readReturnBody( int pipefd[2] ) {
-	close(pipefd[1]);
 	char buffer[4096];
 	size_t bytes_read;
 
-	while ((bytes_read = read(pipefd[0], buffer, 4096)) > 0) {
-		_returnBody.append(buffer, bytes_read);
-	}
+	// setar return code=201 em caso de POST
+	close(pipefd[1]);
+	bytes_read = read(pipefd[0], buffer, sizeof(buffer) - 1);
+	buffer[bytes_read] = '\0';
+	std::string strBuffer(buffer);
+	if (!strBuffer.empty()) { _returnBody = strBuffer; }
 	close(pipefd[0]);
 }
 
@@ -173,6 +175,19 @@ void	CGI::executeCGI( void ) {
 	} else if (pid == 0) {
 		close(pipefd[0]);
 		dup2(pipefd[1], STDOUT_FILENO);
+		
+		if (_request.getMethod() == "POST") {
+			int postPipe[2];
+			if (pipe(postPipe) == -1) {
+				exit(EXIT_FAILURE);
+			}
+			dup2(postPipe[0], STDIN_FILENO);
+			close(postPipe[0]);
+			
+			std::string body = _request.getBody();
+			write(postPipe[1], body.c_str(), body.length());
+			close(postPipe[1]);
+		}
 		close(pipefd[1]);
 
 		if (execve(_cgiExecutable.c_str(), argv, envp) == -1) {
