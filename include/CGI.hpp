@@ -50,8 +50,9 @@ class CGI {
 namespace CGIUtils {
 	bool	methodIsOnLocation( LocationConfigs &location, 
 		const std::string &method );
-	std::string	intToString(int value);
-	void	deleteEnvp(char **envp);
+	std::string extractFileName( const std::string &body );
+	std::string	intToString( int value );
+	void	deleteEnvp( char **envp );
 }
 
 #endif
