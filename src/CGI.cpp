@@ -17,6 +17,7 @@ CGI::CGI( const Request &request, const ServerConfigs &server,
 			_request.getMethod())) {
 			_handleCGIError(405, ERROR_METHOD_NOT_ALLOWED);
 		} else { this->_setEnvironmentVars(); }
+		// talvez o construtor deva verificar _locationConfig.uploadEnabled
 	}
 }
 
