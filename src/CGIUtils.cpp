@@ -30,13 +30,13 @@ namespace CGIUtils {
 		return (filename);
 	}
 
-	std::string	intToString(int value) {
+	std::string	intToString( int value ) {
 		std::stringstream ss;
 		ss << value;
 		return ss.str();
 	}
 
-	void	deleteEnvp(char **envp) {
+	void	deleteEnvp( char **envp ) {
 		for (int i = 0; envp[i] != NULL; ++i) {
 			delete[] envp[i];
 		}
