@@ -50,6 +50,7 @@ class CGI {
 namespace CGIUtils {
 	bool	methodIsOnLocation( LocationConfigs &location, 
 		const std::string &method );
+	bool	isUploadRequest(const Request &request);
 	std::string extractFileName( const std::string &body );
 	std::string	intToString( int value );
 	void	deleteEnvp( char **envp );
