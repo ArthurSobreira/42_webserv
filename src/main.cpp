@@ -33,34 +33,28 @@ void handleNewConnection(int server_sockfd, int epoll_fd, Logger &logger)
 	getConfig().setSocketServerMap(client_sockfd, server_sockfd);
 }
 
-bool readClientData(int client_sockfd, char *buffer, std::string &fullRequest, Logger &logger)
+void readClientData(int client_sockfd, char *buffer, std::stringstream &fullRequest, int &n, Logger &logger)
 {
-	int n = recv(client_sockfd, buffer, 4096, MSG_DONTWAIT | MSG_NOSIGNAL);
+	n = recv(client_sockfd, buffer, 4096, MSG_DONTWAIT | MSG_NOSIGNAL);
 	if (n == -1)
 	{
 		if (errno == EAGAIN || errno == EWOULDBLOCK)
 		{
 			logger.logDebug(LOG_DEBUG, "No data available to read, try again later.");
-			return true;
+			n = 0;
 		}
 		else
 		{
 			logger.logError(LOG_ERROR, "Error receiving data from client socket");
-			return false;
 		}
 	}
 	else if (n == 0)
 	{
 		logger.logDebug(LOG_DEBUG, "Client disconnected");
-		return false;
 	}
 	else
 	{
-		fullRequest.append(buffer, n);
-		std::cout << std::endl;
-		std::cout << fullRequest << std::endl;
-		std::cout << std::endl;
-		return true;
+		fullRequest.write(buffer, n);
 	}
 }
 
@@ -81,22 +75,18 @@ bool processRequest(Request &request, const std::string &fullRequest, Logger &lo
 bool handleClientRequest(int client_sockfd, Request &request, Logger &logger)
 {
 	char buffer[4096];
-	std::string fullRequest;
-
-	while (true)
+	std::stringstream fullRequest;
+	int n = 1;
+	while (n)
 	{
-		if (!readClientData(client_sockfd, buffer, fullRequest, logger))
-			return false;
-		if (request.isComplete(fullRequest))
-		{
-			if (!processRequest(request, fullRequest, logger))
-				return false;
-			// if (!request.keepAlive())
-			// 	logger.logDebug(LOG_DEBUG, "Closing connection after response");
-
-			return true;
-		}
+		readClientData(client_sockfd, buffer, fullRequest, n, logger);
+		std::cout << n << std::endl;
 	}
+	request.parseRequest(fullRequest.str());
+	if(request.isComplete(fullRequest.str())){
+		return true;
+	}
+	return false;
 }
 
 void closeConnection(int client_fd, int epoll_fd)
