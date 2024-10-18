@@ -21,7 +21,7 @@ def	main() -> None:
                 with open(file_path, 'wb') as output_file:
                     output_file.write(file_item.file.read())
 
-                print(f"<h1>File {filename} uploaded successfully to {file_path}</h1>")
+                print(f"<h1>File <u>{filename}</u> uploaded successfully to <u>{file_path}</u></h1>")
             else:
                 print("<h1>No File Uploaded</h1></body>")
         else:
