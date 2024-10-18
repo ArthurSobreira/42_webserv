@@ -135,7 +135,6 @@ void	CGI::_readReturnBody( int pipefd[2] ) {
 	char buffer[4096];
 	size_t bytes_read;
 
-	// setar return code=201 em caso de POST
 	close(pipefd[1]);
 	bytes_read = read(pipefd[0], buffer, sizeof(buffer) - 1);
 	buffer[bytes_read] = '\0';
@@ -204,8 +203,22 @@ void	CGI::executeCGI( void ) {
 		if (WIFEXITED(status) && WEXITSTATUS(status) != 0) {
 			_handleCGIError(500, ERROR_CGI_EXECUTION);
 		} else {
-			_returnCode = 200;
-			_reasonPhrase = "OK";
+			if (_request.getMethod() == "GET") {
+				_returnCode = 200;
+				_reasonPhrase = "OK";
+			} else if (_request.getMethod() == "POST") {
+				std::string uploadPath = _locationConfig.uploadPath;
+				std::string body = _request.getBody();
+				std::string file = CGIUtils::extractFileName(body);
+
+				if (ConfigUtils::fileExists(uploadPath + "/" + file)) {
+					_returnCode = 201;
+					_reasonPhrase = "Created";
+				} else {
+					_returnCode = 200;
+					_reasonPhrase = "OK";
+				}
+			}
 		}
 	}
 	CGIUtils::deleteEnvp(envp);
