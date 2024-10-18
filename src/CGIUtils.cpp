@@ -1,8 +1,6 @@
 #include "Includes.hpp"
 #include "Defines.hpp"
 #include "Config.hpp"
-#include "Request.hpp"
-#include "Response.hpp"
 
 namespace CGIUtils {
 	bool	methodIsOnLocation( LocationConfigs &location, 
@@ -17,6 +15,19 @@ namespace CGIUtils {
 			if (*it == DELETE && method == "DELETE") { return true; }
 		}
 		return (false);
+	}
+
+	std::string extractFileName( const std::string &body ) {
+		std::string filename;
+		std::string::size_type pos = body.find("filename=\"");
+		if (pos != std::string::npos) {
+			pos += 10;
+			std::string::size_type endPos = body.find("\"", pos);
+			if (endPos != std::string::npos) {
+				filename = body.substr(pos, endPos - pos);
+			}
+		}
+		return (filename);
 	}
 
 	std::string	intToString(int value) {
