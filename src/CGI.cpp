@@ -16,8 +16,10 @@ CGI::CGI( const Request &request, const ServerConfigs &server,
 		} else if (!CGIUtils::methodIsOnLocation(_locationConfig, 
 			_request.getMethod())) {
 			_handleCGIError(405, ERROR_METHOD_NOT_ALLOWED);
+		} else if (CGIUtils::isUploadRequest(_request) && 
+			!_locationConfig.uploadEnabled) {
+			_handleCGIError(403, ERROR_FORBIDDEN);
 		} else { this->_setEnvironmentVars(); }
-		// talvez o construtor deva verificar _locationConfig.uploadEnabled
 	}
 }
 
