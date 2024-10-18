@@ -18,3 +18,5 @@ else:
     result = "Invalid Operation"
 
 print(f"<html><body><h1>Resultado: {result}</h1></body></html>")
+
+# curl -X GET "http://localhost:4002/calculator?num1=10&num2=5&operation=div"
