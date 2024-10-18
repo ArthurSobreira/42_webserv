@@ -44,6 +44,10 @@ void	CGI::_setEnvironmentVars( void ) {
 			_env["CONTENT_TYPE"] = contentType;
 		} else { _env["CONTENT_TYPE"] = "text/plain"; }
 	}
+	if (_locationConfig.uploadEnabled) {
+		_env["UPLOAD_PATH"] = _locationConfig.uploadPath;
+		_env["UPLOAD_ENABLED"] = "true";
+	} else { _env["UPLOAD_ENABLED"] = "false"; }
 }
 
 char	**CGI::_generateEnvp( void ) {
