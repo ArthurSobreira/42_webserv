@@ -82,6 +82,7 @@ bool handleClientRequest(int client_sockfd, Request &request, Logger &logger)
 		readClientData(client_sockfd, buffer, fullRequest, n, logger);
 		std::cout << n << std::endl;
 	}
+	std::cout << fullRequest.str() << std::endl;
 	request.parseRequest(fullRequest.str());
 	if(request.isComplete(fullRequest.str())){
 		return true;
