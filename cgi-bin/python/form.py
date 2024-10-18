@@ -18,4 +18,5 @@ def	main() -> None:
 if __name__ == "__main__":
 	main()
 
+# curl -X GET "http://localhost:4002/form?name=John&age=30"
 # curl -X POST -d "name=John&age=30" http://localhost:4002/form
