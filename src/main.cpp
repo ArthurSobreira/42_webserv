@@ -82,7 +82,10 @@ bool handleClientRequest(int client_sockfd, Request &request, Logger &logger)
 		readClientData(client_sockfd, buffer, fullRequest, n, logger);
 		std::cout << n << std::endl;
 	}
-	request.parseRequest(fullRequest.str());
+	if(!request.parseRequest(fullRequest.str())){
+		logger.logError(LOG_ERROR, "Invalid HTTP request", true);
+		return false;
+	}
 	if(request.isComplete(fullRequest.str())){
 		return true;
 	}

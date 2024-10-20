@@ -6,8 +6,6 @@ Request::Request() : HttpMessage(), method(""), uri(""), requestIsValid(false) {
 bool Request::parseRequest(const std::string &raw_request)
 {
 	rawRequest = raw_request;
-	std::cout << "Raw request: " << raw_request << std::endl;
-
 	size_t body_start = raw_request.find("\r\n\r\n");
 	if (body_start == std::string::npos)
 	{
@@ -16,6 +14,7 @@ bool Request::parseRequest(const std::string &raw_request)
 	}
 
 	std::string header_part = raw_request.substr(0, body_start);
+	std::cout << "header_part: " << header_part << std::endl;
 	body = raw_request.substr(body_start + 4);
 
 	if (!parseStartLine(header_part))

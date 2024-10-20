@@ -107,7 +107,6 @@ LocationConfigs Response::returnLocationConfig(const ServerConfigs *respconfig, 
 
 bool isValidContentType(const std::string &contentType)
 {
-	// Lista de Content-Types permitidos
 	std::set<std::string> validTypes;
 	validTypes.insert("image/jpeg");
 	validTypes.insert("image/png");
@@ -119,6 +118,7 @@ bool isValidContentType(const std::string &contentType)
 	validTypes.insert("text/html");
 	validTypes.insert("text/css");
 	validTypes.insert("text/javascript");
+	validTypes.insert("video/mp4");
 	return validTypes.find(contentType) != validTypes.end();
 }
 
@@ -132,7 +132,8 @@ void Response::postHandler(std::string path, const LocationConfigs &location, co
 		return;
 	}
 	std::string pathl = location.uploadPath;
-	pathl += "teste.png";
+	pathl += "/teste.pdf";
+	std::cout << "pathl: " << pathl << std::endl;
 
 	std::ofstream outFile(pathl.c_str(), std::ios::out | std::ios::trunc);
 	if (!outFile)
