@@ -9,6 +9,8 @@ namespace ServerExtraction {
 	void	port( stringVector &tokens, ServerConfigs &server ) {
 		if (tokens.size() < 2 || tokens[1].empty()) {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
+		} else if (tokens.size() > 2) {
+			throw std::runtime_error(ERROR_EXTRA_VALUE);
 		}
 		std::stringstream stringPort(tokens[1]);
 		long long portValue;
@@ -25,6 +27,8 @@ namespace ServerExtraction {
 	void	host( stringVector &tokens, ServerConfigs &server ) {
 		if (tokens.size() < 2 || tokens[1].empty()) {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
+		} else if (tokens.size() > 2) {
+			throw std::runtime_error(ERROR_EXTRA_VALUE);
 		}
 		if (!ConfigUtils::hostIsValid(server)) {
 			throw std::runtime_error(ERROR_INVALID_HOST);
@@ -34,12 +38,16 @@ namespace ServerExtraction {
 	void	serverName( stringVector &tokens, ServerConfigs &server ) {
 		if (tokens.size() < 2 || tokens[1].empty()) {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
+		} else if (tokens.size() > 2) {
+			throw std::runtime_error(ERROR_EXTRA_VALUE);
 		} else { server.serverName = tokens[1]; }
 	}
 
 	void	limitBodySize( stringVector &tokens, ServerConfigs &server ) {
 		if (tokens.size() < 2 || tokens[1].empty()) {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
+		} else if (tokens.size() > 2) {
+			throw std::runtime_error(ERROR_EXTRA_VALUE);
 		}
 		std::stringstream stringSize(tokens[1]);
 		size_t	limitBodySizeMB;
@@ -55,6 +63,8 @@ namespace ServerExtraction {
 	void	errorPages( stringVector &tokens, ServerConfigs &server ) {
 		if (tokens.size() < 3 || tokens[1].empty() || tokens[2].empty()) {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
+		} else if (tokens.size() > 3) {
+			throw std::runtime_error(ERROR_EXTRA_VALUE);
 		}
 		std::string	errorCode = tokens[1];
 		std::string	fileName = tokens[2];
@@ -72,6 +82,8 @@ namespace LocationExtraction {
 	void	methods( stringVector &tokens, LocationConfigs &location ) {
 		if (tokens.size() < 2 || tokens[1].empty()) {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
+		} else if (tokens.size() > 4) {
+			throw std::runtime_error(ERROR_EXTRA_VALUE);
 		}
 		stringVector::iterator it;
 		location.methods.clear();
@@ -94,35 +106,43 @@ namespace LocationExtraction {
 	void	locationPath( stringVector &tokens, LocationConfigs &location ) {
 		if (tokens.size() < 2 || tokens[1].empty()) {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
+		} else if (tokens.size() > 2) {
+			throw std::runtime_error(ERROR_EXTRA_VALUE);
 		} else { location.locationPath = tokens[1]; }
 	}
 
 	void	root( stringVector &tokens, LocationConfigs &location ) {
 		if (tokens.size() < 2 || tokens[1].empty()) {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
+		} else if (tokens.size() > 2) {
+			throw std::runtime_error(ERROR_EXTRA_VALUE);
 		}
 		std::string	rootPath = tokens[1];
 		ConfigUtils::formatPath(rootPath);
 
 		if (!ConfigUtils::directoryExists(rootPath)) {
 			throw std::runtime_error(ERROR_INVALID_ROOT);
-		} else { 
+		} else {
 			location.root = rootPath;
-			location.rootSet = true;	
+			location.rootSet = true;
 		}
 	}
 
 	void	index( stringVector &tokens, LocationConfigs &location ) {
 		if (tokens.size() < 2 || tokens[1].empty()) {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
+		} else if (tokens.size() > 2) {
+			throw std::runtime_error(ERROR_EXTRA_VALUE);
 		} else { location.index = tokens[1]; }
 	}
 
 	void	redirect( stringVector &tokens, LocationConfigs &location ) {
 		if (tokens.size() < 2 || tokens[1].empty()) {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
-		} else { 
-			location.redirect = tokens[1]; 
+		} else if (tokens.size() > 2) {
+			throw std::runtime_error(ERROR_EXTRA_VALUE);
+		} else {
+			location.redirect = tokens[1];
 			location.redirectSet = true;
 		}
 	}
@@ -130,6 +150,8 @@ namespace LocationExtraction {
 	void	uploadPath( stringVector &tokens, LocationConfigs &location ) {
 		if (tokens.size() < 2 || tokens[1].empty()) {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
+		} else if (tokens.size() > 2) {
+			throw std::runtime_error(ERROR_EXTRA_VALUE);
 		} else {
 			ConfigUtils::formatPath(tokens[1]);
 			location.uploadPath = tokens[1];
@@ -139,26 +161,36 @@ namespace LocationExtraction {
 	void	autoindex( stringVector &tokens, LocationConfigs &location ) {
 		if (tokens.size() < 2 || tokens[1].empty()) {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
+		} else if (tokens.size() > 2) {
+			throw std::runtime_error(ERROR_EXTRA_VALUE);
 		}
 		std::transform(tokens[1].begin(), tokens[1].end(), tokens[1].begin(), ::tolower);
 		if (tokens[1] == "on") {
 			location.autoindex = true;
+		} else if (tokens[1] == "off") {
+			location.autoindex = false;
 		} else { throw std::runtime_error(ERROR_INVALID_AUTOINDEX); }
 	}
 
 	void	uploadEnabled( stringVector &tokens, LocationConfigs &location ) {
 		if (tokens.size() < 2 || tokens[1].empty()) {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
+		} else if (tokens.size() > 2) {
+			throw std::runtime_error(ERROR_EXTRA_VALUE);
 		}
 		if (tokens[1] == "on") {
 			location.uploadEnabled = true;
+		} else if (tokens[1] == "off") {
+			location.uploadEnabled = false;
 		} else { throw std::runtime_error(ERROR_INVALID_UPLOAD_ENABLED); }
 	}
 
 	void	cgiPath( stringVector &tokens, LocationConfigs &location ) {
 		if (tokens.size() < 2 || tokens[1].empty()) {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
-		} 
+		} else if (tokens.size() > 2) {
+			throw std::runtime_error(ERROR_EXTRA_VALUE);
+		}
 		std::string	cgiPath = tokens[1];
 		size_t	lastDot = cgiPath.find_last_of('.');
 
@@ -173,6 +205,8 @@ namespace LocationExtraction {
 	void	cgiExtension( stringVector &tokens, LocationConfigs &location ) {
 		if (tokens.size() < 2 || tokens[1].empty()) {
 			throw std::runtime_error(ERROR_MISSING_VALUE);
+		} else if (tokens.size() > 2) {
+			throw std::runtime_error(ERROR_EXTRA_VALUE);
 		}
 		std::string	cgiExtension = tokens[1];
 

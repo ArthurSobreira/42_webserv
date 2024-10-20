@@ -67,6 +67,19 @@ std::string readFile(const std::string &path)
 	return content;
 }
 
+std::string	removeLastSlashes(const std::string &uri) {
+	std::string formatUri = uri;
+	size_t queryPos = formatUri.find("?");
+	if (queryPos != std::string::npos) {
+		formatUri = formatUri.substr(0, queryPos);
+	}
+
+	while (!formatUri.empty() && formatUri[formatUri.length() - 1] == '/') {
+		formatUri = formatUri.substr(0, formatUri.length() - 1);
+	}
+	return (formatUri);
+}
+
 std::string getContentType(const std::string &uri){
 	std::string extension = uri.substr(uri.find_last_of(".") + 1);
 	if (extension == "html" || extension == "htm")

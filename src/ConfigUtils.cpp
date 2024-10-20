@@ -193,7 +193,7 @@ namespace ConfigUtils {
 		std::cout << "[ Server Locations ]: " << std::endl;
 		for (std::vector<LocationConfigs>::const_iterator it = server.locations.begin(); 
 			it != server.locations.end(); ++it) {
-			std::cout << "\tHTTP Method: ";
+			std::cout << "  HTTP Method: ";
 			for (std::vector<httpMethod>::const_iterator it2 = it->methods.begin(); 
 				it2 != it->methods.end(); ++it2) {
 				if (*it2 == GET) {
@@ -206,18 +206,18 @@ namespace ConfigUtils {
 				std::cout << " ";
 			}
 			std::cout << std::endl;
-			std::cout << "\tlocation_path: " << it->locationPath << std::endl;
-			std::cout << "\troot: " << it->root << std::endl;
-			std::cout << "\tindex: " << it->index << std::endl;
-			std::cout << "\tredirect: " << it->redirect << std::endl;
-			std::cout << "\tupload_path: " << it->uploadPath << std::endl;
-			std::cout << "\tautoindex: " << it->autoindex << std::endl;
-			std::cout << "\tupload_enabled: " << it->uploadEnabled << std::endl;
-			std::cout << "\troot_set: " << it->rootSet << std::endl;
-			std::cout << "\tredirect_set: " << it->redirectSet << std::endl;
-			std::cout << "\tCGI path: " << it->cgiPath << std::endl;
-			std::cout << "\tCGI extension: " << it->cgiExtension << std::endl;
-			std::cout << "\tCGI enabled: " << it->cgiEnabled << std::endl;
+			std::cout << "  location_path: " << it->locationPath << std::endl;
+			std::cout << "  root: " << it->root << std::endl;
+			std::cout << "  index: " << it->index << std::endl;
+			std::cout << "  redirect: " << it->redirect << std::endl;
+			std::cout << "  upload_path: " << it->uploadPath << std::endl;
+			std::cout << "  autoindex: " << it->autoindex << std::endl;
+			std::cout << "  upload_enabled: " << it->uploadEnabled << std::endl;
+			std::cout << "  root_set: " << it->rootSet << std::endl;
+			std::cout << "  redirect_set: " << it->redirectSet << std::endl;
+			std::cout << "  CGI path: " << it->cgiPath << std::endl;
+			std::cout << "  CGI extension: " << it->cgiExtension << std::endl;
+			std::cout << "  CGI enabled: " << it->cgiEnabled << std::endl;
 			std::cout << std::endl;
 		}
 	}

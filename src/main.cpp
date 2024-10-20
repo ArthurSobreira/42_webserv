@@ -116,8 +116,6 @@ void handleClientSocket(int client_fd, int epoll_fd, Request &request, Logger &l
 		return;
 	}
 
-	logger.logDebug(LOG_ERROR, "Lembrar de arrumar tokens size na confg", true);
-
 	bool locationFound = false;
 	const LocationConfigs locationConfig = config.getLocationConfig(*serverConfig,
 																	request.getUri(), locationFound);
@@ -132,17 +130,15 @@ void handleClientSocket(int client_fd, int epoll_fd, Request &request, Logger &l
 	if (locationConfig.cgiEnabled)
 	{
 		CGI cgi(request, *serverConfig, locationConfig);
-
-		response.setStatus(cgi.getReturnCode(), "OK");
-		responseFull = cgi.getReturnBody();
-	}
-	else
-	{
-		response.processRequest(request, serverConfig, logger);
+		cgi.executeCGI();
+		response.setStatus(cgi.getReturnCode(), cgi.getReasonPhrase());
+		response.setBody(cgi.getReturnBody());
+		responseFull = response.generateResponse();
+	} else {
+		response.processRequest(request, serverConfig, logger); 
 		responseFull = response.generateResponse();
 	}
 
-	logger.logDebug(LOG_DEBUG, "Sending response to client", true);
 	ssize_t bytes_sent = send(client_fd, responseFull.c_str(), responseFull.size(), 0);
 
 	if (bytes_sent == -1)
