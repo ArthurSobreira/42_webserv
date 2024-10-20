@@ -82,8 +82,10 @@ bool handleClientRequest(int client_sockfd, Request &request, Logger &logger)
 		readClientData(client_sockfd, buffer, fullRequest, n, logger);
 		std::cout << n << std::endl;
 	}
-	std::cout << fullRequest.str() << std::endl;
-	request.parseRequest(fullRequest.str());
+	if(!request.parseRequest(fullRequest.str())){
+		logger.logError(LOG_ERROR, "Invalid HTTP request", true);
+		return false;
+	}
 	if(request.isComplete(fullRequest.str())){
 		return true;
 	}
@@ -98,22 +100,25 @@ void closeConnection(int client_fd, int epoll_fd)
 
 void handleClientSocket(int client_fd, int epoll_fd, Request &request, Logger &logger)
 {
-	if (!handleClientRequest(client_fd, request, logger)) {
+	if (!handleClientRequest(client_fd, request, logger))
+	{
+		std::cout << "Error handling client request" << std::endl;
 		closeConnection(client_fd, epoll_fd);
 		return;
 	}
 
 	Config &config = getConfig();
-	const ServerConfigs* serverConfig = config.getServerConfig(config.getServerSocket(client_fd));
-	if (serverConfig == NULL) {
+	const ServerConfigs *serverConfig = config.getServerConfig(config.getServerSocket(client_fd));
+	if (serverConfig == NULL)
+	{
 		logger.logError(LOG_ERROR, "Server config not found");
 		closeConnection(client_fd, epoll_fd);
 		return;
 	}
 
 	bool locationFound = false;
-	const LocationConfigs locationConfig = config.getLocationConfig(*serverConfig, 
-		request.getUri(), locationFound);
+	const LocationConfigs locationConfig = config.getLocationConfig(*serverConfig,
+																	request.getUri(), locationFound);
 	std::string responseFull;
 	Response response;
 
@@ -122,9 +127,9 @@ void handleClientSocket(int client_fd, int epoll_fd, Request &request, Logger &l
 	// 	response.handleError(404, serverConfig->errorPages.at("404"), "File not found", logger);
 	// }
 
-	if (locationConfig.cgiEnabled) {
+	if (locationConfig.cgiEnabled)
+	{
 		CGI cgi(request, *serverConfig, locationConfig);
-
 		cgi.executeCGI();
 		response.setStatus(cgi.getReturnCode(), cgi.getReasonPhrase());
 		response.setBody(cgi.getReturnBody());
