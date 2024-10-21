@@ -105,8 +105,9 @@ LocationConfigs Response::returnLocationConfig(const ServerConfigs *respconfig, 
 	return bestMatch;
 }
 
-bool isValidContentType(const std::string &contentType)
+bool isValidContentType(std::string &contentType)
 {
+	std::cout << "contentType: " << contentType << std::endl;
 	std::set<std::string> validTypes;
 	validTypes.insert("image/jpeg");
 	validTypes.insert("image/png");
@@ -119,36 +120,52 @@ bool isValidContentType(const std::string &contentType)
 	validTypes.insert("text/css");
 	validTypes.insert("text/javascript");
 	validTypes.insert("video/mp4");
-	return validTypes.find(contentType) != validTypes.end();
+	if (validTypes.find(contentType) == validTypes.end())
+	{
+		return false;
+	}
+
+	contentType = contentType.substr(contentType.find("/") + 1);
+	if (contentType == "plain")
+		contentType = "txt";
+	if (contentType == "javascript")
+		contentType = "js";
+	return true;
 }
 
-void Response::postHandler(std::string path, const LocationConfigs &location, const Request &request, const ServerConfigs *respconfig, Logger &logger)
+void Response::postHandler(const LocationConfigs &location, const Request &request, const ServerConfigs *respconfig, Logger &logger)
 {
-	(void)path;
+	static int i = 0;
+
 	std::string contentType = request.getHeader("Content-Type");
+	std::cout << RED << "Content-Type: " << contentType << RESET << std::endl;
+	if (contentType.empty())
+	{
+		handleError(400, respconfig->errorPages.at("400"), "Bad Request: Content-Type header missing", logger);
+		return;
+	}
 	if (!isValidContentType(contentType))
 	{
 		handleError(415, respconfig->errorPages.at("415"), "Unsupported Media Type", logger);
 		return;
 	}
-	std::string pathl = location.uploadPath;
-	pathl += "/teste.pdf";
-	std::cout << "pathl: " << pathl << std::endl;
-
-	std::ofstream outFile(pathl.c_str(), std::ios::out | std::ios::trunc);
+	std::string filePath = location.uploadPath;
+	std::stringstream ss;
+	ss << i++;
+	filePath += "/archive" + ss.str() + "." + contentType;
+	std::cout << "File path: " << filePath << std::endl;
+	std::ofstream outFile(filePath.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
 	if (!outFile)
 	{
-		handleError(500, respconfig->errorPages.at("500"), "Internal Server Error", logger);
+		handleError(500, respconfig->errorPages.at("500"), "Internal Server Error: Could not open file for writing", logger);
 		return;
 	}
-
 	outFile << request.getBody();
 	outFile.close();
-
-	// Configurar a resposta de sucesso
 	setStatus(201, "Created");
 	setBodyWithContentType("Resource created successfully", "text/plain");
-	logger.logDebug(LOG_INFO, "Resource created at: " + path);
+
+	logger.logDebug(LOG_INFO, "Resource created at: " + filePath, true);
 }
 
 void Response::getHandler(std::string path, const LocationConfigs &location, const ServerConfigs *respconfig, Logger &logger)
@@ -186,6 +203,33 @@ void Response::getHandler(std::string path, const LocationConfigs &location, con
 	handleFileResponse(path, logger);
 }
 
+void Response::deleteHandler(std::string path, const LocationConfigs &location, const ServerConfigs *respconfig, Logger &logger)
+{
+	std::string fullPath = location.root + path;
+
+	if (access(fullPath.c_str(), F_OK) != 0)
+	{
+		handleError(404, respconfig->errorPages.at("404"), "File not found", logger);
+		return;
+	}
+
+	if (access(fullPath.c_str(), W_OK) != 0)
+	{
+		handleError(403, respconfig->errorPages.at("403"), "Permission denied", logger);
+		return;
+	}
+	if (remove(fullPath.c_str()) != 0)
+	{
+		handleError(500, respconfig->errorPages.at("500"), "Internal Server Error", logger);
+	}
+	else
+	{
+		setStatus(204, "No Content");
+		setBodyWithContentType("", "text/plain");
+		logger.logDebug(LOG_INFO, "Resource deleted at: " + fullPath, true);
+	}
+}
+
 void Response::processRequest(Request &request, const ServerConfigs *respconfig, Logger &logger)
 {
 	LocationConfigs location = returnLocationConfig(respconfig, request.getUri());
@@ -204,7 +248,7 @@ void Response::processRequest(Request &request, const ServerConfigs *respconfig,
 		break;
 	case POST:
 		std::cout << "debbug response 3" << std::endl;
-		postHandler(path, location, request, respconfig, logger);
+		postHandler(location, request, respconfig, logger);
 		break;
 	case DELETE:
 		std::cout << "debbug response 4" << std::endl;

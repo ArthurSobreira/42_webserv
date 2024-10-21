@@ -46,6 +46,7 @@
 # define DEFAULT_ERROR_403 "./static/errors/403.html"
 # define DEFAULT_ERROR_404 "./static/errors/404.html"
 # define DEFAULT_ERROR_405 "./static/errors/405.html"
+# define DEFAULT_ERROR_415 "./static/errors/415.html"
 # define DEFAULT_ERROR_500 "./static/errors/500.html"
 
 /* CGI Macros */

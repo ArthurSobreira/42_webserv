@@ -39,7 +39,8 @@ private:
 	bool validMethod(const LocationConfigs it, const std::string &method);
 	LocationConfigs returnLocationConfig(const ServerConfigs *respconfig, const std::string &uri);
 	void getHandler(std::string path,const LocationConfigs &location, const ServerConfigs *respconfig, Logger &logger);
-	void postHandler(std::string path, const LocationConfigs &location, const Request &request, const ServerConfigs *respconfig, Logger &logger);
+	void postHandler(const LocationConfigs &location, const Request &request, const ServerConfigs *respconfig, Logger &logger);
+	void deleteHandler(std::string path, const LocationConfigs &location, const ServerConfigs *respconfig, Logger &logger);
 };
 
 #endif // RESPONSE_HPP_

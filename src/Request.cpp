@@ -6,6 +6,7 @@ Request::Request() : HttpMessage(), method(""), uri(""), requestIsValid(false) {
 bool Request::parseRequest(const std::string &raw_request)
 {
 	rawRequest = raw_request;
+	std::cout << "raw_request: \n" << raw_request << std::endl;
 	size_t body_start = raw_request.find("\r\n\r\n");
 	if (body_start == std::string::npos)
 	{
@@ -14,7 +15,6 @@ bool Request::parseRequest(const std::string &raw_request)
 	}
 
 	std::string header_part = raw_request.substr(0, body_start);
-	std::cout << "header_part: " << header_part << std::endl;
 	body = raw_request.substr(body_start + 4);
 
 	if (!parseStartLine(header_part))
@@ -28,12 +28,6 @@ bool Request::parseRequest(const std::string &raw_request)
 		std::cout << "debbug 03" << std::endl;
 		return false;
 	}
-
-	// if (!validateContentLength())
-	// {
-	// 	std::cout << "debbug 04" << std::endl;
-	// 	return false;
-	// }
 
 	requestIsValid = true;
 	return true;
@@ -74,33 +68,30 @@ bool processChunkedBody(std::string &raw_request, std::string &body)
 
 	while (true)
 	{
-		// Encontrar o final do tamanho do chunk (linha em branco após o valor)
 		size_t chunk_size_end = raw_request.find("\r\n", pos);
 		if (chunk_size_end == std::string::npos)
-			return false; // Cabeçalho do chunk incompleto
-		// Extrair o tamanho do chunk em hexadecimal
+			return false;
 		std::string chunk_size_hex = raw_request.substr(pos, chunk_size_end - pos);
 		int chunk_size = hexstr_to_int(chunk_size_hex);
-		pos = chunk_size_end + 2; // Avançar para o início dos dados
-		// Se o tamanho do chunk é 0, terminamos
+		pos = chunk_size_end + 2;
 		if (chunk_size == 0)
 			break;
-		// Verificar se os dados completos do chunk estão presentes
 		if (raw_request.size() < pos + chunk_size + 2)
-			return false; // Ainda não recebemos todos os dados do chunk
-		// Adicionar os dados do chunk ao corpo
+			return false;
 		body.append(raw_request, pos, chunk_size);
-		pos += chunk_size + 2; // Avançar para o próximo chunk (pulando o \r\n após o chunk)
+		pos += chunk_size + 2;
 	}
-	return true; // Todos os chunks foram processados
+	return true;
 }
 
 bool Request::isComplete(const std::string &raw_request) const
 {
 	size_t header_end = raw_request.find("\r\n\r\n");
 	if (header_end == std::string::npos)
-		return false; // Cabeçalhos incompletos
-
+	{
+		std::cout << "header_end == std::string::npos" << std::endl;
+		return false;
+	}
 	std::string body_part = raw_request.substr(header_end + 4);
 	std::string content_length_str = getHeader("Content-Length");
 
@@ -109,26 +100,44 @@ bool Request::isComplete(const std::string &raw_request) const
 		int content_length;
 		std::stringstream content_length_stream(content_length_str);
 		content_length_stream >> content_length;
-
+		std::string referer = getHeader("Referer");
 		std::cout << "Content-Length: " << content_length << std::endl;
 		std::cout << "Body size: " << body_part.size() << std::endl;
-
-		// Verifica se a quantidade de dados recebidos corresponde ao Content-Length
 		if (raw_request.size() >= header_end + 4 + content_length)
 		{
-			std::cout << COLORIZE("debug request 989", GREEN) << std::endl;
+			std::cout << COLORIZE("raw_request.size() >= header_end + 4 + content_length", GREEN) << std::endl;
 			return true;
 		}
+		else if (!referer.empty())
+		{
+			std::cout << COLORIZE("getHeader(\"referer\")", GREEN) << std::endl;
+			return true;
+		}
+		std::cout << COLORIZE("raw_request.size() < header_end + 4 + content_length", RED) << std::endl;
 	}
-	// Verifica se Transfer-Encoding é chunked
 	else if (getHeader("Transfer-Encoding") == "chunked")
 	{
 		std::string temp_body;
 		if (processChunkedBody(body_part, temp_body))
+		{
+			std::cout << "processChunkedBody(body_part, temp_body) == true" << std::endl;
 			return true;
+		}
+		std::cout << "processChunkedBody(body_part, temp_body) == false" << std::endl;
+		return false;
+	}
+	else if (method == "GET")
+	{
+		std::cout << "method == GET" << std::endl;
+		return true;
+	}
+	else if (body_part.empty())
+	{
+		std::cout << "body_part.empty()" << std::endl;
+		return true;
 	}
 
-	return false; // A requisição ainda não está completa
+	return false;
 }
 
 // Getters

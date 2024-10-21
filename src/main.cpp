@@ -44,19 +44,14 @@ void readClientData(int client_sockfd, char *buffer, std::stringstream &fullRequ
 			n = 0;
 		}
 		else
-		{
 			logger.logError(LOG_ERROR, "Error receiving data from client socket");
-		}
 	}
 	else if (n == 0)
-	{
 		logger.logDebug(LOG_DEBUG, "Client disconnected");
-	}
 	else
-	{
 		fullRequest.write(buffer, n);
-	}
 }
+
 
 bool processRequest(Request &request, const std::string &fullRequest, Logger &logger)
 {
@@ -76,21 +71,59 @@ bool handleClientRequest(int client_sockfd, Request &request, Logger &logger)
 {
 	char buffer[4096];
 	std::stringstream fullRequest;
-	int n = 1;
-	while (n)
+	int n = 0;
+	do
 	{
 		readClientData(client_sockfd, buffer, fullRequest, n, logger);
-		std::cout << n << std::endl;
-	}
-	if(!request.parseRequest(fullRequest.str())){
+	} while (n > 0);
+	if (!request.parseRequest(fullRequest.str()))
+	{
 		logger.logError(LOG_ERROR, "Invalid HTTP request", true);
 		return false;
 	}
-	if(request.isComplete(fullRequest.str())){
+	std::string contentLength_str = request.getHeader("Content-Length");
+	if (contentLength_str.empty())
+	{
+		std::cout << "Content-Length not found" << std::endl;
 		return true;
 	}
+	size_t contentLength;
+	std::stringstream contentLengthStream(contentLength_str);
+	contentLengthStream >> contentLength;
+	if (contentLength == 0)
+	{
+		std::cout << "Content-Length is 0" << std::endl;
+		return true;
+	}
+	std::string body = fullRequest.str();
+	int attempts = 0;
+	const int maxAttempts = 10;  
+
+	while (body.size() < contentLength && attempts < maxAttempts)
+	{
+		readClientData(client_sockfd, buffer, fullRequest, n, logger);
+		body = fullRequest.str();
+		// attempts++;
+		if (n <= 0) 
+		{
+			logger.logError(LOG_ERROR, "Failed to read more data, closing connection", true);
+			return false;
+		}
+	}
+
+	if (attempts >= maxAttempts) 
+	{
+		logger.logError(LOG_ERROR, "Maximum attempts reached while reading request body", true);
+		return false;
+	}
+
+	std::cout << "Request processed" << std::endl;
+	if (request.isComplete(body)) 
+		return true;
+	std::cout << "Request not complete" << std::endl;
 	return false;
 }
+
 
 void closeConnection(int client_fd, int epoll_fd)
 {
@@ -148,17 +181,6 @@ void handleClientSocket(int client_fd, int epoll_fd, Request &request, Logger &l
 		return;
 	}
 
-	// std::ofstream outfile("request_body.pdf", std::ios::binary);
-	// if (outfile.is_open())
-	// {
-	// 	outfile.write(request.getBody().data(), request.getBody().size()); // write em vez de <<
-	// 	outfile.close();
-	// 	logger.logDebug(LOG_DEBUG, "Request body written to file", true);
-	// }
-	// else
-	// {
-	// 	logger.logError(LOG_ERROR, "Failed to open file to write request body");
-	// }
 
 	// // Response response;
 	// response.processRequest(request,getConfig().getServerConfig(getConfig().getServerSocket(client_fd)), logger);
@@ -279,71 +301,3 @@ int main(int argc, char **argv)
 
 	return EXIT_SUCCESS;
 }
-
-// void startEventLoop(Logger &logger)
-// {
-// 	epollEvent events[MAX_EVENTS];
-// 	Request request;
-// 	Response response;
-
-// 	while (true)
-// 	{
-// 		int num_events = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
-// 		if (num_events == -1)
-// 		{
-// 			logger.logError(LOG_ERROR, "Error on epoll_wait");
-// 			continue;
-// 		}
-// 		for (int i = 0; i < num_events; ++i)
-// 		{
-// 			int sockfd = events[i].data.fd;
-// 			request = clientServerAccept(sockfd, logger);
-// 			response.responseTratament(request, logger);
-// 			std::string responseFull = response.generateResponse();
-// 			send(request.getClientSocket(), responseFull.c_str(), responseFull.size(), 0);
-// 			close(request.getClientSocket());
-// 			// std::string response = requestHandler(request, logger);
-// 			// std::string header = createHeaderRequest(request.uri, request.status, response.size());
-// 			// response = header + response;
-// 			// sendResponse(request.client_socket, response, logger);
-// 		}
-// 	}
-// }
-
-// Request clientServerAccept(int sockfd, Logger &logger)
-// {
-// 	sockaddrIn cli_addr;
-// 	socklen_t clilen = sizeof(cli_addr);
-// 	Request request;
-// 	int newsockfd = accept(sockfd, (sockAddr *)&cli_addr, &clilen);
-// 	addToEpoll(newsockfd);
-// 	if (newsockfd < 0)
-// 	{
-// 		logger.logError(LOG_ERROR, "Error on accept");
-// 		ft_error("Error on accept", __FUNCTION__, __FILE__, __LINE__, std::runtime_error("Error on accept"));
-// 	}
-// 	std::ostringstream log, access_log;
-// 	char buffer[4096];
-// 	int n = recv(newsockfd, buffer, 4095, 0);
-// 	if (n < 0)
-// 	{
-// 		logger.logError(LOG_ERROR, "Error reading from socket");
-// 		close(newsockfd);
-// 		ft_error("Error reading from socket", __FUNCTION__, __FILE__, __LINE__, std::runtime_error("Error reading from socket"));
-// 	}
-
-// 	std::string str(buffer);
-// 	if (!request.parseRequest(str))
-// 	{
-// 		request.setRequestIsValid(false);
-// 		logger.logError(LOG_ERROR, "Error parsing request");
-// 	}
-// 	log << "Request received: " << request.getMethod() << " " << request.getUri() << " " << request.getHttpVersion();
-// 	logger.logDebug(LOG_DEBUG, log.str());
-// 	request.setClientSocket(newsockfd);
-// 	access_log << inetNtop(cli_addr.sin_addr.s_addr) << " - -  \"" << request.getMethod() << " " << request.getUri() << " " << request.getHttpVersion() << "\" ";
-// 	logger.logAccess(LOG_INFO, access_log.str());
-// 	logger.logDebug(LOG_DEBUG, request.getMethod(), true);
-// 	request.setRequestIsValid(true);
-// 	return request;
-// }
