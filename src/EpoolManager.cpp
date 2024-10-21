@@ -14,8 +14,8 @@ int EpollManager::getEpollFD() const{ return epoll_fd; }
 
 void EpollManager::addToEpoll(int sockfd)
 {
-	struct epoll_event event;
-	event.events = EPOLLIN | EPOLLOUT;
+	struct epoll_event event = {};
+	event.events = EPOLLIN;
 	event.data.fd = sockfd;
 	if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, sockfd, &event) == -1)
 		throw std::runtime_error("Failed to add socket to epoll");

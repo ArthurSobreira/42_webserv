@@ -19,8 +19,8 @@ void handleNewConnection(int server_sockfd, int epoll_fd, Logger &logger)
 		logger.logError(LOG_ERROR, "Error accepting new connection");
 		return;
 	}
-	epollEvent ev;
-	ev.events = EPOLLIN | EPOLLET;
+	epollEvent ev = {};
+	ev.events = EPOLLIN;
 	ev.data.fd = client_sockfd;
 	if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_sockfd, &ev) == -1)
 	{
@@ -38,20 +38,13 @@ void readClientData(int client_sockfd, char *buffer, std::stringstream &fullRequ
 	n = recv(client_sockfd, buffer, 4096, MSG_DONTWAIT | MSG_NOSIGNAL);
 	if (n == -1)
 	{
-		if (errno == EAGAIN || errno == EWOULDBLOCK)
-		{
-			logger.logDebug(LOG_DEBUG, "No data available to read, try again later.");
-			n = 0;
-		}
-		else
-			logger.logError(LOG_ERROR, "Error receiving data from client socket");
+		n = 0;
 	}
 	else if (n == 0)
 		logger.logDebug(LOG_DEBUG, "Client disconnected");
 	else
 		fullRequest.write(buffer, n);
 }
-
 
 bool processRequest(Request &request, const std::string &fullRequest, Logger &logger)
 {
@@ -97,33 +90,32 @@ bool handleClientRequest(int client_sockfd, Request &request, Logger &logger)
 	}
 	std::string body = fullRequest.str();
 	int attempts = 0;
-	const int maxAttempts = 10;  
+	const int maxAttempts = 10;
 
 	while (body.size() < contentLength && attempts < maxAttempts)
 	{
 		readClientData(client_sockfd, buffer, fullRequest, n, logger);
 		body = fullRequest.str();
-		// attempts++;
-		if (n <= 0) 
+		attempts++;
+		if (n <= 0)
 		{
 			logger.logError(LOG_ERROR, "Failed to read more data, closing connection", true);
 			return false;
 		}
 	}
 
-	if (attempts >= maxAttempts) 
+	if (attempts >= maxAttempts)
 	{
 		logger.logError(LOG_ERROR, "Maximum attempts reached while reading request body", true);
 		return false;
 	}
 
 	std::cout << "Request processed" << std::endl;
-	if (request.isComplete(body)) 
+	if (request.isComplete(body))
 		return true;
 	std::cout << "Request not complete" << std::endl;
 	return false;
 }
-
 
 void closeConnection(int client_fd, int epoll_fd)
 {
@@ -167,8 +159,10 @@ void handleClientSocket(int client_fd, int epoll_fd, Request &request, Logger &l
 		response.setStatus(cgi.getReturnCode(), cgi.getReasonPhrase());
 		response.setBody(cgi.getReturnBody());
 		responseFull = response.generateResponse();
-	} else {
-		response.processRequest(request, serverConfig, logger); 
+	}
+	else
+	{
+		response.processRequest(request, serverConfig, logger);
 		responseFull = response.generateResponse();
 	}
 
@@ -180,7 +174,6 @@ void handleClientSocket(int client_fd, int epoll_fd, Request &request, Logger &l
 		closeConnection(client_fd, epoll_fd);
 		return;
 	}
-
 
 	// // Response response;
 	// response.processRequest(request,getConfig().getServerConfig(getConfig().getServerSocket(client_fd)), logger);
@@ -208,7 +201,7 @@ bool isServerSocket(int fd, const std::vector<int> &server_fds)
 
 void runServer(const std::vector<int> &server_fds, int epoll_fd, Logger &logger)
 {
-	epollEvent events[MAX_EVENTS];
+	epollEvent events[MAX_EVENTS] = {};
 
 	while (true)
 	{

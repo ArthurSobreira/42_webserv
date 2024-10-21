@@ -167,16 +167,19 @@ void Request::setUri(const std::string &u)
 	uri = u;
 }
 
-// Função para parsear a linha inicial da requisição
 bool Request::parseStartLine(const std::string &start_line)
 {
 	std::istringstream stream(start_line);
 	stream >> method >> uri >> http_version;
 
-	return validateMethod() && validateHttpVersion();
+	if(method.empty() || uri.empty() || http_version.empty())
+	{
+		std::cout << "method.empty() || uri.empty() || http_version.empty()" << std::endl;
+		return false;
+	}
+	return true;
 }
 
-// Função para parsear e armazenar os headers
 bool Request::parseHeaders(const std::string &header_part)
 {
 	std::istringstream stream(header_part);
@@ -194,7 +197,6 @@ bool Request::parseHeaders(const std::string &header_part)
 	return !headers.empty();
 }
 
-// Função para validar o Content-Length
 bool Request::validateContentLength()
 {
 	if (headers.find("Content-Length") != headers.end())
@@ -207,27 +209,6 @@ bool Request::validateContentLength()
 		return body.size() == content_length;
 	}
 	return true;
-}
-
-// Validações específicas da Request
-bool Request::validateMethod()
-{
-	static const std::set<std::string> valid_methods = createValidMethods();
-	return valid_methods.find(method) != valid_methods.end();
-}
-
-bool Request::validateHttpVersion()
-{
-	return (http_version == "HTTP/1.1" || http_version == "HTTP/1.0");
-}
-
-std::set<std::string> Request::createValidMethods()
-{
-	std::set<std::string> valid_methods;
-	valid_methods.insert("GET");
-	valid_methods.insert("POST");
-	valid_methods.insert("DELETE");
-	return valid_methods;
 }
 
 bool Request::keepAlive() const

@@ -138,7 +138,7 @@ void Response::postHandler(const LocationConfigs &location, const Request &reque
 	static int i = 0;
 
 	std::string contentType = request.getHeader("Content-Type");
-	std::cout << RED << "Content-Type: " << contentType << RESET << std::endl;
+	// std::cout << RED << "Content-Type: " << contentType << RESET << std::endl;
 	if (contentType.empty())
 	{
 		handleError(400, respconfig->errorPages.at("400"), "Bad Request: Content-Type header missing", logger);
@@ -172,12 +172,13 @@ void Response::getHandler(std::string path, const LocationConfigs &location, con
 {
 	status Status;
 
+	path = removeLastSlashes(path);
 	if (isDirectory(path) && path[path.size() - 1] != '/')
 		path += "/";
 	if (path[path.size() - 1] == '/' && !location.autoindex)
 	{
 		std::cout << "debbug response 4" << std::endl;
-		path += "index.html";
+		path += location.index;
 	}
 	if (stat(path.c_str(), &Status) != 0)
 	{
@@ -252,6 +253,7 @@ void Response::processRequest(Request &request, const ServerConfigs *respconfig,
 		break;
 	case DELETE:
 		std::cout << "debbug response 4" << std::endl;
+		deleteHandler(path, location, respconfig, logger);
 		break;
 	default:
 		handleError(400, respconfig->errorPages.at("400"), "Bad Request", logger);
