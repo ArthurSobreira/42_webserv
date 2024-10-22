@@ -24,7 +24,7 @@ namespace CGIUtils {
 			if (contentType.find("multipart/form-data") != std::string::npos) {
 				return (true);
 			}
-	
+
 			std::string contentDisposition = 
 				request.getHeader("Content-Disposition");
 			if (contentDisposition.find("filename=") != std::string::npos) {
