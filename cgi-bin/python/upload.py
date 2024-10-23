@@ -2,6 +2,9 @@
 
 import os
 import cgi
+import cgitb
+
+cgitb.enable()
 
 def	main() -> None:
 	form = cgi.FieldStorage()
