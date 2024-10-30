@@ -19,14 +19,18 @@ TESTNAME	=	testes
 BUILD		=	./build
 LOG			=	./logs
 BUILD_TEST	=	./build_test
-SRCS		=	src/Config.cpp src/ConfigExtract.cpp src/ConfigUtils.cpp \
-				src/HttpError.cpp src/listDirectory.cpp src/Logger.cpp \
-				src/Request.cpp src/Response.cpp src/Server.cpp src/Utils.cpp \
-				src/EpoolManager.cpp src/main.cpp
+SRCS		=	src/CGI/CGI.cpp src/CGI/CGIUtils.cpp \
+				src/Config/Config.cpp \
+				src/Config/ConfigExtract.cpp \
+				src/Config/ConfigUtils.cpp \
+				src/EpoolManager.cpp src/Fds.cpp src/GetResponse.cpp \
+				src/Logger.cpp src/PostResponse.cpp src/Request.cpp \
+				src/Response.cpp src/Server.cpp src/ServerManager.cpp \
+				src/Utils.cpp src/main.cpp
 
 TEST_SRCS	=	test/main.cpp $(filter-out src/main.cpp, $(SRCS)) 
-OBJS		=	$(addprefix $(BUILD)/, $(notdir $(SRCS:.cpp=.o)))
-OBJSTESTS	=	$(addprefix $(BUILD_TEST)/, $(notdir $(TEST_SRCS:.cpp=.o)))
+OBJS		=	$(addprefix $(BUILD)/, $(patsubst src/%, %, $(SRCS:.cpp=.o)))
+OBJSTESTS	=	$(addprefix $(BUILD_TEST)/, $(patsubst src/%, %, $(TEST_SRCS:.cpp=.o)))
 INC			=	$(wildcard include/*.hpp)
 
 GREEN	=	"\033[32;1m"
@@ -63,6 +67,8 @@ $(BUILD_TEST)/%.o: src/%.cpp $(INC)
 
 $(BUILD):
 	@mkdir -p $(BUILD)
+	@mkdir -p $(BUILD)/CGI/
+	@mkdir -p $(BUILD)/Config/
 	@mkdir -p $(LOG)
 
 $(BUILD_TEST):
@@ -88,4 +94,8 @@ run: all
 
 tests: $(TESTNAME)
 	@echo $(CYAN)[Running tests...]$(LIMITER)
-	./$(TESTNAME) config/serverTest.conf
+	./$(TESTNAME) config/testServer.conf
+
+valgrind: all
+	@echo $(CYAN)[Running valgrind...]$(LIMITER)
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(NAME) config/testServer.conf
