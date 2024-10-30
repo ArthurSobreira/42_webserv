@@ -8,11 +8,11 @@
 #include "Request.hpp"
 #include "Response.hpp"
 
-class CGI {
+class CGI : public Response {
 	private:
-		int		_returnCode;
-		std::string	_reasonPhrase;
-		std::string	_returnBody;
+		// int		_returnCode;
+		// std::string	_reasonPhrase;
+		// std::string	_returnBody;
 		std::string	_cgiPath;
 		std::string	_cgiExecutable;
 		Request		_request;
@@ -41,15 +41,15 @@ class CGI {
 		~CGI( void );
 
 		/* Public Methods */
-		int	getReturnCode( void ) const;
-		std::string	getReturnBody( void ) const;
-		std::string	getReasonPhrase( void ) const;
+		// int	getReturnCode( void ) const;
+		// std::string	getReturnBody( void ) const;
+		// std::string	getReasonPhrase( void ) const;
 		void	executeCGI( void );
 };
 
 namespace CGIUtils {
 	bool	methodIsOnLocation( LocationConfigs &location, 
-		const std::string &method );
+		httpMethod method );
 	bool	isUploadRequest(const Request &request);
 	std::string extractFileName( const std::string &body );
 	std::string	intToString( int value );

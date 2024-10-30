@@ -15,7 +15,9 @@ class PostResponse : public Response {
 		LocationConfigs _location;
 
     public:
-        PostResponse(int clientSocket, Logger &logger, std::string filePath, std::string postData, ServerConfigs &server, LocationConfigs &location, std::string fileDescription="");
+		PostResponse(std::string filePath, std::string postData, 
+			ServerConfigs &server, LocationConfigs &location, 
+			std::string fileDescription="");
 
         std::string prepareResponse();
 		int createFile();

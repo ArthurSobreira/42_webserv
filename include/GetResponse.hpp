@@ -10,7 +10,7 @@ class GetResponse : public Response {
 		std::map<std::string, std::string> _headers;
 
 	public:
-		GetResponse(int clientSocket, Logger *logger, std::string filePath);
+		GetResponse(std::string filePath);
 		void listDirectoryHandler();
 		void prepareResponse(const LocationConfigs &location, const ServerConfigs &respconfig);
 };
