@@ -2,6 +2,7 @@
 #include "Defines.hpp"
 #include "Logger.hpp"
 #include "Config.hpp"
+#include "Globals.hpp"
 
 bool inetPton(const std::string &ip_str)
 {
@@ -67,7 +68,24 @@ std::string readFile(const std::string &path)
 	return content;
 }
 
-std::string getContentType(const std::string &uri){
+std::string removeLastSlashes(const std::string &uri)
+{
+	std::string formatUri = uri;
+	size_t queryPos = formatUri.find("?");
+	if (queryPos != std::string::npos)
+	{
+		formatUri = formatUri.substr(0, queryPos);
+	}
+
+	while (!formatUri.empty() && formatUri[formatUri.length() - 1] == '/')
+	{
+		formatUri = formatUri.substr(0, formatUri.length() - 1);
+	}
+	return (formatUri);
+}
+
+std::string getContentType(const std::string &uri)
+{
 	std::string extension = uri.substr(uri.find_last_of(".") + 1);
 	if (extension == "html" || extension == "htm")
 		return "text/html";
@@ -134,7 +152,6 @@ std::string getContentType(const std::string &uri){
 	return "plain/text";
 }
 
-
 Config *config = NULL;
 
 void setConfig(Config &c)
@@ -148,8 +165,39 @@ Config &getConfig()
 	return *config;
 }
 
-void signals(int sig)
+void exitHandler(int sig)
 {
 	if (sig == SIGINT || sig == SIGQUIT || sig == SIGTERM)
-		throw std::runtime_error("bye bye");
+	{
+		stop = 1;
+		std::cout << "Exiting...👋🚪" << std::endl;
+	}
+}
+
+
+void setupSignalHandlers()
+{
+	signal(SIGINT, exitHandler);
+	signal(SIGQUIT, exitHandler);
+}
+
+bool createSocket(int &sockfd, int domain, int type)
+{
+	sockfd = socket(domain, type, 0);
+	Logger logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE);
+	if (sockfd < 0)
+	{
+		logger.logError(LOG_ERROR, "Error opening socket");
+		return false;
+	}
+	logger.logDebug(LOG_DEBUG, "Socket created");
+	return true;
+}
+
+bool isDirectory(const std::string &path)
+{
+	struct stat statbuf;
+	if (stat(path.c_str(), &statbuf) != 0)
+		return false;
+	return S_ISDIR(statbuf.st_mode);
 }

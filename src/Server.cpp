@@ -1,106 +1,94 @@
-#include "Includes.hpp"
-#include "Defines.hpp"
 #include "Server.hpp"
-#include "Logger.hpp"
-#include "Utils.hpp"
+#include "Globals.hpp"
 
-void closeSocket(int &sockfd, Logger &logger)
+Server::Server(ServerConfigs &config, Logger &logger, EpollManager &epoll)
+	: _epoll(epoll), _logger(logger), _config(config)
 {
-	if (sockfd >= 0)
-	{
-		close(sockfd);
-		logger.logDebug(LOG_DEBUG, "Socket closed");
-		sockfd = -1;
-	}
+	_backlog = SOMAXCONN;
+	_serverSocket = -1;
 }
 
-bool logErrorAndClose(const std::string &message, int &sockfd, Logger &logger)
+Server::~Server()
 {
-	logger.logError(LOG_ERROR, message);
-	closeSocket(sockfd, logger);
+	if (_serverSocket != -1)
+		close(_serverSocket);
+}
+
+bool Server::initialize() { 
+	if (!createSocket()) return false;
+	if (!configureSocket()) return false;
+	if (!bindSocket()) return false;
+	if (!listenSocket()) return false;
+	if(!_epoll.addToEpoll(_serverSocket, EPOLLIN)) return false;
+	return true;
+ }
+
+bool Server::createSocket()
+{
+	_serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+
+
+	if (_serverSocket < 0)
+	{
+		_logger.logError(LOG_ERROR, "Error opening socket");
+		return false;
+	}
+	_logger.logDebug(LOG_DEBUG, "Socket created");
+	return true;
+}
+
+bool Server::logErrorAndClose(const std::string &message)
+{
+
+	close(_serverSocket);
+	_logger.logError(LOG_ERROR, message);
 	return false;
 }
 
-bool validateBacklog(const int &backlog, Logger &logger)
-{
-	if (backlog < 0 || backlog > SOMAXCONN)
-	{
-		logger.logError(LOG_ERROR, "Invalid backlog number");
-		return false;
-	}
-	return true;
-}
-
-bool createSocket(int &sockfd, int domain, int protocol, Logger &logger)
-{
-	sockfd = socket(domain, protocol, 0);
-	if (sockfd < 0)
-	{
-		logger.logError(LOG_ERROR, "Error opening socket");
-		return false;
-	}
-	logger.logDebug(LOG_DEBUG, "Socket created");
-	return true;
-}
-
-bool bindSocket(int &sockfd, const unsigned short &port, const uint32_t &ip, sockaddrIn &serv_addr, Logger &logger)
+bool Server::bindSocket()
 {
 	logStream log;
-
-	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_addr.s_addr = ip;
-	serv_addr.sin_port = htons(port);
-	if (bind(sockfd, (sockAddr *)&serv_addr, sizeof(serv_addr)) < 0)
+	_serv_addr.sin_family = AF_INET;
+	_serv_addr.sin_addr.s_addr = INADDR_ANY;
+	_serv_addr.sin_port = htons(_config.port);
+	if (bind(_serverSocket, (sockAddr *)&_serv_addr, sizeof(_serv_addr)) < 0)
 	{
-		log << "Error on binding to port " << port;
-		return logErrorAndClose(log.str(), sockfd, logger);
+		log << "Error on binding to port " << _config.port;
+		return logErrorAndClose(log.str());
 	}
-	log << "Binded to port " << port;
-	logger.logDebug(LOG_DEBUG, log.str());
+	log << "Binded to port " << _config.port;
+	_logger.logDebug(LOG_DEBUG, log.str());
 	return true;
 }
 
-bool listenSocket(int &sockfd, int &backlog, Logger &logger)
+bool Server::listenSocket()
 {
 	logStream log;
-
-	if (listen(sockfd, backlog) < 0)
-		return logErrorAndClose("Error on listen", sockfd, logger);
-	log << "Listening on socket with backlog: " << backlog;
-	logger.logDebug(LOG_DEBUG, log.str());
+	if (listen(_serverSocket, _backlog) < 0)
+	{
+		log << "Error on listening to port " << _config.port;
+		return logErrorAndClose(log.str());
+	}
+	log << "Listening on port " << _config.port;
+	_logger.logDebug(LOG_DEBUG, log.str());
 	return true;
 }
 
-bool configureSocket(int sockfd, Logger &logger)
+
+bool Server::configureSocket()
 {
 	int opt = 1;
-
-	if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
-	{
-		logger.logError(LOG_ERROR, "Error on setsockopt");
-		return false;
-	}
-	logger.logDebug(LOG_DEBUG, "Socket configured");
-	return true;
-}
-
-bool createServer(int &sockfd, const unsigned short &port, int &backlog, Logger &logger)
-{
-	sockaddrIn serv_addr;
 	logStream log;
-	uint32_t ip = INADDR_ANY;
-
-	if (!validateBacklog(backlog, logger))
-		return false;
-	if (!createSocket(sockfd, AF_INET, SOCK_STREAM, logger))
-		return false;
-	if (!configureSocket(sockfd, logger))
-		return false;
-	if (!bindSocket(sockfd, port, ip, serv_addr, logger))
-		return false;
-	if (!listenSocket(sockfd, backlog, logger))
-		return false;
-	log << "Server created on " << inetNtop(ip) << ":" << port;
-	logger.logDebug(LOG_DEBUG, log.str(), true);
+	if (setsockopt(_serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
+	{
+		log << "Error on setting socket options";
+		return logErrorAndClose(log.str());
+	}
+	log << "Socket options set";
+	_logger.logDebug(LOG_DEBUG, log.str());
 	return true;
 }
+
+
+
+

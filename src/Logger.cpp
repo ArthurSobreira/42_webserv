@@ -22,7 +22,6 @@ Logger::Logger( const std::string &debugLog, const std::string &logAccess,
 		this->logError(LOG_INFO, "Starting error log...", true);
 	}
 }
-
 /* Destructor Method */
 Logger::~Logger( void ) {
 	if (_debugLog.is_open())
@@ -88,3 +87,4 @@ std::string Logger::_colSeverity( const std::string &severity ) const {
 	else if (severity == LOG_ERROR) { return COLORIZE(RED, severity); }
 	return severity;
 }
+
