@@ -6,19 +6,11 @@
 #include "Logger.hpp"
 
 typedef enum {
+	INVALID = -1,
 	GET = 1,
 	POST,
 	DELETE,
 } httpMethod;
-
-struct CGIConfigs {
-	std::string cgiPath;
-	std::string cgiExtension;
-	bool cgiEnabled;
-
-	/* Struct Constructor */
-	CGIConfigs( void );
-};
 
 struct LocationConfigs {
 	std::vector<httpMethod> methods;
@@ -31,15 +23,17 @@ struct LocationConfigs {
 	bool uploadEnabled;
 	bool rootSet;
 	bool redirectSet;
-	CGIConfigs cgiConfig;
+	bool cgiEnabled;
+	std::string cgiPath;
+	std::string cgiExtension;
 
 	/* Struct Constructor */
 	LocationConfigs( void );
 };
 
 struct ServerConfigs {
-	unsigned short	port;
-	std::string	host;
+	unsigned short port;
+	std::string host;
 	std::string serverName;
 	size_t limitBodySize;
 	errorMap errorPages;
@@ -56,7 +50,7 @@ class Config {
 		short _serverCount;
 		Logger &_logger;
 		std::map<int, const ServerConfigs*> _socketConfigMap;
-		std::map<int,int> _socketServerMap;
+		std::map<int, int> _socketServerMap;
 
 		/* Private Methods */
 		void _parseConfigFile( std::ifstream &configFile );
@@ -68,8 +62,7 @@ class Config {
 
 	public:
 		/* Constructor Method */
-		Config( const std::string &fileName,
-			Logger &logger );
+		Config( const std::string &fileName, Logger &logger );
 
 		/* Destructor Method */
 		~Config( void );
@@ -81,7 +74,8 @@ class Config {
 		const ServerConfigs *getServerConfig( const int &socket );
 		void setSocketServerMap( const int &socket, const int &server );
 		int getServerSocket( const int &socket );
-		
+		const LocationConfigs getLocationConfig( const ServerConfigs &serverConfig,
+			const std::string &uri, bool &locationFound ) const;
 };
 
 /* Config Utils Functions */

@@ -1,57 +1,48 @@
-#ifndef REQUEST_HPP_
-#define REQUEST_HPP_
+#ifndef REQUEST_HPP
+#define REQUEST_HPP
 
 #include "Includes.hpp"
-#include <map>
-#include <string>
-#include <sstream>
-#include <set>
+#include "Config.hpp"
 
-// Classe Request para parsing de requisições HTTP
 class Request
 {
-private:
-	std::string method;
-	std::string uri;
-	std::string http_version;
-	bool requestIsValid;
-	int client_socket;
-	bool allow_directory_listing;
-	std::map<std::string, std::string> headers;
-	std::string body;
-	std::string raw_request;
 
+private:
+	httpMethod _method;								 // Método HTTP (GET, POST, DELETE)
+	std::string _uri;							 // URI da requisição
+	std::map<std::string, std::string> _headers; // Cabeçalhos HTTP
+	std::string _body;							 // Corpo da requisição, se houver
+	std::string _rawRequest;					 // Requisição bruta para parseamento
+	bool _isCGI;								 // Indica se a requisição é para um script CGI
+	LocationConfigs _location;					 // Configurações da localização
+	bool _connectionClose;						 // Indica se a conexão deve ser fechada
+	std::string _fileDescription;
 public:
-	Request();
-	bool parseRequest(const std::string &raw_request);
-	bool isComplete(const std::string &raw_request) const;
-	// Getters
-	std::string getMethod() const { return method; }
-	std::string getUri() const { return uri; }
-	std::string getHttpVersion() const { return http_version; }
-	bool getIsRequestValid() const { return requestIsValid; }
-	int getClientSocket() const { return client_socket; }
-	bool getIsAllowDirectoryListing() const { return allow_directory_listing; }
-	std::map<std::string, std::string> getHeaders() const { return headers; }
-	std::string getBody() const { return body; }
-	std::string getHeader(const std::string &key) const;
-	bool keepAlive() const;
-	std::string getRawRequest() const { return raw_request; }
+	// Construtor que recebe a requisição bruta
+	Request(const std::string &rawRequest);
 
-	// Setters
-	void setMethod(const std::string &m) { method = m; }
-	void setUri(const std::string &u) { uri = u; }
-	void setHttpVersion(const std::string &hv) { http_version = hv; }
-	void setRequestIsValid(bool valid) { requestIsValid = valid; }
-	void setClientSocket(int socket) { client_socket = socket; }
-	void setAllowDirectoryListing(bool allow) { allow_directory_listing = allow; }
-	void setHeaders(const std::map<std::string, std::string> &h) { headers = h; }
-	void setBody(const std::string &b) { body = b; }
-	void setRawRequest(const std::string &raw) { raw_request = raw; }
-	bool validateMethod();
-
+	// Métodos para acessar os dados da requisição
+	httpMethod getMethod() const;									  // Retorna o método da requisição
+	const std::string &getUri() const;							  // Retorna a URI
+	const std::string &getHeader(const std::string &name) const;  // Retorna o valor de um cabeçalho específico
+	const std::map<std::string, std::string> &getHeaders() const; // Retorna todos os cabeçalhos
+	const std::string &getBody() const;							  // Retorna o corpo da requisição
+	bool isCGI() const { return _isCGI; }						  // Retorna se a requisição é para um script CGI
+	LocationConfigs getLocation() const { return _location; }
+	std::string validateRequest(Config _config, ServerConfigs server);
+	bool connectionClose() const { return _connectionClose; }
 private:
-	bool validateHttpVersion();
+	// Método privado para fazer o parsing da requisição
+	void parseRequest();
+	void parseMethodAndUri(const std::string &line);				// Extrai o método e a URI da linha inicial
+	void parseHeaders(const std::vector<std::string> &headerLines); // Extrai os cabeçalhos
+	void parseBody(const std::string &body);						// Extrai o corpo da requisição, se houver
+	std::string folderPath();										// Retorna o caminho do diretório da URI
+	void checkConnectionClose();									// Verifica se a conexão deve ser fechada
+
+	// Funções auxiliares
+	httpMethod parseMethod(const std::string &method); // Converte string para enum Method
 };
 
-#endif // REQUEST_HPP_
+#endif // REQUEST_HPP
+

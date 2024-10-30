@@ -18,10 +18,8 @@ class Logger {
 		/* Constructor Method */
 		Logger( const std::string &log, const std::string &logAccess, 
 			const std::string &logError );
-
 		/* Destructor Method */
 		~Logger( void );
-
 		/* Public Methods */
 		void logDebug( const std::string &severity,
 			const std::string &message, bool tty = false );
