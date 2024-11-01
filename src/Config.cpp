@@ -29,6 +29,7 @@ ServerConfigs::ServerConfigs( void ) {
 	errorPages["403"] = DEFAULT_ERROR_403;
 	errorPages["404"] = DEFAULT_ERROR_404;
 	errorPages["405"] = DEFAULT_ERROR_405;
+	errorPages["500"] = DEFAULT_ERROR_500;
 }
 
 /* Constructor Method */
@@ -130,7 +131,12 @@ void	Config::_parseServerBlock( const std::string &serverBlock ) {
 			if (!token.empty() && token[token.size() - 1] == ';') {
 				token = token.substr(0, token.size() - 1);
 			}
-			tokens.push_back(token);
+			token.erase(std::remove_if(token.begin(), token.end(), 
+				::isspace), token.end());
+
+			if (token.empty()) { 
+				continue; 
+			} else { tokens.push_back(token); }
 		}
 
 		if (tokens.empty()) { continue; }
@@ -266,9 +272,10 @@ const LocationConfigs Config::getLocationConfig( const ServerConfigs &serverConf
 	LocationConfigs bestMatch;
 	size_t bestMatchLength = 0;
 
+	std::string formatUri = removeLastSlashes(uri);
 	for (std::vector<LocationConfigs>::const_iterator it = serverConfig.locations.begin(); 
 		it != serverConfig.locations.end(); ++it) {
-		if (uri.find(it->locationPath) == 0 && it->locationPath.length() > bestMatchLength) {
+		if (formatUri == it->locationPath && it->locationPath.length() > bestMatchLength) {
 			bestMatch = *it;
 			locationFound = true;
 			bestMatchLength = it->locationPath.length();

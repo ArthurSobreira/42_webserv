@@ -46,12 +46,14 @@
 # define DEFAULT_ERROR_403 "./static/errors/403.html"
 # define DEFAULT_ERROR_404 "./static/errors/404.html"
 # define DEFAULT_ERROR_405 "./static/errors/405.html"
+# define DEFAULT_ERROR_500 "./static/errors/500.html"
 
 /* CGI Macros */
-# define PHP_EXECUTABLE "/usr/bin/php-cgi"
+# define PHP_EXECUTABLE "/usr/bin/php"
 # define PYTHON_EXECUTABLE "/usr/bin/python3"
 # define EXTENSION_PHP ".php"
 # define EXTENSION_PY ".py"
+# define TIMEOUT_ERROR 256
 
 /* File Error Macros */
 # define ERROR_OPEN_LOG_FILE "Could Not Open Log File!"
@@ -65,6 +67,7 @@
 # define ERROR_INVALID_KEY "Invalid Key in Configuration File!"
 # define ERROR_MISSING_VALUE "Missing Value In Configuration File!"
 # define ERROR_DUPLICATE_KEY "Duplicate Key In Configuration File!"
+# define ERROR_EXTRA_VALUE "Extra Value In Configuration File!"
 
 /* Server Extraction Error */
 # define ERROR_INVALID_PORT "Server: Invalid Port Number!"
@@ -82,6 +85,12 @@
 # define ERROR_INVALID_CGI_PATH "Location: Invalid CGI Path!"
 # define ERROR_INVALID_CGI_EXTENSION "Location: Invalid CGI Extension!"
 
+/* Request Error Macros */
 # define ERROR_METHOD_NOT_ALLOWED "Method Not Allowed!"
+# define ERROR_FORBIDDEN "Forbidden File or Directory!"
+# define ERROR_NOT_FOUND "File Not Found!"
+# define ERORR_CREATE_PIPE "Error Creating Pipe!"
+# define ERROR_CREATE_FORK "Error Creating Fork!"
+# define ERROR_CGI_EXECUTION "Error Executing CGI Script!"
 
 #endif
