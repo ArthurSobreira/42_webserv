@@ -161,6 +161,7 @@ void ServerManager::handleResponse(Request &request, ServerConfigs &server, int 
 {
 	std::string status = request.validateRequest(_config, server);
 	std::cout << "vazio é o normal [" << status << "]" << std::endl;
+	_connectionMap[clientSocket] = request.connectionClose();
 	if (status != "")
 	{
 		handleError(clientSocket, _logger, server.errorPages[status], status);
@@ -228,7 +229,6 @@ void ServerManager::handleWrite(int clientSocket)
 			{
 				handleResponse(request, (*it)->getConfig(), clientSocket);
 				_requestMap[clientSocket] = "";
-				_connectionMap[clientSocket] = request.connectionClose();
 				break;
 			}
 		}
@@ -252,6 +252,7 @@ void ServerManager::handleWrite(int clientSocket)
 			if (_connectionMap[clientSocket])
 			{
 				closeConnection(clientSocket);
+				std::cout << "Connection closed" << std::endl;
 				return;
 			}
 			_epollManager.modifyEpoll(clientSocket, EPOLLIN);
