@@ -12,7 +12,9 @@ typedef enum {
 	DELETE,
 } httpMethod;
 
+struct ServerConfigs;
 struct LocationConfigs {
+	ServerConfigs *server;
 	std::vector<httpMethod> methods;
 	std::string locationPath;
 	std::string root;
@@ -29,6 +31,9 @@ struct LocationConfigs {
 
 	/* Struct Constructor */
 	LocationConfigs( void );
+
+	/* Struct Destructor */
+	~LocationConfigs( void ); // Fazer isso limpar os ponteiros de server
 };
 
 struct ServerConfigs {
