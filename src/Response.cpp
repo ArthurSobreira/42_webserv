@@ -82,9 +82,12 @@ httpMethod returnMethod(std::string method)
 
 bool Response::validMethod(const LocationConfigs it, const std::string &method)
 {
-
 	if (isRepeatedMethod(it.methods, returnMethod(method)))
 		return true;
+
+	
+	if (isRepeatedMethod(it.methods, returnMethod(method)))
+				return true;
 	return false;
 }
 
@@ -157,6 +160,21 @@ void Response::getHandler(std::string path, const LocationConfigs &location, con
 
 	if (isDirectory(path) && path[path.size() - 1] != '/')
 		path += "/";
+=======
+}
+
+
+void Response::processRequest(Request &request, const ServerConfigs *respconfig, Logger &logger)
+{
+	LocationConfigs location = returnLocationConfig(respconfig, request.getUri());
+	std::string path = location.root + request.getUri();
+	if (!validMethod(location, request.getMethod()))
+	{
+		std::cout << "debbug response 1" << std::endl;
+		handleError(405, respconfig->errorPages.at("405"), "Method not allowed", logger);
+		return;
+	}
+	logger.logDebug(LOG_INFO, "'response' Request URI: " + path, true);
 	if (path[path.size() - 1] == '/' && !location.autoindex)
 	{
 		std::cout << "debbug response 4" << std::endl;

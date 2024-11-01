@@ -49,8 +49,7 @@ void	CGI::_setEnvironmentVars( void ) {
 	}
 	if (_locationConfig.uploadEnabled) {
 		_env["UPLOAD_PATH"] = _locationConfig.uploadPath;
-		_env["UPLOAD_ENABLED"] = "true";
-	} else { _env["UPLOAD_ENABLED"] = "false"; }
+	}
 }
 
 char	**CGI::_generateEnvp( void ) {
