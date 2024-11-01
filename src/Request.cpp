@@ -7,7 +7,6 @@ Request::Request(const std::string &rawRequest) : _rawRequest(rawRequest)
 	_method = INVALID;
 	_isCGI = false;
 	_connectionClose = false;
-	std::cout << YELLOW << "rawRequest: " << _rawRequest << RESET << std::endl;
 	parseRequest();
 }
 
@@ -35,33 +34,35 @@ void Request::parseRequest()
 	std::istringstream requestStream(_rawRequest);
 	std::string line;
 	std::vector<std::string> headerLines;
-	bool body = false;
 
-	while (std::getline(requestStream, line))
+	size_t pos = _rawRequest.find("\r\n\r\n");
+	if (pos != std::string::npos)
 	{
-		if (line.empty())
+		// Separar cabeçalhos e corpo
+		std::string headersPart = _rawRequest.substr(0, pos);
+		_body = _rawRequest.substr(pos + 4);
+		// Processar cabeçalhos linha por linha
+		std::istringstream headersStream(headersPart);
+		bool isFirstLine = true;
+		while (std::getline(headersStream, line))
 		{
-			body = true;
-			continue;
-		}
-		if (!body)
-		{
-			if (_method == INVALID)
+			if (line.empty() || line == "\r")
+				continue;
+
+			if (isFirstLine)
 			{
 				parseMethodAndUri(line);
+				isFirstLine = false;
 			}
 			else
 			{
 				headerLines.push_back(line);
 			}
 		}
-		else
-		{
-			_body += line + "\n";
-		}
+		parseHeaders(headerLines);
 	}
-	parseHeaders(headerLines);
-	parseBody(_body);
+
+	parseBody(); // Verifica o Content-Length e exibe informações de tamanho
 }
 
 void Request::parseMethodAndUri(const std::string &line)
@@ -77,7 +78,8 @@ void Request::parseMethodAndUri(const std::string &line)
 	{
 		_uri = uri;
 	}
-	else{
+	else
+	{
 		_uri = removeLastSlashes(uri);
 	}
 }
@@ -96,29 +98,64 @@ void Request::parseHeaders(const std::vector<std::string> &headerLines)
 	}
 }
 
-void Request::parseBody(const std::string &body)
+void Request::extractMultipartNamesAndFilenames()
 {
-	(void)body;
-	// if(body.find("Content-Type") != std::string::npos)
-	// {
-	// 	std::cout << MAGENTA << "body: " << body << RESET << std::endl;
-	// 	std::stringstream ss(body);
-	// 	std::string separator;
-	// 	std::string firstLine;
-	// 	std::string secondeLine;
-	// 	ss >> separator >> firstLine >> secondeLine;
-	// 	std::cout << RED << separator <<RESET << std::endl;
-	// 	std::cout << RED <<firstLine <<RESET << std::endl;
-	// 	std::cout << RED <<secondeLine <<RESET << std::endl;
-	// 	std::cout << BLUE << _body << RESET <<std::endl;
-	// 	return;
-	// }
-	// _body = body;
+	std::string boundary = "--" + _headers["boundary"];
+	std::string endBoundary = boundary + "--";
+	size_t pos = _body.find(boundary);
+	size_t endPos = _body.find(endBoundary);
+	while (pos != std::string::npos && pos < endPos)
+	{
+		size_t namePos = _body.find("name=\"", pos);
+		size_t filenamePos = _body.find("filename=\"", pos);
+		if (namePos != std::string::npos && filenamePos != std::string::npos)
+		{
+			namePos += 6;
+			filenamePos += 10;
+			size_t nameEnd = _body.find("\"", namePos);
+			size_t filenameEnd = _body.find("\"", filenamePos);
+			std::string name = _body.substr(namePos, nameEnd - namePos);
+			std::string filename = _body.substr(filenamePos, filenameEnd - filenamePos);
+			_headers["name"] = name;
+			_headers["filename"] = filename;	
+		}
+		pos = _body.find(boundary, pos + 1);
+	}
+	std::cout << "name: " << _headers["name"] << std::endl;
+	std::cout << "filename: " << _headers["filename"] << std::endl;
+}
+
+
+
+
+
+void Request::parseBody()
+{
+	if (_headers.find("Content-Length") == _headers.end())
+	{
+		return;
+	}
+	std::cout << RED << "Content-Length: " << _headers["Content-Length"] << RESET <<std::endl;
+	std::cout << "Body size: " << _body.size() << std::endl;
+	if (_headers.find("Content-Type") != _headers.end())
+	{
+		std::string contentType = _headers["Content-Type"];
+		if (contentType.find("multipart/form-data") != std::string::npos)
+		{
+			size_t pos = contentType.find("boundary=");
+			if (pos != std::string::npos)
+			{
+				_headers["boundary"] = contentType.substr(pos + 9);
+				extractMultipartNamesAndFilenames();
+				std::cout << YELLOW << "parseada" << RESET << std::endl;
+			}
+		}
+	}
 }
 
 httpMethod Request::parseMethod(const std::string &method)
 {
-	if (method == "GET") 
+	if (method == "GET")
 	{
 		return GET;
 	}
@@ -148,7 +185,6 @@ bool counterOneSlash(const std::string &uri)
 		return true;
 	}
 	return false;
-
 }
 
 std::string Request::folderPath()
@@ -156,14 +192,14 @@ std::string Request::folderPath()
 	if (_uri == "/")
 		return _uri;
 	std::string folderPath = _uri;
+	if (isDirectory(folderPath) && folderPath[folderPath.size() - 1] != '/')
+	{
+		folderPath += "/";
+	}
 	if (counterOneSlash(folderPath))
 	{
 		folderPath = "/";
 		return folderPath;
-	}
-	if (isDirectory(folderPath) && folderPath[folderPath.size() - 1] != '/')
-	{
-		folderPath += "/";
 	}
 	if (folderPath[folderPath.size() - 1] == '/')
 	{
@@ -183,13 +219,7 @@ std::string Request::validateRequest(Config _config, ServerConfigs server)
 	std::string error = "";
 	bool locationFound = false;
 	std::cout << "passou aki " << counter++ << std::endl;
-	std::cout << GREEN << _uri << RESET << std::endl;
-	std::string folder = folderPath();
-	std::cout << YELLOW << _method << RESET << std::endl;
-	_location = _config.getLocationConfig(server, _uri, locationFound);
-	if (!locationFound) {
-		_location = _config.getLocationConfig(server, folderPath(), locationFound);
-	}
+	_location = _config.getLocationConfig(server, folderPath(), locationFound);
 	if (!locationFound)
 	{
 		error = "404";
@@ -213,4 +243,3 @@ void Request::checkConnectionClose()
 		_connectionClose = true;
 	}
 }
-

@@ -1,7 +1,6 @@
 #include "GetResponse.hpp"
 
-GetResponse::GetResponse( std::string filePath )
-	: Response(), _filePath(filePath) {}
+GetResponse::GetResponse(std::string filePath) : Response(), _filePath(filePath) {}
 
 void GetResponse::listDirectoryHandler(){
 		std::cout << "debbug response 6" << std::endl;
@@ -17,7 +16,7 @@ void GetResponse::listDirectoryHandler(){
 
 void GetResponse::prepareResponse(const LocationConfigs &location, const ServerConfigs &respconfig){
 	status Status;
-	std::cout << RED << "[" <<_filePath << "]"<< RESET << std::endl;
+	std::cout << RED << "prepareResponse [" <<_filePath << "]"<< RESET << std::endl;
 	_filePath = location.root + _filePath;
 	std::cout << _filePath << std::endl;
 	if (_filePath[_filePath.size() - 1] == '/' && !location.autoindex)
