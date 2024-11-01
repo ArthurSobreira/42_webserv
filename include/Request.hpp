@@ -14,6 +14,7 @@ class Request : public HttpMessage
 		std::string method;
 		std::string uri;
 		bool requestIsValid;
+		std::string rawRequest;
 
 	public:
 		Request();
@@ -27,11 +28,16 @@ class Request : public HttpMessage
 		std::string getMethod() const;
 		std::string getUri() const;
 		bool isRequestValid() const;
+		std::string getRawRequest() const;
 
 		// Setters (se necessário)
 		void setMethod(const std::string& m);
 		void setUri(const std::string& u);
+		void setRawRequest(const std::string& r);
+
+		// Funções auxiliares
 		bool validateContentLength();
+
 
 	private:
 		bool parseStartLine(const std::string& start_line);

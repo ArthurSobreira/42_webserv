@@ -25,5 +25,7 @@ std::string listDirectory(const std::string &dirPath);
 std::string	removeLastSlashes(const std::string &uri);
 void setConfig(Config &c);
 Config &getConfig();
+bool isDirectory(const std::string &path);
+
 
 #endif
