@@ -1,7 +1,7 @@
 #include "ServerManager.hpp"
 #include "Globals.hpp"
 #include "Includes.hpp"
-#include "CGI.hpp"
+#include "CGIResponse.hpp"
 
 ServerManager::ServerManager(const std::string &configFilePath)
 	: _logger(new Logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE)),
@@ -175,7 +175,7 @@ void ServerManager::handleResponse(Request &request, ServerConfigs &server, int 
 	}
 	if (request.isCGI())
 	{
-		CGI cgi(request, server, request.getLocation());
+		CGIResponse cgi(request, request.getLocation());
 
 		cgi.executeCGI();
 		_responseMap[clientSocket] = cgi.generateResponse();
