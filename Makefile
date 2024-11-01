@@ -19,10 +19,10 @@ TESTNAME	=	testes
 BUILD		=	./build
 LOG			=	./logs
 BUILD_TEST	=	./build_test
-SRCS		=	src/Config.cpp src/ConfigExtract.cpp src/ConfigUtils.cpp \
-				src/HttpError.cpp src/listDirectory.cpp src/Logger.cpp \
-				src/Request.cpp src/Response.cpp src/Server.cpp src/Utils.cpp \
-				src/main.cpp
+SRCS		=	src/CGI.cpp src/CGIUtils.cpp src/Config.cpp src/ConfigExtract.cpp \
+				src/ConfigUtils.cpp src/HttpError.cpp src/listDirectory.cpp \
+				src/Logger.cpp src/Request.cpp src/Response.cpp src/Server.cpp \
+				src/Utils.cpp src/EpoolManager.cpp src/main.cpp
 
 TEST_SRCS	=	test/main.cpp $(filter-out src/main.cpp, $(SRCS)) 
 OBJS		=	$(addprefix $(BUILD)/, $(notdir $(SRCS:.cpp=.o)))
@@ -84,8 +84,8 @@ re: fclean all
 run: all
 	@echo $(CYAN)[Running $(NAME) executable...]$(LIMITER)
 	@echo $(GREEN)[Server is running...]$(LIMITER)
-	@./$(NAME) config/testServer.conf
+	@./$(NAME) config/testLocation.conf
 
 tests: $(TESTNAME)
 	@echo $(CYAN)[Running tests...]$(LIMITER)
-	./$(TESTNAME) config/serverTest.conf
+	./$(TESTNAME) config/testLocation.conf

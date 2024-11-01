@@ -1,46 +1,51 @@
+#ifndef REQUEST_HPP
+#define REQUEST_HPP
 
-#ifndef REQUEST_HPP_
-#define REQUEST_HPP_
+#include "HttpMessage.hpp"
+#include <string>
+#include <sstream>
+#include <map>
+#include <set>
+#include <iostream>
 
-#include "Includes.hpp"
-
-// Class declaration
-class Request
+class Request : public HttpMessage
 {
-private:
-	std::string method;
-	std::string uri;
-	std::string http_version;
-	bool requestIsValid;
-	int client_socket;
-	bool allow_directory_listing;
-	std::map<std::string, std::string> headers;
-	std::string body;
+	private:
+		std::string method;
+		std::string uri;
+		bool requestIsValid;
+		std::string rawRequest;
 
-public:
-	// Método para parsear a requisição do cliente
-	bool parseRequest(const std::string &raw_request);
-	Request();
-	// Getters
-	std::string getMethod() const { return method; }
-	std::string getUri() const { return uri; }
-	std::string getHttpVersion() const { return http_version; }
-	bool getIsRequestValid() const { return requestIsValid; }
-	int getClientSocket() const { return client_socket; }
-	bool getIsAllowDirectoryListing() const { return allow_directory_listing; }
-	std::map<std::string, std::string> getHeaders() const { return headers; }
-	std::string getBody() const { return body; }
+	public:
+		Request();
 
-	// Setters
-	void setMethod(const std::string &m) { method = m; }
-	void setUri(const std::string &u) { uri = u; }
-	void setHttpVersion(const std::string &hv) { http_version = hv; }
-	void setRequestIsValid(bool valid) { requestIsValid = valid; }
-	void setClientSocket(int socket) { client_socket = socket; }
-	void setAllowDirectoryListing(bool allow) { allow_directory_listing = allow; }
-	void setHeaders(const std::map<std::string, std::string> &h) { headers = h; }
-	void setBody(const std::string &b) { body = b; }
+		// Função para processar e validar a requisição
+		bool parseRequest(const std::string& raw_request);
+		bool isComplete(const std::string& raw_request) const;
+		bool keepAlive() const;
+
+		// Getters
+		std::string getMethod() const;
+		std::string getUri() const;
+		bool isRequestValid() const;
+		std::string getRawRequest() const;
+
+		// Setters (se necessário)
+		void setMethod(const std::string& m);
+		void setUri(const std::string& u);
+		void setRawRequest(const std::string& r);
+
+		// Funções auxiliares
+		bool validateContentLength();
+
+
+	private:
+		bool parseStartLine(const std::string& start_line);
+		bool parseHeaders(const std::string& header_part);
+		bool validateMethod();
+		bool validateHttpVersion();
+		std::set<std::string> createValidMethods();
+
 };
 
-
-#endif // REQUEST_HPP_
+#endif // REQUEST_HPP

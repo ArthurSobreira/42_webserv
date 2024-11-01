@@ -51,4 +51,8 @@
 // Process control functions (waitpid, kill)
 #include <sys/wait.h> // waitpid
 
+// Defines
+
+#include "Defines.hpp"
+
 #endif

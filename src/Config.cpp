@@ -2,24 +2,21 @@
 #include "Defines.hpp"
 #include "Config.hpp"
 
-/* Struct CGIConfigs Constructor */
-CGIConfigs::CGIConfigs( void ) {
-	cgiPath = DEFAULT_CGI_PATH;
-	cgiExtension = DEFAULT_CGI_EXT;
-	cgiEnabled = false;
-}
-
 /* Struct LocationConfigs Constructor */
 LocationConfigs::LocationConfigs( void ) {
 	methods.push_back(GET);
 	locationPath = DEFAULT_LOCATION_PATH;
 	root = DEFAULT_ROOT;
 	index = DEFAULT_INDEX;
-	redirect = DEFAULT_REDIRECT;
+	redirect = DEFAULT_EMPTY;
 	uploadPath = DEFAULT_UPLOAD_PATH;
 	autoindex = false;
 	uploadEnabled = false;
-	cgiConfig = CGIConfigs();
+	rootSet = false;
+	redirectSet = false;
+	cgiEnabled = false;
+	cgiPath = DEFAULT_EMPTY;
+	cgiExtension = DEFAULT_EMPTY;
 }
 
 /* Struct ServerConfigs Constructor */
@@ -28,8 +25,11 @@ ServerConfigs::ServerConfigs( void ) {
 	host = DEFAULT_HOST;
 	serverName = DEFAULT_SERVER_NAME;
 	limitBodySize = DEFAULT_LIMIT_BODY_SIZE;
+	errorPages["400"] = DEFAULT_ERROR_400;
 	errorPages["403"] = DEFAULT_ERROR_403;
 	errorPages["404"] = DEFAULT_ERROR_404;
+	errorPages["405"] = DEFAULT_ERROR_405;
+	errorPages["500"] = DEFAULT_ERROR_500;
 }
 
 /* Constructor Method */
@@ -46,10 +46,8 @@ Config::Config( const std::string &fileName, Logger &logger )
 	}
 
 	if (configFile.is_open()) {
-		_logger.logDebug(LOG_DEBUG, "Config file: " + fileName, true);
 		_serverCount = ConfigUtils::getServerCount(fileName);
-		_logger.logDebug(LOG_DEBUG, "Server count: " 
-				+ ConfigUtils::shortToString(_serverCount), true);
+		_logger.logDebug(LOG_DEBUG, "Starting to parse " + fileName, true);
 		_parseConfigFile(configFile);
 		configFile.close();
 		return ;
@@ -59,11 +57,7 @@ Config::Config( const std::string &fileName, Logger &logger )
 /* Destructor Method */
 Config::~Config( void ) {};
 
-/* Public Methods */
-std::vector<ServerConfigs> Config::getServers( void ) const {
-	return (this->_servers);
-}
-
+/* Private Methods */
 void Config::_parseConfigFile( std::ifstream &configFile ) {
 	std::string line;
 	std::string serverBlock;
@@ -137,14 +131,19 @@ void	Config::_parseServerBlock( const std::string &serverBlock ) {
 			if (!token.empty() && token[token.size() - 1] == ';') {
 				token = token.substr(0, token.size() - 1);
 			}
-			tokens.push_back(token);
+			token.erase(std::remove_if(token.begin(), token.end(), 
+				::isspace), token.end());
+
+			if (token.empty()) { 
+				continue; 
+			} else { tokens.push_back(token); }
 		}
 
 		if (tokens.empty()) { continue; }
 
 		if (tokens[0] != "error_page" && tokens[0] != "location" &&
 			serverKeys.find(tokens[0]) != serverKeys.end()) {
-			throw std::runtime_error(ERROR_DUPLICATE_SERVER_KEY);
+			throw std::runtime_error(ERROR_DUPLICATE_KEY);
 		} else { serverKeys.insert(tokens[0]); }
 
 		if (tokens[0] == "listen") { ServerExtraction::port(tokens, server); }
@@ -185,7 +184,6 @@ void	Config::_parseLocationStream( std::istringstream &serverStream, ServerConfi
 					}
 				}
 			}
-
 			if (locationBracketsCount == 0) {
 				locationBracketsCount = 0;
 				insideLocationBlock = false;
@@ -224,17 +222,64 @@ void	Config::_parseLocationBlock( const std::string &locationBlock, LocationConf
 		if (tokens.empty()) { continue; }
 
 		if (locationKeys.find(tokens[0]) != locationKeys.end()) {
-			throw std::runtime_error(ERROR_DUPLICATE_LOCATION_KEY);
+			throw std::runtime_error(ERROR_DUPLICATE_KEY);
 		} else { locationKeys.insert(tokens[0]); }
 
-		if (tokens[0] == "location_path") { LocationExtraction::locationPath(tokens, location); }
-		// else if (tokens[0] == "root") { LocationExtraction::root(tokens, location); }
-		// else if (tokens[0] == "index") { LocationExtraction::index(tokens, location); }
-		// else if (tokens[0] == "redirect") { LocationExtraction::redirect(tokens, location); }
-		// else if (tokens[0] == "methods") { LocationExtraction::methods(tokens, location); }
-		// else if (tokens[0] == "autoindex") { LocationExtraction::autoindex(tokens, location); }
-		// else if (tokens[0] == "upload") { LocationExtraction::upload(tokens, location); }
-		// else if (tokens[0] == "cgi") { LocationExtraction::cgi(tokens, location); }
-		// else { throw std::runtime_error(ERROR_INVALID_KEY); }
+		if (tokens[0] == "methods") { LocationExtraction::methods(tokens, location); }
+		else if (tokens[0] == "location_path") { LocationExtraction::locationPath(tokens, location); }
+		else if (tokens[0] == "root") { LocationExtraction::root(tokens, location); }
+		else if (tokens[0] == "index") { LocationExtraction::index(tokens, location); }
+		else if (tokens[0] == "redirect") { LocationExtraction::redirect(tokens, location); }
+		else if (tokens[0] == "upload_path") { LocationExtraction::uploadPath(tokens, location); }
+		else if (tokens[0] == "autoindex") { LocationExtraction::autoindex(tokens, location); }
+		else if (tokens[0] == "upload_enabled") { LocationExtraction::uploadEnabled(tokens, location); }
+		else if (tokens[0] == "cgi_path") { LocationExtraction::cgiPath(tokens, location); }
+		else if (tokens[0] == "cgi_extension") { LocationExtraction::cgiExtension(tokens, location); }
+		else { throw std::runtime_error(ERROR_INVALID_KEY); }
 	}
+	ConfigUtils::validateFullLocationPath(location);
+	ConfigUtils::validateFullCGIPath(location);
+	ConfigUtils::createUploadFolder(location.uploadPath);
+}
+
+/* Public Methods */
+std::vector<ServerConfigs> Config::getServers( void ) const {
+	return (this->_servers);
+}
+
+std::map<int,const ServerConfigs*> Config::getSocketConfigMap( void ) const {
+	return (this->_socketConfigMap);
+}
+
+void Config::setSocketConfigMap( const int &socket, const ServerConfigs *config ) {
+	this->_socketConfigMap[socket] = config;
+}
+
+const ServerConfigs *Config::getServerConfig( const int &socket ) {
+	return (this->_socketConfigMap[socket]);
+}
+
+void Config::setSocketServerMap( const int &socket, const int &server ){
+	this->_socketServerMap[socket] = server;
+}
+
+int Config::getServerSocket( const int &socket ){
+	return (this->_socketServerMap[socket]);
+}
+
+const LocationConfigs Config::getLocationConfig( const ServerConfigs &serverConfig,
+	const std::string &uri, bool &locationFound ) const {
+	LocationConfigs bestMatch;
+	size_t bestMatchLength = 0;
+
+	std::string formatUri = removeLastSlashes(uri);
+	for (std::vector<LocationConfigs>::const_iterator it = serverConfig.locations.begin(); 
+		it != serverConfig.locations.end(); ++it) {
+		if (formatUri == it->locationPath && it->locationPath.length() > bestMatchLength) {
+			bestMatch = *it;
+			locationFound = true;
+			bestMatchLength = it->locationPath.length();
+		}
+	}
+	return (bestMatch);
 }

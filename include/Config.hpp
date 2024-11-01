@@ -6,19 +6,11 @@
 #include "Logger.hpp"
 
 typedef enum {
+	INVALID = -1,
 	GET = 1,
 	POST,
 	DELETE,
 } httpMethod;
-
-struct CGIConfigs {
-	std::string cgiPath;
-	std::string cgiExtension;
-	bool cgiEnabled;
-
-	/* Struct Constructor */
-	CGIConfigs( void );
-};
 
 struct LocationConfigs {
 	std::vector<httpMethod> methods;
@@ -29,15 +21,19 @@ struct LocationConfigs {
 	std::string uploadPath;
 	bool autoindex;
 	bool uploadEnabled;
-	CGIConfigs cgiConfig;
+	bool rootSet;
+	bool redirectSet;
+	bool cgiEnabled;
+	std::string cgiPath;
+	std::string cgiExtension;
 
 	/* Struct Constructor */
 	LocationConfigs( void );
 };
 
 struct ServerConfigs {
-	unsigned short	port;
-	std::string	host;
+	unsigned short port;
+	std::string host;
 	std::string serverName;
 	size_t limitBodySize;
 	errorMap errorPages;
@@ -53,6 +49,8 @@ class Config {
 		std::vector<ServerConfigs> _servers;
 		short _serverCount;
 		Logger &_logger;
+		std::map<int, const ServerConfigs*> _socketConfigMap;
+		std::map<int, int> _socketServerMap;
 
 		/* Private Methods */
 		void _parseConfigFile( std::ifstream &configFile );
@@ -64,21 +62,35 @@ class Config {
 
 	public:
 		/* Constructor Method */
-		Config( const std::string &fileName,
-			Logger &logger );
+		Config( const std::string &fileName, Logger &logger );
 
 		/* Destructor Method */
 		~Config( void );
 
 		/* Public Methods */
 		std::vector<ServerConfigs> getServers( void ) const;
+		std::map<int, const ServerConfigs*> getSocketConfigMap( void ) const;
+		void setSocketConfigMap( const int &socket, const ServerConfigs *config );
+		const ServerConfigs *getServerConfig( const int &socket );
+		void setSocketServerMap( const int &socket, const int &server );
+		int getServerSocket( const int &socket );
+		const LocationConfigs getLocationConfig( const ServerConfigs &serverConfig,
+			const std::string &uri, bool &locationFound ) const;
 };
 
 /* Config Utils Functions */
 namespace ConfigUtils {
 	short	getServerCount( const std::string &fileName );
 	std::string	trimServerBlock( const std::string &serverBlock );
-	std::string	shortToString( const short &value );
+	bool	hostIsValid( ServerConfigs &server );
+	bool	isRepeatedMethod( std::vector<httpMethod> &methodsVector, 
+		httpMethod method );
+	bool	directoryExists( const std::string &path );
+	bool	fileExists( const std::string &path );
+	void	formatPath( std::string &path );
+	void	validateFullLocationPath( LocationConfigs &location );
+	void	validateFullCGIPath( LocationConfigs &location );
+	void	createUploadFolder( std::string &uploadPath );
 	void	printServerStruct( const ServerConfigs &server );
 }
 
@@ -101,6 +113,8 @@ namespace LocationExtraction {
 	void	uploadPath( stringVector &tokens, LocationConfigs &location );
 	void	autoindex( stringVector &tokens, LocationConfigs &location );
 	void	uploadEnabled( stringVector &tokens, LocationConfigs &location );
+	void	cgiPath( stringVector &tokens, LocationConfigs &location );
+	void	cgiExtension( stringVector &tokens, LocationConfigs &location );
 }
 
 #endif

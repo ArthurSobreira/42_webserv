@@ -10,8 +10,9 @@ class Logger {
 		std::ofstream _logError;
 
 		/* Private Methods */
-		std::string _currentDateTime( void ) const;
 		bool _isTerminal( std::ostream &os ) const;
+		std::string _currentDateTime( void ) const;
+		std::string _colSeverity( const std::string &severity ) const;
 
 	public:
 		/* Constructor Method */

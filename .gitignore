@@ -57,8 +57,10 @@ dkms.conf
 .dist/
 */.dist/
 */*/build/
+build/
 logs/
 
 # Executables
 webserv
+testes
 *.out

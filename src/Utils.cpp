@@ -1,9 +1,11 @@
 #include "Includes.hpp"
 #include "Defines.hpp"
 #include "Logger.hpp"
+#include "Config.hpp"
 
-bool inetPton(const std::string &ip_str, Logger &logger)
+bool inetPton(const std::string &ip_str)
 {
+	Logger logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE);
 	std::istringstream stream(ip_str);
 	std::string segment;
 	std::vector<int> bytes;
@@ -63,6 +65,19 @@ std::string readFile(const std::string &path)
 		return "";
 	std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 	return content;
+}
+
+std::string	removeLastSlashes(const std::string &uri) {
+	std::string formatUri = uri;
+	size_t queryPos = formatUri.find("?");
+	if (queryPos != std::string::npos) {
+		formatUri = formatUri.substr(0, queryPos);
+	}
+
+	while (!formatUri.empty() && formatUri[formatUri.length() - 1] == '/') {
+		formatUri = formatUri.substr(0, formatUri.length() - 1);
+	}
+	return (formatUri);
 }
 
 std::string getContentType(const std::string &uri){
@@ -130,4 +145,24 @@ std::string getContentType(const std::string &uri){
 	if (extension == "mp3")
 		return "audio/mpeg";
 	return "plain/text";
+}
+
+
+Config *config = NULL;
+
+void setConfig(Config &c)
+{
+	if (!config)
+		config = &c;
+}
+
+Config &getConfig()
+{
+	return *config;
+}
+
+void signals(int sig)
+{
+	if (sig == SIGINT || sig == SIGQUIT || sig == SIGTERM)
+		throw std::runtime_error("bye bye");
 }
