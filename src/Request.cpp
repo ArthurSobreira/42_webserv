@@ -70,8 +70,9 @@ void Request::parseMethodAndUri(const std::string &line)
 	std::istringstream lineStream(line);
 	std::string method;
 	std::string uri;
+	std::string version;
 
-	lineStream >> method >> uri;
+	lineStream >> method >> uri >> version;
 
 	_method = parseMethod(method);
 	if (uri == "/")
@@ -82,6 +83,7 @@ void Request::parseMethodAndUri(const std::string &line)
 	{
 		_uri = removeLastSlashes(uri);
 	}
+	
 }
 
 void Request::parseHeaders(const std::vector<std::string> &headerLines)

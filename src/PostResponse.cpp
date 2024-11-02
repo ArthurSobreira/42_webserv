@@ -1,5 +1,4 @@
 #include "PostResponse.hpp"
-
 PostResponse::PostResponse(std::string filePath, std::string postData, ServerConfigs server, LocationConfigs location, std::map<std::string,std::string> headers) : Response(), _postData(postData), _filePath(filePath), _headers(headers), _server(server), _location(location){
 	_validTypes.insert("image/jpeg");
 	_validTypes.insert("image/png");
@@ -42,9 +41,15 @@ std::string PostResponse::prepareResponse()
 		handleError("405", _server.errorPages.at("405"), "Method Not Allowed", _logger);
 	}
 	else if(createFile() == 0){
-		_statusCode = "201";
-		_reasonPhrase = "Created";
-		_body = "<html><h1>File uploaded successfully</h1></html>";
+		if(_postData.empty()){
+			_statusCode = "204";
+			_reasonPhrase = "No Content";
+		}
+		else
+			if(access(_filePath.c_str(), F_OK) != -1){
+			_statusCode = "201";
+			_reasonPhrase = "Created";
+			}
 	}
 	else{
 		handleError("500", _server.errorPages.at("500"), "Internal server error", _logger);
@@ -56,15 +61,37 @@ std::string PostResponse::prepareResponse()
 	return generateResponse();
 }
 
-void PostResponse::removeBoundary(){}
+void removeCarriageReturn(std::string &str)
+{
+	size_t pos = str.find("\r");
+	while (pos != std::string::npos)
+	{
+		str.erase(pos, 1);
+		pos = str.find("\r");
+	}
+}
+
+
+void PostResponse::removeBoundary(){
+	removeCarriageReturn(_headers["boundary"]);
+	size_t pos = _postData.find("\r\n\r\n");
+	_postData = _postData.substr(pos + 4);
+	pos = _postData.find(_headers["boundary"]);
+	_postData = _postData.substr(0, pos - 2);
+	
+	
+}
 
 int PostResponse::createFile()
 {
 	static int archivo = 0;
+	if(_postData.empty()){
+		return 0;
+	}
 	if (!_headers["boundary"].empty())
 	{
 		_fileName = _headers["filename"];
-		// removeBoundary();
+		removeBoundary();
 	}
 	else
 	{
@@ -75,7 +102,6 @@ int PostResponse::createFile()
 	}
 
 	_filePath = _location.uploadPath + "/" + _fileName;
-
 
 	std::ofstream file(_filePath.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
 	if (!file.is_open())

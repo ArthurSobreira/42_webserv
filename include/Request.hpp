@@ -10,6 +10,7 @@ class Request
 private:
 	httpMethod _method;								 // Método HTTP (GET, POST, DELETE)
 	std::string _uri;							 // URI da requisição
+	std::string _version;						 // Versão do protocolo HTTP
 	std::map<std::string, std::string> _headers; // Cabeçalhos HTTP
 	std::string _body;							 // Corpo da requisição, se houver
 	std::string _rawRequest;					 // Requisição bruta para parseamento
@@ -24,6 +25,7 @@ public:
 	// Métodos para acessar os dados da requisição
 	httpMethod getMethod() const;									  // Retorna o método da requisição
 	const std::string &getUri() const;							  // Retorna a URI
+	const std::string &getVersion() const { return _version; }	  // Retorna a versão do protocolo
 	const std::string &getHeader(const std::string &name) const;  // Retorna o valor de um cabeçalho específico
 	const std::map<std::string, std::string> &getHeaders() const; // Retorna todos os cabeçalhos
 	const std::string &getBody() const;							  // Retorna o corpo da requisição
