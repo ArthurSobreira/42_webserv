@@ -18,6 +18,7 @@ private:
 	LocationConfigs _location;					 // Configurações da localização
 	bool _connectionClose;						 // Indica se a conexão deve ser fechada
 	std::string _boundary;						 // Boundary da requisição
+	std::string _queryString;					 // Query string da requisição
 public:
 	// Construtor que recebe a requisição bruta
 	Request(const std::string &rawRequest);
@@ -27,6 +28,7 @@ public:
 	const std::string &getUri() const;							  // Retorna a URI
 	const std::string &getVersion() const { return _version; }	  // Retorna a versão do protocolo
 	const std::string &getHeader(const std::string &name) const;  // Retorna o valor de um cabeçalho específico
+	std::string	getQueryString() const; 						  // Extrai a query string da URI
 	const std::map<std::string, std::string> &getHeaders() const; // Retorna todos os cabeçalhos
 	const std::string &getBody() const;							  // Retorna o corpo da requisição
 	bool isCGI() const { return _isCGI; }						  // Retorna se a requisição é para um script CGI
@@ -43,6 +45,7 @@ private:
 	void checkConnectionClose();									// Verifica se a conexão deve ser fechada
 	void extractMultipartNamesAndFilenames();									// Extrai os dados de um formulário multipart	
 	void removeBoundary();												// Remove o boundary do corpo da requisição
+	void parserQueryString();											// Extrai a query string da requisição
 
 	// Funções auxiliares
 	httpMethod parseMethod(const std::string &method); // Converte string para enum Method
