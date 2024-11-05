@@ -74,6 +74,7 @@ void Request::parseMethodAndUri(const std::string &line)
 
 	lineStream >> method >> uri >> version;
 
+	parserQueryString();
 	_method = parseMethod(method);
 	if (uri == "/")
 	{
@@ -83,7 +84,7 @@ void Request::parseMethodAndUri(const std::string &line)
 	{
 		_uri = removeLastSlashes(uri);
 	}
-	
+	_version = version;
 }
 
 void Request::parseHeaders(const std::vector<std::string> &headerLines)
@@ -126,10 +127,6 @@ void Request::extractMultipartNamesAndFilenames()
 	std::cout << "name: " << _headers["name"] << std::endl;
 	std::cout << "filename: " << _headers["filename"] << std::endl;
 }
-
-
-
-
 
 void Request::parseBody()
 {
@@ -221,7 +218,11 @@ std::string Request::validateRequest(Config _config, ServerConfigs server)
 	std::string error = "";
 	bool locationFound = false;
 	std::cout << "passou aki " << counter++ << std::endl;
-	_location = _config.getLocationConfig(server, folderPath(), locationFound);
+	_location = _config.getLocationConfig(server, _uri, locationFound);
+	if (!locationFound)
+	{
+		_location = _config.getLocationConfig(server, folderPath(), locationFound);
+	}
 	if (!locationFound)
 	{
 		error = "404";
@@ -244,4 +245,20 @@ void Request::checkConnectionClose()
 	{
 		_connectionClose = true;
 	}
+}
+
+
+void Request::parserQueryString()
+{
+	size_t pos = _uri.find("?");
+	if (pos != std::string::npos)
+	{
+		_queryString = _uri.substr(pos + 1);
+		_uri = _uri.substr(0, pos);
+	}
+}
+
+std::string Request::getQueryString() const
+{
+	return _queryString;
 }
