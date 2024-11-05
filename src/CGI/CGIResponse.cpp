@@ -17,7 +17,14 @@ CGIResponse::CGIResponse( const Request &request, const LocationConfigs &locatio
 		} else if (CGIUtils::isUploadRequest(_request) && 
 			!_locationConfig.uploadEnabled) {
 			_handleCGIError(403, ERROR_FORBIDDEN);
-		} else { this->_setEnvironmentVars(); }
+		} else if (_request.getMethod() == POST && 
+			!_getContentLength().empty() && 
+			_request.getBody().size() > 
+			_locationConfig.server->limitBodySize) {
+			_handleCGIError(413, "Request Entity Too Large");  // criar uma macro pra isso
+		}
+		
+		else { this->_setEnvironmentVars(); }
 	}
 }
 
@@ -25,14 +32,15 @@ CGIResponse::CGIResponse( const Request &request, const LocationConfigs &locatio
 CGIResponse::~CGIResponse( void ) {};
 
 /* Private Methods */
-void	CGIResponse::_setEnvironmentVars( void ) {
+void	CGIResponse::_setEnvironmentVars( void ) {  // Provavelmente o erro do CGI está aqui
 	_env["SERVER_PROTOCOL"] = _request.getVersion();
 	_env["REQUEST_METHOD"] = _request.getMethod();
 	_env["REQUEST_URI"] = _request.getUri();
 	_env["SCRIPT_NAME"] = _locationConfig.cgiPath;
 	_env["SCRIPT_FILENAME"] = _cgiPath;
 	_env["PATH_INFO"] = _getPathInfo(_request.getUri());
-	_env["QUERY_STRING"] = _getQueryString(_request.getUri());
+	// _env["QUERY_STRING"] = _getQueryString(_request.getUri());
+	_env["QUERY_STRING"] = _request.getQueryString();
 	if (_request.getMethod() == POST) {
 		std::string contentLength = _request.getHeader("Content-Length");
 		std::string contentType = _request.getHeader("Content-Type");
@@ -47,6 +55,12 @@ void	CGIResponse::_setEnvironmentVars( void ) {
 	}
 	if (_locationConfig.uploadEnabled) {
 		_env["UPLOAD_PATH"] = _locationConfig.uploadPath;
+	}
+
+	_logger.logDebug(LOG_INFO, "=====Environment variables: ", true);
+	for (std::map<std::string, std::string>::iterator it = _env.begin(); 
+		it != _env.end(); ++it) {
+		_logger.logDebug(LOG_INFO, it->first + ": " + it->second, true);
 	}
 }
 
@@ -119,6 +133,7 @@ bool	CGIResponse::_waitChild( pid_t pid, int &status, std::clock_t start ) {
 		}
 		if (!waitpid(pid, &status, WNOHANG)) {
 			kill(pid, SIGKILL);
+			_logger.logError(LOG_ERROR, "deu timeout zé", true);
 			status = TIMEOUT_ERROR;
 			return (false);
 		}
@@ -136,7 +151,7 @@ void	CGIResponse::_readReturnBody( int pipefd[2] ) {
 	std::string strBuffer(buffer);
 	if (!strBuffer.empty()) { _body = strBuffer; }
 	handleFileResponse(DEFAULT_EMPTY, _logger);
-	_logger.logDebug(LOG_INFO, "CGI response: " + _body, true);
+	_logger.logDebug(LOG_INFO, "=====CGI response: " + _body, true);
 	close(pipefd[0]);
 }
 
