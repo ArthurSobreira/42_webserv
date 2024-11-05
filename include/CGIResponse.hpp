@@ -10,13 +10,9 @@
 
 class CGIResponse : public Response {
 	private:
-		// int		_returnCode;
-		// std::string	_reasonPhrase;
-		// std::string	_returnBody;
 		std::string	_cgiPath;
 		std::string	_cgiExecutable;
 		Request		_request;
-		// ServerConfigs	_serverConfig;
 		LocationConfigs	_locationConfig;
 		Logger	_logger;
 		std::map<std::string, std::string> _env;
@@ -41,9 +37,6 @@ class CGIResponse : public Response {
 		~CGIResponse( void );
 
 		/* Public Methods */
-		// int	getReturnCode( void ) const;
-		// std::string	getReturnBody( void ) const;
-		// std::string	getReasonPhrase( void ) const;
 		void	executeCGI( void );
 };
 
