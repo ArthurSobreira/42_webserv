@@ -19,7 +19,7 @@ private:
 
 public:
 	PostResponse(std::string filePath, std::string postData, ServerConfigs server, LocationConfigs location, std::map<std::string, std::string> headers);
-	std::string prepareResponse();
+	void prepareResponse();
 
 private:
 	int createFile();

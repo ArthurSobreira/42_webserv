@@ -9,6 +9,13 @@
 # define MIN_PORT_NUMBER 0
 # define MAX_PORT_NUMBER 65535
 
+/* preguica de fazer um enum */
+
+# define SUCCESS 0
+# define BAD_REQUEST 2
+# define UNSUPPORTED_MEDIA_TYPE 3
+# define INTERNAL_SERVER_ERROR 4
+
 /* Colors Macros */
 # define COLORIZE(color, text) \
 	(std::string(color) + text + "\033[0m")
