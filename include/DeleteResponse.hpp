@@ -9,7 +9,8 @@ class DeleteResponse : public Response {
         std::string _filePath;
 		ServerConfigs _server;
     public:
-        DeleteResponse(const std::string &filePath, ServerConfigs server);
+        DeleteResponse(const std::string &filePath, 
+            ServerConfigs &server);
 
         void prepareResponse();
 };
