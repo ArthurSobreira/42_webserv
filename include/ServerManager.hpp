@@ -24,7 +24,9 @@ private:
 	void handleResponse(Request &request, ServerConfigs &server, int clientSocket);
 	void handleError(int clientSocket, Logger *logger, const std::string &errorPage, const std::string &status);
 	void closeConnection(int clientSocket);
+	bool verifyContentLength(int clientSocket, std::string &buffer);
 
+private:
 	Logger *_logger;
 	EpollManager _epollManager;
 	Config _config;
@@ -34,8 +36,6 @@ private:
 	std::map<int, std::string> _responseMap;
 	std::map<int, bool> _connectionMap; 
 	std::map<int, int> _clientServerMap;
-	// quero dizer ao request que esse arquivo tem boundary
-	std::map<int, bool> _boundaryMap;
 };
 
 #endif // SERVERMANAGER_HPP

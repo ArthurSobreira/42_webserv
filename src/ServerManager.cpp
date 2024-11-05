@@ -1,6 +1,9 @@
 #include "ServerManager.hpp"
 #include "Globals.hpp"
 #include "Includes.hpp"
+#include "GetResponse.hpp"
+#include "PostResponse.hpp"
+#include "DeleteResponse.hpp"
 #include "CGIResponse.hpp"
 
 ServerManager::ServerManager(const std::string &configFilePath)
@@ -68,7 +71,6 @@ void ServerManager::acceptConnection(int serverSocket)
 	_responseMap[clientSocket] = "";
 	_clientServerMap[clientSocket] = serverSocket;
 	_connectionMap[clientSocket] = true;
-	_boundaryMap[clientSocket] = false;
 	// _fds.addFdToServer(clientSocket);
 }
 
@@ -133,22 +135,14 @@ void ServerManager::handleRead(int clientSocket)
 		std::string lenfVerif = std::string(buffer, bytesRead);
 		if (lenfVerif.size() < 65535)
 		{
-			lenfVerif[lenfVerif.size() - 1] = '\0';
-			if (lenfVerif.find("boundary=") != std::string::npos)
-			{
-				std::cout << "achei o boundary" << std::endl;
-				_boundaryMap[clientSocket] = true;
-			}
 			_epollManager.modifyEpoll(clientSocket, EPOLLOUT);
 			_requestMap[clientSocket] += lenfVerif;
-			std::cout << "entrei nesse if: " << lenfVerif.size() << std::endl;
 			return;
 		}
 	}
 
 	std::cout << "debbug 02" << std::endl;
 	_requestMap[clientSocket] += std::string(buffer, bytesRead);
-	// std::cout << "Received data: " << std::string(buffer, bytesRead) << std::endl;
 	std::cout << "read: success" << std::endl;
 }
 
@@ -168,6 +162,7 @@ void ServerManager::handleResponse(Request &request, ServerConfigs &server, int 
 {
 	std::string status = request.validateRequest(_config, server);
 	std::cout << "vazio é o normal [" << status << "]" << std::endl;
+	_connectionMap[clientSocket] = request.connectionClose();
 	if (status != "")
 	{
 		handleError(clientSocket, _logger, server.errorPages[status], status);
@@ -187,7 +182,6 @@ void ServerManager::handleResponse(Request &request, ServerConfigs &server, int 
 	{
 	case GET:
 	{
-		std::cout << "entrou no get" << std::endl;
 		GetResponse getResponse(request.getUri());
 		getResponse.prepareResponse(request.getLocation(), server);
 		_responseMap[clientSocket] = getResponse.generateResponse();
@@ -195,17 +189,18 @@ void ServerManager::handleResponse(Request &request, ServerConfigs &server, int 
 	}
 	case POST:
 	{
-		// PostResponse postResponse(clientSocket, *_logger, request.getUri());
-		// postResponse.prepareResponse();
-		// postResponse.sendResponse();
-		handleError(clientSocket, _logger, server.errorPages["999"], "999");
+		PostResponse postResponse(request.getUri(), request.getBody(), server, request.getLocation(), request.getHeaders());
+		postResponse.prepareResponse();
+		_responseMap[clientSocket] = postResponse.generateResponse();
+		_connectionMap[clientSocket] = true;
 		break;
 	}
 	case DELETE:
 	{
-		// DeleteResponse deleteResponse(clientSocket, *_logger, request.getUri());
-		// deleteResponse.prepareResponse();
-		// deleteResponse.sendResponse();
+		DeleteResponse deleteResponse(request.getUri(), server);
+		deleteResponse.prepareResponse();
+		_responseMap[clientSocket] = deleteResponse.generateResponse();
+		_connectionMap[clientSocket] = true;
 		break;
 	}
 	default:
@@ -225,12 +220,8 @@ void ServerManager::handleWrite(int clientSocket)
 {
 	if (_responseMap[clientSocket] == "")
 	{
-		if (_boundaryMap[clientSocket]){
-			std::cout << "entrei no boundary" << std::endl;
-			_epollManager.modifyEpoll(clientSocket, EPOLLIN);
-			_boundaryMap[clientSocket] = false;
+		if (!verifyContentLength(clientSocket, _requestMap[clientSocket]))
 			return;
-		}
 		Request request(_requestMap[clientSocket]);
 		for (std::vector<Server *>::iterator it = _servers.begin(); it != _servers.end(); ++it)
 		{
@@ -238,12 +229,12 @@ void ServerManager::handleWrite(int clientSocket)
 			{
 				handleResponse(request, (*it)->getConfig(), clientSocket);
 				_requestMap[clientSocket] = "";
-				_connectionMap[clientSocket] = request.connectionClose();
 				break;
 			}
 		}
 	}
-	else{
+	else
+	{
 		int bytesWritten = send(clientSocket, _responseMap[clientSocket].c_str(), _responseMap[clientSocket].size(), 0);
 		if (bytesWritten <= 0)
 		{
@@ -261,9 +252,36 @@ void ServerManager::handleWrite(int clientSocket)
 			if (_connectionMap[clientSocket])
 			{
 				closeConnection(clientSocket);
+				std::cout << "Connection closed" << std::endl;
 				return;
 			}
 			_epollManager.modifyEpoll(clientSocket, EPOLLIN);
 		}
 	}
+}
+bool ServerManager::verifyContentLength(int clientSocket, std::string &buffer)
+{
+	std::string contentLengthHeader = "Content-Length: ";
+	size_t pos = buffer.find(contentLengthHeader);
+
+	if (pos != std::string::npos) {
+		size_t endOfHeader = buffer.find("\r\n", pos);
+		std::string contentLengthStr = buffer.substr(pos + contentLengthHeader.size(),
+													 endOfHeader - (pos + contentLengthHeader.size()));		std::stringstream ss;
+		ss << contentLengthStr;
+		size_t contentLength;
+		ss >> contentLength;
+		size_t endOfHeaders = buffer.find("\r\n\r\n");
+		if (endOfHeaders == std::string::npos) {
+			_epollManager.modifyEpoll(clientSocket, EPOLLIN);
+			return false;
+		}
+		if (buffer.size() - endOfHeaders - 4 >= contentLength) {
+			return true;
+		} else {
+			_epollManager.modifyEpoll(clientSocket, EPOLLIN);
+			return false;
+		}
+	}
+	return true;
 }

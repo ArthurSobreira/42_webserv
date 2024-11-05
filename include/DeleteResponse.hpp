@@ -7,13 +7,11 @@
 class DeleteResponse : public Response {
     private:
         std::string _filePath;
-        std::string _responseData;
-
+		ServerConfigs _server;
     public:
-        DeleteResponse(int clientSocket, Logger &logger, const std::string &filePath);
+        DeleteResponse(const std::string &filePath, ServerConfigs server);
 
         void prepareResponse();
-        void sendResponse();
 };
 
 #endif // DELETERESPONSE_HPP
