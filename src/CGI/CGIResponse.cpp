@@ -1,11 +1,10 @@
-#include "CGI.hpp"
+#include "CGIResponse.hpp"
 
 /* Constructor Method */
-CGI::CGI( const Request &request, const ServerConfigs &server,  // remover server e location depois
-	const LocationConfigs &location ) 
-	: Response(), _request(request), _serverConfig(server), _locationConfig(location), 
+CGIResponse::CGIResponse( const Request &request, const LocationConfigs &location ) 
+	: Response(), _request(request), _locationConfig(location), 
 	_logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE) {
-
+	
 	if (_locationConfig.cgiEnabled) {
 		_cgiPath = location.root + "/" + location.cgiPath;
 		_cgiExecutable = _getExecutable(location.cgiExtension);
@@ -23,11 +22,11 @@ CGI::CGI( const Request &request, const ServerConfigs &server,  // remover serve
 }
 
 /* Destructor Method */
-CGI::~CGI( void ) {};
+CGIResponse::~CGIResponse( void ) {};
 
 /* Private Methods */
-void	CGI::_setEnvironmentVars( void ) {
-	_env["SERVER_PROTOCOL"] = "HTTP/1.1";
+void	CGIResponse::_setEnvironmentVars( void ) {
+	_env["SERVER_PROTOCOL"] = _request.getVersion();
 	_env["REQUEST_METHOD"] = _request.getMethod();
 	_env["REQUEST_URI"] = _request.getUri();
 	_env["SCRIPT_NAME"] = _locationConfig.cgiPath;
@@ -51,7 +50,7 @@ void	CGI::_setEnvironmentVars( void ) {
 	}
 }
 
-char	**CGI::_generateEnvp( void ) {
+char	**CGIResponse::_generateEnvp( void ) {
 	char **envp = new char*[_env.size() + 1];
 	int index = 0;
 
@@ -66,27 +65,27 @@ char	**CGI::_generateEnvp( void ) {
 	return (envp);
 }
 
-std::string CGI::_getContentLength( void ) const {
+std::string CGIResponse::_getContentLength( void ) const {
 	std::string contentLength = _request.getHeader("Content-Length");
 
 	if (!contentLength.empty()) { return contentLength; }
 	else { return DEFAULT_EMPTY; }
 }
 
-std::string	CGI::_getExecutable( const std::string &extension ) {
+std::string	CGIResponse::_getExecutable( const std::string &extension ) {
 	if (extension == EXTENSION_PHP) { return PHP_EXECUTABLE; }
 	else if (extension == EXTENSION_PY) { return PYTHON_EXECUTABLE; }
 	return (DEFAULT_EMPTY);
 }
 
-std::string	CGI::_getQueryString( const std::string &uri ) const {
+std::string	CGIResponse::_getQueryString( const std::string &uri ) const {
 	std::size_t pos = uri.find('?');
 	if (pos != std::string::npos) { 
 		return uri.substr(pos + 1); 
 	} else { return DEFAULT_EMPTY; }
 }
 
-std::string	CGI::_getPathInfo( const std::string &uri ) const {
+std::string	CGIResponse::_getPathInfo( const std::string &uri ) const {
 	std::string scriptName = _locationConfig.cgiPath;
 	std::size_t scriptPos = uri.find(scriptName);
 
@@ -102,15 +101,17 @@ std::string	CGI::_getPathInfo( const std::string &uri ) const {
 	return (DEFAULT_LOCATION_PATH);
 }
 
-void	CGI::_handleCGIError( int code, const std::string &message ) {
+void	CGIResponse::_handleCGIError( int code, const std::string &message ) {
 	_body.clear();
 	_statusCode = CGIUtils::intToString(code);
 	_reasonPhrase = message;
 	_logger.logError(LOG_ERROR, message, true);
-	handleError(_statusCode, _serverConfig.errorPages[_statusCode], message, _logger);
+	std::string errorPage = _locationConfig.server->errorPages[_statusCode];
+	_logger.logDebug(LOG_INFO, "Error page: " + errorPage, true);
+	handleError(_statusCode, errorPage, message, _logger);
 }
 
-bool	CGI::_waitChild( pid_t pid, int &status, std::clock_t start ) {
+bool	CGIResponse::_waitChild( pid_t pid, int &status, std::clock_t start ) {
 	if (!waitpid(pid, &status, WNOHANG)) {
 		while (double(std::clock() - start) / CLOCKS_PER_SEC <= 2.0) {
 			if (waitpid(pid, &status, WNOHANG))
@@ -119,13 +120,13 @@ bool	CGI::_waitChild( pid_t pid, int &status, std::clock_t start ) {
 		if (!waitpid(pid, &status, WNOHANG)) {
 			kill(pid, SIGKILL);
 			status = TIMEOUT_ERROR;
-			// return (false);
+			return (false);
 		}
 	}
 	return (true);
 }
 
-void	CGI::_readReturnBody( int pipefd[2] ) {
+void	CGIResponse::_readReturnBody( int pipefd[2] ) {
 	char buffer[4096];
 	size_t bytes_read;
 
@@ -134,13 +135,13 @@ void	CGI::_readReturnBody( int pipefd[2] ) {
 	buffer[bytes_read] = '\0';
 	std::string strBuffer(buffer);
 	if (!strBuffer.empty()) { _body = strBuffer; }
-	_logger.logDebug(LOG_INFO, "CGI response: " + _body, true);
 	handleFileResponse(DEFAULT_EMPTY, _logger);
+	_logger.logDebug(LOG_INFO, "CGI response: " + _body, true);
 	close(pipefd[0]);
 }
 
 /* Public Methods */
-void	CGI::executeCGI( void ) {
+void	CGIResponse::executeCGI( void ) {
 	if (_statusCode != "200") { return ; }
 
 	std::clock_t start = std::clock();
@@ -163,7 +164,7 @@ void	CGI::executeCGI( void ) {
 	} else if (pid == 0) {
 		close(pipefd[0]);
 		dup2(pipefd[1], STDOUT_FILENO);
-		
+
 		if (_request.getMethod() == POST) {
 			int postPipe[2];
 			if (pipe(postPipe) == -1) {
@@ -171,7 +172,7 @@ void	CGI::executeCGI( void ) {
 			}
 			dup2(postPipe[0], STDIN_FILENO);
 			close(postPipe[0]);
-			
+
 			std::string body = _request.getBody();
 			write(postPipe[1], body.c_str(), body.length());
 			close(postPipe[1]);
@@ -183,7 +184,7 @@ void	CGI::executeCGI( void ) {
 		}
 	} else {
 		if (_waitChild(pid, status, start)) { _readReturnBody(pipefd); }
-		
+
 		if (WIFEXITED(status) && WEXITSTATUS(status) != 0) {
 			_handleCGIError(500, ERROR_CGI_EXECUTION);
 		} else {

@@ -12,7 +12,10 @@ typedef enum {
 	DELETE,
 } httpMethod;
 
+struct ServerConfigs;
+
 struct LocationConfigs {
+	ServerConfigs *server;
 	std::vector<httpMethod> methods;
 	std::string locationPath;
 	std::string root;

@@ -19,7 +19,7 @@ TESTNAME	=	testes
 BUILD		=	./build
 LOG			=	./logs
 BUILD_TEST	=	./build_test
-SRCS		=	src/CGI/CGI.cpp src/CGI/CGIUtils.cpp \
+SRCS		=	src/CGI/CGIResponse.cpp src/CGI/CGIUtils.cpp \
 				src/Config/Config.cpp \
 				src/Config/ConfigExtract.cpp \
 				src/Config/ConfigUtils.cpp \

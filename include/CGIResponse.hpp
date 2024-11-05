@@ -1,5 +1,5 @@
-#ifndef CGI_HPP
-#define CGI_HPP
+#ifndef CGIRESPONSE_HPP
+#define CGIRESPONSE_HPP
 
 #include "Includes.hpp"
 #include "Defines.hpp"
@@ -8,15 +8,11 @@
 #include "Request.hpp"
 #include "Response.hpp"
 
-class CGI : public Response {
+class CGIResponse : public Response {
 	private:
-		// int		_returnCode;
-		// std::string	_reasonPhrase;
-		// std::string	_returnBody;
 		std::string	_cgiPath;
 		std::string	_cgiExecutable;
 		Request		_request;
-		ServerConfigs	_serverConfig;
 		LocationConfigs	_locationConfig;
 		Logger	_logger;
 		std::map<std::string, std::string> _env;
@@ -34,16 +30,13 @@ class CGI : public Response {
 
 	public:
 		/* Constructor Method */
-		CGI( const Request &request, const ServerConfigs &server,
+		CGIResponse( const Request &request, 
 			const LocationConfigs &location );
 
 		/* Destructor Method */
-		~CGI( void );
+		~CGIResponse( void );
 
 		/* Public Methods */
-		// int	getReturnCode( void ) const;
-		// std::string	getReturnBody( void ) const;
-		// std::string	getReasonPhrase( void ) const;
 		void	executeCGI( void );
 };
 

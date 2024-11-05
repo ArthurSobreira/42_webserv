@@ -4,6 +4,7 @@
 
 /* Struct LocationConfigs Constructor */
 LocationConfigs::LocationConfigs( void ) {
+	server = NULL;
 	methods.push_back(GET);
 	locationPath = DEFAULT_LOCATION_PATH;
 	root = DEFAULT_ROOT;
@@ -191,6 +192,7 @@ void	Config::_parseLocationStream( std::istringstream &serverStream, ServerConfi
 				locationBracketsCount = 0;
 				insideLocationBlock = false;
 				_parseLocationBlock(locationBlock, location);
+				location.server = new ServerConfigs(server);
 				server.locations.push_back(location);
 				locationBlock.clear();
 				return ;
