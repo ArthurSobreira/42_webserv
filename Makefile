@@ -23,10 +23,10 @@ SRCS		=	src/CGI/CGIResponse.cpp src/CGI/CGIUtils.cpp \
 				src/Config/Config.cpp \
 				src/Config/ConfigExtract.cpp \
 				src/Config/ConfigUtils.cpp \
-				src/EpoolManager.cpp src/Fds.cpp src/GetResponse.cpp \
-				src/Logger.cpp src/PostResponse.cpp src/Request.cpp \
-				src/Response.cpp src/Server.cpp src/ServerManager.cpp \
-				src/Utils.cpp src/main.cpp
+				src/DeleteResponse.cpp src/EpoolManager.cpp src/Fds.cpp \
+				src/GetResponse.cpp src/Logger.cpp src/PostResponse.cpp \
+				src/Request.cpp src/Response.cpp src/Server.cpp \
+				src/ServerManager.cpp src/Utils.cpp src/main.cpp
 
 TEST_SRCS	=	test/main.cpp $(filter-out src/main.cpp, $(SRCS)) 
 OBJS		=	$(addprefix $(BUILD)/, $(patsubst src/%, %, $(SRCS:.cpp=.o)))
