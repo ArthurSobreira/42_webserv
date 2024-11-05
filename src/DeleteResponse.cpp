@@ -1,8 +1,7 @@
 #include "DeleteResponse.hpp"
 
-DeleteResponse::DeleteResponse(const std::string &filePath, ServerConfigs server) : Response(), _filePath(filePath), _server(server)
-{
-}
+DeleteResponse::DeleteResponse(const std::string &filePath, ServerConfigs &server) 
+	: Response(), _filePath(filePath), _server(server) {}
 
 void DeleteResponse::prepareResponse()
 {
