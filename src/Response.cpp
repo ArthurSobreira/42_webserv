@@ -41,6 +41,9 @@ void Response::handleFileResponse(const std::string &path, Logger &logger)
 	std::stringstream ss;
 	ss << _body.size();
 	_headers["Content-Length"] = ss.str();
-	_headers["Content-Type"] = getContentType(path);
+	if (path.empty())
+		_headers["Content-Type"] = "text/html";
+	else
+		_headers["Content-Type"] = getContentType(path);
 	logger.logDebug(LOG_INFO, "Response body: " + _body);
 }
