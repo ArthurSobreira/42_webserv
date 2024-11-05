@@ -26,7 +26,7 @@ CGIResponse::~CGIResponse( void ) {};
 
 /* Private Methods */
 void	CGIResponse::_setEnvironmentVars( void ) {
-	_env["SERVER_PROTOCOL"] = "HTTP/1.1";
+	_env["SERVER_PROTOCOL"] = _request.getVersion();
 	_env["REQUEST_METHOD"] = _request.getMethod();
 	_env["REQUEST_URI"] = _request.getUri();
 	_env["SCRIPT_NAME"] = _locationConfig.cgiPath;
@@ -164,7 +164,7 @@ void	CGIResponse::executeCGI( void ) {
 	} else if (pid == 0) {
 		close(pipefd[0]);
 		dup2(pipefd[1], STDOUT_FILENO);
-		
+
 		if (_request.getMethod() == POST) {
 			int postPipe[2];
 			if (pipe(postPipe) == -1) {
@@ -172,7 +172,7 @@ void	CGIResponse::executeCGI( void ) {
 			}
 			dup2(postPipe[0], STDIN_FILENO);
 			close(postPipe[0]);
-			
+
 			std::string body = _request.getBody();
 			write(postPipe[1], body.c_str(), body.length());
 			close(postPipe[1]);
@@ -184,7 +184,7 @@ void	CGIResponse::executeCGI( void ) {
 		}
 	} else {
 		if (_waitChild(pid, status, start)) { _readReturnBody(pipefd); }
-		
+
 		if (WIFEXITED(status) && WEXITSTATUS(status) != 0) {
 			_handleCGIError(500, ERROR_CGI_EXECUTION);
 		} else {
