@@ -4,6 +4,7 @@
 #include "CGI.hpp"
 #include "GetResponse.hpp"
 #include "PostResponse.hpp"
+#include "DeleteResponse.hpp"
 
 ServerManager::ServerManager(const std::string &configFilePath)
 	: _logger(new Logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE)),
@@ -181,7 +182,6 @@ void ServerManager::handleResponse(Request &request, ServerConfigs &server, int 
 	{
 	case GET:
 	{
-		std::cout << "entrou no get" << std::endl;
 		GetResponse getResponse(request.getUri());
 		getResponse.prepareResponse(request.getLocation(), server);
 		_responseMap[clientSocket] = getResponse.generateResponse();
@@ -193,14 +193,14 @@ void ServerManager::handleResponse(Request &request, ServerConfigs &server, int 
 		postResponse.prepareResponse();
 		_responseMap[clientSocket] = postResponse.generateResponse();
 		_connectionMap[clientSocket] = true;
-		std::cout << "response: " << _responseMap[clientSocket] << std::endl;
 		break;
 	}
 	case DELETE:
 	{
-		// DeleteResponse deleteResponse(clientSocket, *_logger, request.getUri());
-		// deleteResponse.prepareResponse();
-		// deleteResponse.sendResponse();
+		DeleteResponse deleteResponse(request.getUri(), server);
+		deleteResponse.prepareResponse();
+		_responseMap[clientSocket] = deleteResponse.generateResponse();
+		_connectionMap[clientSocket] = true;
 		break;
 	}
 	default:
