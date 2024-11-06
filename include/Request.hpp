@@ -41,10 +41,9 @@ private:
 	void parseMethodAndUri(const std::string &line);				// Extrai o método e a URI da linha inicial
 	void parseHeaders(const std::vector<std::string> &headerLines); // Extrai os cabeçalhos
 	void parseBody();						// Extrai o corpo da requisição, se houver
-	std::string folderPath();										// Retorna o caminho do diretório da URI
+	std::string folderPath(const std::string &uri);										// Retorna o caminho do diretório da URI
 	void checkConnectionClose();									// Verifica se a conexão deve ser fechada
 	void extractMultipartNamesAndFilenames();									// Extrai os dados de um formulário multipart	
-	void removeBoundary();												// Remove o boundary do corpo da requisição
 	void parserQueryString();											// Extrai a query string da requisição
 
 	// Funções auxiliares
