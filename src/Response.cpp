@@ -17,9 +17,6 @@ std::string Response::generateResponse() const
 	response_stream << "\r\n";
 	response_stream << _body;
 
-	std::cout << "====================================================================" << std::endl;
-	std::cout << "Response: \n" << response_stream.str() << std::endl;
-	std::cout << "====================================================================" << std::endl;
 
 	return response_stream.str();
 }

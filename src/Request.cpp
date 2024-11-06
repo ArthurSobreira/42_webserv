@@ -74,7 +74,8 @@ void Request::parseMethodAndUri(const std::string &line)
 
 	parserQueryString();
 	_method = parseMethod(method);
-	if (_uri != "/"){
+	if (_uri != "/")
+	{
 		_uri = removeLastSlashes(_uri);
 	}
 
@@ -117,7 +118,7 @@ void Request::extractMultipartNamesAndFilenames()
 			std::string name = _body.substr(namePos, nameEnd - namePos);
 			std::string filename = _body.substr(filenamePos, filenameEnd - filenamePos);
 			_headers["name"] = name;
-			_headers["filename"] = filename;	
+			_headers["filename"] = filename;
 		}
 		pos = _body.find(boundary, pos + 1);
 	}
@@ -131,7 +132,7 @@ void Request::parseBody()
 	{
 		return;
 	}
-	std::cout << RED << "Content-Length: " << _headers["Content-Length"] << RESET <<std::endl;
+	std::cout << RED << "Content-Length: " << _headers["Content-Length"] << RESET << std::endl;
 	std::cout << "Body size: " << _body.size() << std::endl;
 	if (_headers.find("Content-Type") != _headers.end())
 	{
@@ -183,11 +184,11 @@ bool counterOneSlash(const std::string &uri)
 	return false;
 }
 
-std::string Request::folderPath()
+std::string Request::folderPath(const std::string &uri)
 {
-	if (_uri == "/")
-		return _uri;
-	std::string folderPath = _uri;
+	if (uri == "/")
+		return uri;
+	std::string folderPath = uri;
 	if (isDirectory(folderPath) && folderPath[folderPath.size() - 1] != '/')
 	{
 		folderPath += "/";
@@ -214,24 +215,23 @@ std::string Request::validateRequest(Config _config, ServerConfigs server)
 	static int counter = 0;
 	std::string error = "";
 	bool locationFound = false;
+	std::string currentUri = _uri;
+
 	std::cout << "passou aki " << counter++ << std::endl;
-	_location = _config.getLocationConfig(server, _uri, locationFound);
-	if (!locationFound)
+
+	while (!locationFound && !currentUri.empty())
 	{
-		_location = _config.getLocationConfig(server, folderPath(), locationFound);
+		std::cout << "currentUri: " << currentUri << std::endl;
+		_location = _config.getLocationConfig(server, currentUri, locationFound);
+		if (!locationFound)
+			currentUri = folderPath(currentUri);
 	}
 	if (!locationFound)
-	{
 		error = "404";
-	}
 	if (std::find(_location.methods.begin(), _location.methods.end(), getMethod()) == _location.methods.end())
-	{
 		error = "405";
-	}
 	if (_location.cgiEnabled)
-	{
 		_isCGI = true;
-	}
 	return error;
 }
 
@@ -243,7 +243,6 @@ void Request::checkConnectionClose()
 		_connectionClose = true;
 	}
 }
-
 
 void Request::parserQueryString()
 {
