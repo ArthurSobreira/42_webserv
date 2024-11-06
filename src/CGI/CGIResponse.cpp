@@ -2,25 +2,25 @@
 
 /* Constructor Method */
 CGIResponse::CGIResponse( const Request &request, const LocationConfigs &location ) 
-	: Response(), _request(request), _locationConfig(location), 
+	: Response(), _request(request), _location(location), 
 	_logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE) {
 	
-	if (_locationConfig.cgiEnabled) {
+	if (_location.cgiEnabled) {
 		_cgiPath = location.root + "/" + location.cgiPath;
 		_cgiExecutable = _getExecutable(location.cgiExtension);
 
 		if (access(_cgiPath.c_str(), X_OK) == -1) {
 			_handleCGIError(403, ERROR_FORBIDDEN);
-		} else if (!CGIUtils::methodIsOnLocation(_locationConfig, 
+		} else if (!CGIUtils::methodIsOnLocation(_location, 
 			_request.getMethod()) || _request.getMethod() == DELETE) {
 			_handleCGIError(405, ERROR_METHOD_NOT_ALLOWED);
 		} else if (CGIUtils::isUploadRequest(_request) && 
-			!_locationConfig.uploadEnabled) {
+			!_location.uploadEnabled) {
 			_handleCGIError(403, ERROR_FORBIDDEN);
 		} else if (_request.getMethod() == POST && 
 			!_request.getHeader("Content-Length").empty() && 
 			_request.getBody().size() > 
-			_locationConfig.server->limitBodySize) {
+			_location.server->limitBodySize) {
 			_handleCGIError(413, ERROR_TOO_LARGE);
 		} else { this->_setEnvironmentVars(); }
 	}
@@ -36,7 +36,7 @@ void	CGIResponse::_setEnvironmentVars( void ) {
 	_env["REQUEST_URI"] = _getCompleteUri();
 	_env["REQUEST_METHOD"] = _getStringMethod();
 	_env["SCRIPT_FILENAME"] = _cgiPath;
-	_env["SCRIPT_NAME"] = _locationConfig.cgiPath;
+	_env["SCRIPT_NAME"] = _location.cgiPath;
 	_env["PATH_INFO"] = _getPathInfo(_request.getUri());
 	if (_request.getMethod() == POST) {
 		std::string contentLength = _request.getHeader("Content-Length");
@@ -50,8 +50,8 @@ void	CGIResponse::_setEnvironmentVars( void ) {
 			_env["CONTENT_TYPE"] = contentType;
 		} else { _env["CONTENT_TYPE"] = "text/plain"; }
 	}
-	if (_locationConfig.uploadEnabled) {
-		_env["UPLOAD_PATH"] = _locationConfig.uploadPath;
+	if (_location.uploadEnabled) {
+		_env["UPLOAD_PATH"] = _location.uploadPath;
 	}
 }
 
@@ -86,7 +86,7 @@ std::string	CGIResponse::_getStringMethod( void ) const {
 }
 
 std::string	CGIResponse::_getPathInfo( const std::string &uri ) const {
-	std::string scriptName = _locationConfig.cgiPath;
+	std::string scriptName = _location.cgiPath;
 	std::size_t scriptPos = uri.find(scriptName);
 
 	if (scriptPos != std::string::npos) {
@@ -112,7 +112,7 @@ void	CGIResponse::_handleCGIError( int code, const std::string &message ) {
 	_statusCode = CGIUtils::intToString(code);
 	_reasonPhrase = message;
 	_logger.logError(LOG_ERROR, message, true);
-	std::string errorPage = _locationConfig.server->errorPages[_statusCode];
+	std::string errorPage = _location.server->errorPages[_statusCode];
 	handleError(_statusCode, errorPage, message, _logger);
 }
 
@@ -132,6 +132,26 @@ bool	CGIResponse::_waitChild( pid_t pid, int &status, std::clock_t start ) {
 	return (true);
 }
 
+void	CGIResponse::_sendBodyToCGI( const std::string &body ) {
+	if (!body.empty()) {
+		int pipefd[2];
+		if (pipe(pipefd) == -1) {
+			exit(EXIT_FAILURE);
+		}
+		dup2(pipefd[0], STDIN_FILENO);
+		close(pipefd[0]);
+
+		size_t bytes_written = write(pipefd[1], body.c_str(), body.length());
+
+		_logger.logDebug(LOG_INFO, "bytes written to CGI: " + 
+			CGIUtils::intToString(bytes_written), true);
+		_logger.logDebug(LOG_INFO, "Body length: " + 
+			CGIUtils::intToString(body.length()), true);
+		_logger.logDebug(LOG_INFO, "Body sent to CGI ", true);
+		close(pipefd[1]);
+	}
+}
+
 void	CGIResponse::_readReturnBody( int pipefd[2] ) {
 	char buffer[4096];
 	size_t bytes_read;
@@ -145,7 +165,7 @@ void	CGIResponse::_readReturnBody( int pipefd[2] ) {
 	close(pipefd[0]);
 }
 
-/* Public Methods */
+/* Public Method */
 void	CGIResponse::executeCGI( void ) {
 	if (_statusCode != "200") { return ; }
 
@@ -169,20 +189,11 @@ void	CGIResponse::executeCGI( void ) {
 	} else if (pid == 0) {
 		close(pipefd[0]);
 		dup2(pipefd[1], STDOUT_FILENO);
+		close(pipefd[1]);
 
 		if (_request.getMethod() == POST) {
-			int postPipe[2];
-			if (pipe(postPipe) == -1) {
-				exit(EXIT_FAILURE);
-			}
-			dup2(postPipe[0], STDIN_FILENO);
-			close(postPipe[0]);
-
-			std::string body = _request.getBody();
-			write(postPipe[1], body.c_str(), body.length()); // talvez o erro esteja aqui
-			close(postPipe[1]);
+			_sendBodyToCGI(_request.getBody());
 		}
-		close(pipefd[1]);
 
 		if (execve(_cgiExecutable.c_str(), argv, envp) == -1) {
 			exit(EXIT_FAILURE);
@@ -197,7 +208,7 @@ void	CGIResponse::executeCGI( void ) {
 				_statusCode = "200";
 				_reasonPhrase = "OK";
 			} else if (_request.getMethod() == POST) {
-				std::string uploadPath = _locationConfig.uploadPath;
+				std::string uploadPath = _location.uploadPath;
 				std::string body = _request.getBody();
 				std::string file = CGIUtils::extractFileName(body);
 
