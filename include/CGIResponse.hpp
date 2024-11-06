@@ -13,19 +13,20 @@ class CGIResponse : public Response {
 		std::string	_cgiPath;
 		std::string	_cgiExecutable;
 		Request		_request;
-		LocationConfigs	_locationConfig;
+		LocationConfigs	_location;
 		Logger	_logger;
 		std::map<std::string, std::string> _env;
 		
 		/* Private Methods */
 		void	_setEnvironmentVars( void );
 		char	**_generateEnvp( void );
-		std::string	_getContentLength( void ) const;
-		std::string	_getExecutable( const std::string &extension );
-		std::string	_getQueryString( const std::string &uri ) const;
+		std::string	_getCompleteUri( void ) const;
+		std::string	_getStringMethod( void ) const;
 		std::string	_getPathInfo( const std::string &uri ) const;
+		std::string	_getExecutable( const std::string &extension );
 		void	_handleCGIError( int code, const std::string &message );
 		bool	_waitChild( pid_t pid, int &status, std::clock_t start );
+		void	_sendBodyToCGI( const std::string &body );
 		void	_readReturnBody( int pipefd[2] );
 
 	public:
@@ -36,10 +37,11 @@ class CGIResponse : public Response {
 		/* Destructor Method */
 		~CGIResponse( void );
 
-		/* Public Methods */
+		/* Public Method */
 		void	executeCGI( void );
 };
 
+/* CGI Utils Functions */
 namespace CGIUtils {
 	bool	methodIsOnLocation( LocationConfigs &location, 
 		httpMethod method );
