@@ -132,26 +132,6 @@ bool	CGIResponse::_waitChild( pid_t pid, int &status, std::clock_t start ) {
 	return (true);
 }
 
-void	CGIResponse::_sendBodyToCGI( const std::string &body ) {
-	if (!body.empty()) {
-		int pipefd[2];
-		if (pipe(pipefd) == -1) {
-			exit(EXIT_FAILURE);
-		}
-		dup2(pipefd[0], STDIN_FILENO);
-		close(pipefd[0]);
-
-		size_t bytes_written = write(pipefd[1], body.c_str(), body.length());
-
-		_logger.logDebug(LOG_INFO, "bytes written to CGI: " + 
-			CGIUtils::intToString(bytes_written), true);
-		_logger.logDebug(LOG_INFO, "Body length: " + 
-			CGIUtils::intToString(body.length()), true);
-		_logger.logDebug(LOG_INFO, "Body sent to CGI ", true);
-		close(pipefd[1]);
-	}
-}
-
 void	CGIResponse::_readReturnBody( int pipefd[2] ) {
 	char buffer[4096];
 	size_t bytes_read;
@@ -163,6 +143,35 @@ void	CGIResponse::_readReturnBody( int pipefd[2] ) {
 	if (!strBuffer.empty()) { _body = strBuffer; }
 	handleFileResponse(DEFAULT_EMPTY, _logger);
 	close(pipefd[0]);
+}
+
+void	CGIResponse::_sendBodyToCGI( const std::string &body ) {
+	if (body.empty()) { return; }
+
+	char tempFileName[] = CGI_TEMP_FILE;
+	int tempFileFd = mkstemp(tempFileName);
+	if (tempFileFd == -1) { exit(EXIT_FAILURE); }
+
+	const size_t chunkSize = 4096;
+	size_t bytesRemaining = body.length();
+	size_t bytesSent = 0;
+	while (bytesRemaining > 0) {
+		size_t toWrite = std::min(chunkSize, bytesRemaining);
+		ssize_t bytesWritten = write(tempFileFd, body.c_str() + 
+			bytesSent, toWrite);
+
+		if (bytesWritten == -1) {
+			close(tempFileFd);
+			unlink(tempFileName);
+			exit(EXIT_FAILURE);
+		}
+		bytesSent += bytesWritten;
+		bytesRemaining -= bytesWritten;
+	}
+	lseek(tempFileFd, 0, SEEK_SET);
+	dup2(tempFileFd, STDIN_FILENO);
+	close(tempFileFd);
+	unlink(tempFileName);
 }
 
 /* Public Method */
