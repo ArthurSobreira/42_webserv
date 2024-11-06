@@ -1,4 +1,5 @@
 #include "PostResponse.hpp"
+
 PostResponse::PostResponse(std::string filePath, std::string postData, ServerConfigs server, LocationConfigs location, std::map<std::string, std::string> headersRequest) : Response(), _postData(postData), _filePath(filePath), _headersRequest(headersRequest), _server(server), _location(location)
 {
 	_validTypes.insert("image/jpeg");
@@ -31,9 +32,9 @@ void PostResponse::prepareResponse()
 {
 	_filePath = _location.uploadPath + "/" + _filePath;
 	if (_postData.size() > _server.limitBodySize)
-		handleError("413", _server.errorPages.at("413"), "Request Entity Too Large", _logger);
+		handleError("413", _server.errorPages.at("413"), ERROR_TOO_LARGE, _logger);
 	else if (!_location.uploadEnabled)
-		handleError("405", _server.errorPages.at("405"), "Method Not Allowed", _logger);
+		handleError("405", _server.errorPages.at("405"), ERROR_METHOD_NOT_ALLOWED, _logger);
 	else
 	{
 		int valid = createFile();
