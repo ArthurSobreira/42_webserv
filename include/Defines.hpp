@@ -105,5 +105,6 @@
 # define ERORR_CREATE_PIPE "Error Creating Pipe!"
 # define ERROR_CREATE_FORK "Error Creating Fork!"
 # define ERROR_CGI_EXECUTION "Error Executing CGI Script!"
+# define ERROR_CGI_TIMEOUT "CGI Script Timeout!"
 
 #endif
