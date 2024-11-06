@@ -20,10 +20,10 @@ class CGIResponse : public Response {
 		/* Private Methods */
 		void	_setEnvironmentVars( void );
 		char	**_generateEnvp( void );
-		std::string	_getContentLength( void ) const;
-		std::string	_getExecutable( const std::string &extension );
-		std::string	_getQueryString( const std::string &uri ) const;
+		std::string	_getCompleteUri( void ) const;
+		std::string	_getStringMethod( void ) const;
 		std::string	_getPathInfo( const std::string &uri ) const;
+		std::string	_getExecutable( const std::string &extension );
 		void	_handleCGIError( int code, const std::string &message );
 		bool	_waitChild( pid_t pid, int &status, std::clock_t start );
 		void	_readReturnBody( int pipefd[2] );
