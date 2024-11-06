@@ -26,8 +26,8 @@ class CGIResponse : public Response {
 		std::string	_getExecutable( const std::string &extension );
 		void	_handleCGIError( int code, const std::string &message );
 		bool	_waitChild( pid_t pid, int &status, std::clock_t start );
-		void	_sendBodyToCGI( const std::string &body );
 		void	_readReturnBody( int pipefd[2] );
+		void	_sendBodyToCGI( const std::string &body );
 
 	public:
 		/* Constructor Method */
