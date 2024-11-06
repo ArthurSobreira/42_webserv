@@ -36,7 +36,7 @@ class CGIResponse : public Response {
 		/* Destructor Method */
 		~CGIResponse( void );
 
-		/* Public Methods */
+		/* Public Method */
 		void	executeCGI( void );
 };
 
