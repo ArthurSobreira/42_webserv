@@ -21,7 +21,7 @@ CGIResponse::CGIResponse( const Request &request, const LocationConfigs &locatio
 			!_getContentLength().empty() && 
 			_request.getBody().size() > 
 			_locationConfig.server->limitBodySize) {
-			_handleCGIError(413, "Request Entity Too Large");  // criar uma macro pra isso
+			_handleCGIError(413, ERROR_TOO_LARGE);
 		}
 		
 		else { this->_setEnvironmentVars(); }
@@ -32,14 +32,13 @@ CGIResponse::CGIResponse( const Request &request, const LocationConfigs &locatio
 CGIResponse::~CGIResponse( void ) {};
 
 /* Private Methods */
-void	CGIResponse::_setEnvironmentVars( void ) {  // Provavelmente o erro do CGI está aqui
+void	CGIResponse::_setEnvironmentVars( void ) {
 	_env["SERVER_PROTOCOL"] = _request.getVersion();
 	_env["REQUEST_METHOD"] = _request.getMethod();
 	_env["REQUEST_URI"] = _request.getUri();
 	_env["SCRIPT_NAME"] = _locationConfig.cgiPath;
 	_env["SCRIPT_FILENAME"] = _cgiPath;
 	_env["PATH_INFO"] = _getPathInfo(_request.getUri());
-	// _env["QUERY_STRING"] = _getQueryString(_request.getUri());
 	_env["QUERY_STRING"] = _request.getQueryString();
 	if (_request.getMethod() == POST) {
 		std::string contentLength = _request.getHeader("Content-Length");
@@ -57,11 +56,16 @@ void	CGIResponse::_setEnvironmentVars( void ) {  // Provavelmente o erro do CGI 
 		_env["UPLOAD_PATH"] = _locationConfig.uploadPath;
 	}
 
-	_logger.logDebug(LOG_INFO, "=====Environment variables: ", true);
-	for (std::map<std::string, std::string>::iterator it = _env.begin(); 
-		it != _env.end(); ++it) {
-		_logger.logDebug(LOG_INFO, it->first + ": " + it->second, true);
-	}
+	_logger.logDebug(LOG_INFO, "SERVER PROTOCOL: " + _env["SERVER_PROTOCOL"], true);
+	_logger.logDebug(LOG_INFO, "REQUEST METHOD: " + _env["REQUEST_METHOD"], true);
+	_logger.logDebug(LOG_INFO, "REQUEST URI: " + _env["REQUEST_URI"], true);
+	_logger.logDebug(LOG_INFO, "SCRIPT NAME: " + _env["SCRIPT_NAME"], true);
+	_logger.logDebug(LOG_INFO, "SCRIPT FILENAME: " + _env["SCRIPT_FILENAME"], true);
+	_logger.logDebug(LOG_INFO, "PATH INFO: " + _env["PATH_INFO"], true);
+	_logger.logDebug(LOG_INFO, "QUERY STRING: " + _env["QUERY_STRING"], true);
+	_logger.logDebug(LOG_INFO, "CONTENT LENGTH: " + _env["CONTENT_LENGTH"], true);
+	_logger.logDebug(LOG_INFO, "CONTENT TYPE: " + _env["CONTENT_TYPE"], true);
+	_logger.logDebug(LOG_INFO, "UPLOAD PATH: " + _env["UPLOAD_PATH"], true);
 }
 
 char	**CGIResponse::_generateEnvp( void ) {
