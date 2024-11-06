@@ -192,7 +192,8 @@ void ServerManager::handleResponse(Request &request, ServerConfigs &server, int 
 		PostResponse postResponse(request.getUri(), request.getBody(), server, request.getLocation(), request.getHeaders());
 		postResponse.prepareResponse();
 		_responseMap[clientSocket] = postResponse.generateResponse();
-		_connectionMap[clientSocket] = true;
+		std::cout << "Response: " << _responseMap[clientSocket] << std::endl;
+		// _connectionMap[clientSocket] = true;
 		break;
 	}
 	case DELETE:
@@ -200,7 +201,7 @@ void ServerManager::handleResponse(Request &request, ServerConfigs &server, int 
 		DeleteResponse deleteResponse(request.getUri(), server);
 		deleteResponse.prepareResponse();
 		_responseMap[clientSocket] = deleteResponse.generateResponse();
-		_connectionMap[clientSocket] = true;
+		// _connectionMap[clientSocket] = true;
 		break;
 	}
 	default:
@@ -213,6 +214,8 @@ void ServerManager::closeConnection(int clientSocket)
 	_epollManager.removeFromEpoll(clientSocket);
 	_requestMap.erase(clientSocket);
 	_responseMap.erase(clientSocket);
+	_clientServerMap.erase(clientSocket);
+	_connectionMap.erase(clientSocket);
 	close(clientSocket);
 }
 
@@ -240,25 +243,30 @@ void ServerManager::handleWrite(int clientSocket)
 		{
 			_epollManager.removeFromEpoll(clientSocket);
 			close(clientSocket);
+			std::cout << "Connection closed due to send error" << std::endl;
 			return;
 		}
 		else if (bytesWritten < (int)_responseMap[clientSocket].size())
 		{
 			_responseMap[clientSocket] = _responseMap[clientSocket].substr(bytesWritten);
+			std::cout << "Partial response sent, remaining: " << _responseMap[clientSocket].size() << " bytes" << std::endl;
 		}
 		else if (bytesWritten == (int)_responseMap[clientSocket].size())
 		{
 			_responseMap[clientSocket] = "";
+			std::cout << "Full response sent" << std::endl;
 			if (_connectionMap[clientSocket])
 			{
 				closeConnection(clientSocket);
-				std::cout << "Connection closed" << std::endl;
+				std::cout << "Connection closed after sending response" << std::endl;
 				return;
 			}
 			_epollManager.modifyEpoll(clientSocket, EPOLLIN);
+			std::cout << "Modified epoll to EPOLLIN for client socket: " << clientSocket << std::endl;
 		}
 	}
 }
+
 bool ServerManager::verifyContentLength(int clientSocket, std::string &buffer)
 {
 	std::string contentLengthHeader = "Content-Length: ";

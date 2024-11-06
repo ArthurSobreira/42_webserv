@@ -10,7 +10,7 @@ private:
 	std::string _postData;
 	std::string _responseData;
 	std::string _filePath;
-	std::map<std::string, std::string> _headers;
+	std::map<std::string, std::string> _headersRequest;
 	std::string _fileName;
 	ServerConfigs _server;
 	LocationConfigs _location;
@@ -18,7 +18,7 @@ private:
 	std::string _contentType;
 
 public:
-	PostResponse(std::string filePath, std::string postData, ServerConfigs server, LocationConfigs location, std::map<std::string, std::string> headers);
+	PostResponse(std::string filePath, std::string postData, ServerConfigs server, LocationConfigs location, std::map<std::string, std::string> headersRequest);
 	void prepareResponse();
 
 private:

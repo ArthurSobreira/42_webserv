@@ -1,5 +1,5 @@
 #include "PostResponse.hpp"
-PostResponse::PostResponse(std::string filePath, std::string postData, ServerConfigs server, LocationConfigs location, std::map<std::string, std::string> headers) : Response(), _postData(postData), _filePath(filePath), _headers(headers), _server(server), _location(location)
+PostResponse::PostResponse(std::string filePath, std::string postData, ServerConfigs server, LocationConfigs location, std::map<std::string, std::string> headersRequest) : Response(), _postData(postData), _filePath(filePath), _headersRequest(headersRequest), _server(server), _location(location)
 {
 	_validTypes.insert("image/jpeg");
 	_validTypes.insert("image/png");
@@ -16,9 +16,9 @@ PostResponse::PostResponse(std::string filePath, std::string postData, ServerCon
 
 bool PostResponse::isValidContentTypeAndSetExtension()
 {
-	if (_validTypes.find(_headers["Content-Type"]) == _validTypes.end())
+	if (_validTypes.find(_headersRequest["Content-Type"]) == _validTypes.end())
 		return false;
-	_contentType = _headers["Content-Type"];
+	_contentType = _headersRequest["Content-Type"];
 	_contentType = _contentType.substr(_contentType.find("/") + 1);
 	if (_contentType == "plain")
 		_contentType = "txt";
@@ -43,6 +43,7 @@ void PostResponse::prepareResponse()
 			{
 				_statusCode = "201";
 				_reasonPhrase = "Created";
+				_body = "<html><head><title>Created</title></head><body><h1>Created</h1></body></html>";
 				std::stringstream ss;
 				ss << _body.size();
 				_headers["Content-Length"] = ss.str();
@@ -72,10 +73,10 @@ static void removeCarriageReturn(std::string &str)
 
 void PostResponse::removeBoundary()
 {
-	removeCarriageReturn(_headers["boundary"]);
+	removeCarriageReturn(_headersRequest["boundary"]);
 	size_t pos = _postData.find("\r\n\r\n");
 	_postData = _postData.substr(pos + 4);
-	pos = _postData.find(_headers["boundary"]);
+	pos = _postData.find(_headersRequest["boundary"]);
 	_postData = _postData.substr(0, pos - 2);
 }
 
@@ -84,9 +85,9 @@ int PostResponse::createFile()
 	static int archivo = 0;
 	if (_postData.empty())
 		return BAD_REQUEST;
-	if (!_headers["boundary"].empty())
+	if (!_headersRequest["boundary"].empty())
 	{
-		_fileName = _headers["filename"];
+		_fileName = _headersRequest["filename"];
 		removeBoundary();
 	}
 	else
