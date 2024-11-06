@@ -40,6 +40,7 @@ class CGIResponse : public Response {
 		void	executeCGI( void );
 };
 
+/* CGI Utils Functions */
 namespace CGIUtils {
 	bool	methodIsOnLocation( LocationConfigs &location, 
 		httpMethod method );
