@@ -1,21 +1,6 @@
 #ifndef DEFINES_HPP
 #define DEFINES_HPP
 
-/* Server Macros */
-# define LOG_FILE "logs/debug.log"
-# define LOG_ACCESS_FILE "logs/access.log"
-# define LOG_ERROR_FILE "logs/error.log"
-# define MAX_EVENTS 64
-# define MIN_PORT_NUMBER 0
-# define MAX_PORT_NUMBER 65535
-
-/* preguica de fazer um enum */
-
-# define SUCCESS 0
-# define BAD_REQUEST 2
-# define UNSUPPORTED_MEDIA_TYPE 3
-# define INTERNAL_SERVER_ERROR 4
-
 /* Colors Macros */
 # define COLORIZE(color, text) \
 	(std::string(color) + text + "\033[0m")
@@ -30,6 +15,14 @@
 # define MAGENTA "\033[35m"
 # define CYAN "\033[36m"
 # define WHITE "\033[37m"
+
+/* Server Macros */
+# define LOG_FILE "logs/debug.log"
+# define LOG_ACCESS_FILE "logs/access.log"
+# define LOG_ERROR_FILE "logs/error.log"
+# define MAX_EVENTS 64
+# define MIN_PORT_NUMBER 0
+# define MAX_PORT_NUMBER 65535
 
 /* Logger Macros */
 # define LOG_DEBUG "[DEBUG] "
@@ -50,6 +43,20 @@
 # define DEFAULT_SERVER_NAME "localhost"
 # define DEFAULT_LIMIT_BODY_SIZE 1048576
 
+/* POST Macros */
+# define SUCCESS 0
+# define BAD_REQUEST 2
+# define UNSUPPORTED_MEDIA_TYPE 3
+# define INTERNAL_SERVER_ERROR 4
+
+/* CGI Macros */
+# define CGI_TEMP_FILE "/tmp/cgi_body_XXXXXX"
+# define PYTHON_EXECUTABLE "/usr/bin/python3"
+# define PHP_EXECUTABLE "/usr/bin/php"
+# define EXTENSION_PHP ".php"
+# define EXTENSION_PY ".py"
+# define TIMEOUT_ERROR 256
+
 /* Default Error Pages */
 # define DEFAULT_ERROR_400 "./static/errors/400.html"
 # define DEFAULT_ERROR_403 "./static/errors/403.html"
@@ -59,13 +66,6 @@
 # define DEFAULT_ERROR_415 "./static/errors/415.html"
 # define DEFAULT_ERROR_500 "./static/errors/500.html"
 # define DEFAULT_ERROR_999 "./static/errors/999.html"
-
-/* CGI Macros */
-# define PHP_EXECUTABLE "/usr/bin/php"
-# define PYTHON_EXECUTABLE "/usr/bin/python3"
-# define EXTENSION_PHP ".php"
-# define EXTENSION_PY ".py"
-# define TIMEOUT_ERROR 256
 
 /* File Error Macros */
 # define ERROR_OPEN_LOG_FILE "Could Not Open Log File!"
