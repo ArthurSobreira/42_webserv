@@ -100,6 +100,7 @@
 /* Request Error Macros */
 # define ERROR_METHOD_NOT_ALLOWED "Method Not Allowed!"
 # define ERROR_FORBIDDEN "Forbidden File or Directory!"
+# define ERROR_TOO_LARGE "Request Entity Too Large!"
 # define ERROR_NOT_FOUND "File Not Found!"
 # define ERORR_CREATE_PIPE "Error Creating Pipe!"
 # define ERROR_CREATE_FORK "Error Creating Fork!"
