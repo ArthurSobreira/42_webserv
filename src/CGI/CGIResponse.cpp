@@ -12,19 +12,17 @@ CGIResponse::CGIResponse( const Request &request, const LocationConfigs &locatio
 		if (access(_cgiPath.c_str(), X_OK) == -1) {
 			_handleCGIError(403, ERROR_FORBIDDEN);
 		} else if (!CGIUtils::methodIsOnLocation(_locationConfig, 
-			_request.getMethod())) {
+			_request.getMethod()) || _request.getMethod() == DELETE) {
 			_handleCGIError(405, ERROR_METHOD_NOT_ALLOWED);
 		} else if (CGIUtils::isUploadRequest(_request) && 
 			!_locationConfig.uploadEnabled) {
 			_handleCGIError(403, ERROR_FORBIDDEN);
 		} else if (_request.getMethod() == POST && 
-			!_getContentLength().empty() && 
+			!_request.getHeader("Content-Length").empty() && 
 			_request.getBody().size() > 
 			_locationConfig.server->limitBodySize) {
 			_handleCGIError(413, ERROR_TOO_LARGE);
-		}
-		
-		else { this->_setEnvironmentVars(); }
+		} else { this->_setEnvironmentVars(); }
 	}
 }
 
@@ -34,12 +32,12 @@ CGIResponse::~CGIResponse( void ) {};
 /* Private Methods */
 void	CGIResponse::_setEnvironmentVars( void ) {
 	_env["SERVER_PROTOCOL"] = _request.getVersion();
-	_env["REQUEST_METHOD"] = _request.getMethod();
-	_env["REQUEST_URI"] = _request.getUri();
-	_env["SCRIPT_NAME"] = _locationConfig.cgiPath;
-	_env["SCRIPT_FILENAME"] = _cgiPath;
-	_env["PATH_INFO"] = _getPathInfo(_request.getUri());
 	_env["QUERY_STRING"] = _request.getQueryString();
+	_env["REQUEST_URI"] = _getCompleteUri();
+	_env["REQUEST_METHOD"] = _getStringMethod();
+	_env["SCRIPT_FILENAME"] = _cgiPath;
+	_env["SCRIPT_NAME"] = _locationConfig.cgiPath;
+	_env["PATH_INFO"] = _getPathInfo(_request.getUri());
 	if (_request.getMethod() == POST) {
 		std::string contentLength = _request.getHeader("Content-Length");
 		std::string contentType = _request.getHeader("Content-Type");
@@ -55,17 +53,6 @@ void	CGIResponse::_setEnvironmentVars( void ) {
 	if (_locationConfig.uploadEnabled) {
 		_env["UPLOAD_PATH"] = _locationConfig.uploadPath;
 	}
-
-	_logger.logDebug(LOG_INFO, "SERVER PROTOCOL: " + _env["SERVER_PROTOCOL"], true);
-	_logger.logDebug(LOG_INFO, "REQUEST METHOD: " + _env["REQUEST_METHOD"], true);
-	_logger.logDebug(LOG_INFO, "REQUEST URI: " + _env["REQUEST_URI"], true);
-	_logger.logDebug(LOG_INFO, "SCRIPT NAME: " + _env["SCRIPT_NAME"], true);
-	_logger.logDebug(LOG_INFO, "SCRIPT FILENAME: " + _env["SCRIPT_FILENAME"], true);
-	_logger.logDebug(LOG_INFO, "PATH INFO: " + _env["PATH_INFO"], true);
-	_logger.logDebug(LOG_INFO, "QUERY STRING: " + _env["QUERY_STRING"], true);
-	_logger.logDebug(LOG_INFO, "CONTENT LENGTH: " + _env["CONTENT_LENGTH"], true);
-	_logger.logDebug(LOG_INFO, "CONTENT TYPE: " + _env["CONTENT_TYPE"], true);
-	_logger.logDebug(LOG_INFO, "UPLOAD PATH: " + _env["UPLOAD_PATH"], true);
 }
 
 char	**CGIResponse::_generateEnvp( void ) {
@@ -83,24 +70,19 @@ char	**CGIResponse::_generateEnvp( void ) {
 	return (envp);
 }
 
-std::string CGIResponse::_getContentLength( void ) const {
-	std::string contentLength = _request.getHeader("Content-Length");
+std::string	CGIResponse::_getCompleteUri( void ) const {
+	std::string uri = _request.getUri();
+	std::string queryString = _request.getQueryString();
 
-	if (!contentLength.empty()) { return contentLength; }
+	if (!queryString.empty()) { return (uri + "?" + queryString); }
+	else { return uri; }
+}
+
+std::string	CGIResponse::_getStringMethod( void ) const {
+	if (_request.getMethod() == GET) { return "GET"; }
+	else if (_request.getMethod() == POST) { return "POST"; }
+	else if (_request.getMethod() == DELETE) { return "DELETE"; }
 	else { return DEFAULT_EMPTY; }
-}
-
-std::string	CGIResponse::_getExecutable( const std::string &extension ) {
-	if (extension == EXTENSION_PHP) { return PHP_EXECUTABLE; }
-	else if (extension == EXTENSION_PY) { return PYTHON_EXECUTABLE; }
-	return (DEFAULT_EMPTY);
-}
-
-std::string	CGIResponse::_getQueryString( const std::string &uri ) const {
-	std::size_t pos = uri.find('?');
-	if (pos != std::string::npos) { 
-		return uri.substr(pos + 1); 
-	} else { return DEFAULT_EMPTY; }
 }
 
 std::string	CGIResponse::_getPathInfo( const std::string &uri ) const {
@@ -119,13 +101,18 @@ std::string	CGIResponse::_getPathInfo( const std::string &uri ) const {
 	return (DEFAULT_LOCATION_PATH);
 }
 
+std::string	CGIResponse::_getExecutable( const std::string &extension ) {
+	if (extension == EXTENSION_PHP) { return PHP_EXECUTABLE; }
+	else if (extension == EXTENSION_PY) { return PYTHON_EXECUTABLE; }
+	return (DEFAULT_EMPTY);
+}
+
 void	CGIResponse::_handleCGIError( int code, const std::string &message ) {
 	_body.clear();
 	_statusCode = CGIUtils::intToString(code);
 	_reasonPhrase = message;
 	_logger.logError(LOG_ERROR, message, true);
 	std::string errorPage = _locationConfig.server->errorPages[_statusCode];
-	_logger.logDebug(LOG_INFO, "Error page: " + errorPage, true);
 	handleError(_statusCode, errorPage, message, _logger);
 }
 
@@ -137,7 +124,7 @@ bool	CGIResponse::_waitChild( pid_t pid, int &status, std::clock_t start ) {
 		}
 		if (!waitpid(pid, &status, WNOHANG)) {
 			kill(pid, SIGKILL);
-			_logger.logError(LOG_ERROR, "deu timeout zé", true);
+			_logger.logError(LOG_ERROR, ERROR_CGI_TIMEOUT, true);
 			status = TIMEOUT_ERROR;
 			return (false);
 		}
@@ -155,7 +142,6 @@ void	CGIResponse::_readReturnBody( int pipefd[2] ) {
 	std::string strBuffer(buffer);
 	if (!strBuffer.empty()) { _body = strBuffer; }
 	handleFileResponse(DEFAULT_EMPTY, _logger);
-	_logger.logDebug(LOG_INFO, "=====CGI response: " + _body, true);
 	close(pipefd[0]);
 }
 
@@ -193,7 +179,7 @@ void	CGIResponse::executeCGI( void ) {
 			close(postPipe[0]);
 
 			std::string body = _request.getBody();
-			write(postPipe[1], body.c_str(), body.length());
+			write(postPipe[1], body.c_str(), body.length()); // talvez o erro esteja aqui
 			close(postPipe[1]);
 		}
 		close(pipefd[1]);
