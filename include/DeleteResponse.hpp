@@ -9,11 +9,17 @@ class DeleteResponse : public Response {
     private:
         std::string _filePath;
 		ServerConfigs _server;
-    public:
-        DeleteResponse(const std::string &filePath, 
-            ServerConfigs &server);
 
-        void prepareResponse();
+    public:
+        /* Constructor Method */
+        DeleteResponse( const std::string &filePath, 
+            ServerConfigs &server );
+
+        /* Destructor Method */
+        ~DeleteResponse( void );
+
+        /* Public Methods */
+        void prepareResponse( void );
 };
 
 #endif // DELETERESPONSE_HPP
