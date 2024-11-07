@@ -2,6 +2,7 @@
 #define SERVER_HPP
 
 #include "Includes.hpp"
+#include "Defines.hpp"
 #include "Utils.hpp"
 #include "Config.hpp"
 #include "Logger.hpp"

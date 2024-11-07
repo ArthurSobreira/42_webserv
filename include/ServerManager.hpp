@@ -1,6 +1,8 @@
 #ifndef SERVERMANAGER_HPP
 #define SERVERMANAGER_HPP
 
+#include "Includes.hpp"
+#include "Defines.hpp"
 #include "Config.hpp"
 #include "Logger.hpp"
 #include "Server.hpp"
@@ -8,6 +10,10 @@
 #include "Fds.hpp"
 #include "Request.hpp"
 #include "GetResponse.hpp"
+#include "PostResponse.hpp"
+#include "DeleteResponse.hpp"
+#include "CGIResponse.hpp"
+
 class ServerManager
 {
 public:
