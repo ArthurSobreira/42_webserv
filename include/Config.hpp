@@ -39,7 +39,7 @@ struct ServerConfigs {
 	std::string host;
 	std::string serverName;
 	size_t limitBodySize;
-	errorMap errorPages;
+	stringMap errorPages;
 	std::vector<LocationConfigs> locations;
 
 	/* Struct Constructor */
