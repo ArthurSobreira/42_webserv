@@ -2,57 +2,54 @@
 #define WEBSERV_INCLUDES_HPP
 
 // C++ Standard Library headers
-#include <iostream>	 // Entrada e saída padrão
-#include <string>	 // Manipulação de strings
-#include <sstream>	 // Stream de strings
-#include <fstream>	 // Manipulação de arquivos
-#include <map>		 // Containers de mapa associativo
-#include <set>		 // Containers de conjunto
-#include <vector>	 // Containers de vetor
-#include <stdexcept> // Manipulação de exceções
-#include <algorithm> // Funções de algoritmo padrão
-#include <ctime>	 // Manipulação de tempo
-#include <cassert>   // Macros de asserção
-#include <limits>	 // Limites numéricos
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <fstream>
+#include <map>
+#include <set>
+#include <vector>
+#include <stdexcept>
+#include <algorithm>
+#include <ctime>
+#include <cassert>
+#include <limits>
 
-// C headers
-#include <cstring> // Manipulação de strings em C (ex: strlen, strcpy)
-#include <cstdlib> // Funções de utilitários gerais (ex: malloc, free)
-#include <cstdio>  // Entrada e saída em C (ex: printf, fopen)
+// C headers (for C functions)
+#include <cstring>
+#include <cstdlib>
+#include <cstdio>
+#include <csignal>
 
 // Standard I/O functions (read, write, close, open)
-#include <unistd.h>	   // close, read, write, access, dup, dup2, execve, fork, pipe, chdir
-#include <fcntl.h>	   // open, fcntl
-#include <sys/types.h> // stat, waitpid, opendir, readdir, closedir
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/types.h>
 
 // Error handling functions (strerror, errno)
-#include <errno.h>	// errno
-#include <string.h> // strerror, gai_strerror
+#include <errno.h>
+#include <string.h>
 
 // Networking functions (socket, connect, bind, listen, accept, send, recv)
-#include <sys/socket.h> // socket, bind, listen, accept, send, recv, socketpair, setsockopt, getsockname
-#include <netinet/in.h> // htons, htonl, ntohs, ntohl
-#include <netdb.h>		// getaddrinfo, freeaddrinfo, getprotobyname
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
 
 // Multiplexing functions (select, poll, epoll, kqueue)
-#include <sys/select.h> // select
-#include <poll.h>		// poll
-#include <sys/epoll.h>	// epoll_create, epoll_ctl, epoll_wait
+#include <sys/select.h>
+#include <poll.h>
+#include <sys/epoll.h>
 
 // Signal handling functions (signal, kill)
-#include <signal.h> // signal, kill
+#include <signal.h>
 
 // Directory handling functions (opendir, readdir, closedir)
-#include <dirent.h> // opendir, readdir, closedir
+#include <dirent.h>
 
 // File information functions (stat)
-#include <sys/stat.h> // stat
+#include <sys/stat.h>
 
 // Process control functions (waitpid, kill)
-#include <sys/wait.h> // waitpid
-
-// Defines
-
-#include "Defines.hpp"
+#include <sys/wait.h>
 
 #endif
