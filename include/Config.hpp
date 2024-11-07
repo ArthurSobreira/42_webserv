@@ -1,8 +1,8 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#include "Utils.hpp"
 #include "Includes.hpp"
+#include "Utils.hpp"
 #include "Logger.hpp"
 
 typedef enum {
