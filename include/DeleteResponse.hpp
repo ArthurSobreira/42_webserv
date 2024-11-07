@@ -1,8 +1,9 @@
 #ifndef DELETERESPONSE_HPP
 #define DELETERESPONSE_HPP
 
+#include "Includes.hpp"
+#include "Defines.hpp"
 #include "Response.hpp"
-#include <string>
 
 class DeleteResponse : public Response {
     private:
