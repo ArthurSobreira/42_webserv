@@ -186,7 +186,7 @@ namespace ConfigUtils {
 		std::cout << "host: " << server.host << std::endl;
 		std::cout << "server_name: " << server.serverName << std::endl;
 		std::cout << "limit_body_size: " << server.limitBodySize << std::endl;
-		for (errorMap::const_iterator it = server.errorPages.begin(); 
+		for (stringMap::const_iterator it = server.errorPages.begin(); 
 			it != server.errorPages.end(); ++it) {
 			std::cout << "error_pages: " << it->first << " " << it->second << std::endl;
 		}
