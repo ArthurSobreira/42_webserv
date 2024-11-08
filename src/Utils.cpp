@@ -152,19 +152,6 @@ std::string getContentType(const std::string &uri)
 	return "plain/text";
 }
 
-Config *config = NULL;
-
-void setConfig(Config &c)
-{
-	if (!config)
-		config = &c;
-}
-
-Config &getConfig()
-{
-	return *config;
-}
-
 void exitHandler(int sig)
 {
 	if (sig == SIGINT || sig == SIGQUIT || sig == SIGTERM)
