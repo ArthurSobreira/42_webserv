@@ -16,7 +16,7 @@ const std::string &Request::getUri() const { return _uri; }
 
 const std::string &Request::getHeader(const std::string &name) const
 {
-	std::map<std::string, std::string>::const_iterator it = _headers.find(name);
+	stringMap::const_iterator it = _headers.find(name);
 	if (it == _headers.end())
 	{
 		static const std::string empty;
@@ -25,7 +25,7 @@ const std::string &Request::getHeader(const std::string &name) const
 	return it->second;
 }
 
-const std::map<std::string, std::string> &Request::getHeaders() const { return _headers; }
+const stringMap	&Request::getHeaders() const { return _headers; }
 
 const std::string &Request::getBody() const { return _body; }
 
@@ -237,7 +237,7 @@ std::string Request::validateRequest(Config _config, ServerConfigs server)
 
 void Request::checkConnectionClose()
 {
-	std::map<std::string, std::string>::const_iterator it = _headers.find("Connection");
+	stringMap::const_iterator it = _headers.find("Connection");
 	if (it != _headers.end() && it->second == "close")
 	{
 		_connectionClose = true;
