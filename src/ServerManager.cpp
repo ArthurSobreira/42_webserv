@@ -1,10 +1,4 @@
 #include "ServerManager.hpp"
-#include "Globals.hpp"
-#include "Includes.hpp"
-#include "GetResponse.hpp"
-#include "PostResponse.hpp"
-#include "DeleteResponse.hpp"
-#include "CGIResponse.hpp"
 
 ServerManager::ServerManager(const std::string &configFilePath)
 	: _logger(new Logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE)),
@@ -183,7 +177,7 @@ void ServerManager::handleResponse(Request &request, ServerConfigs &server, int 
 	case GET:
 	{
 		GetResponse getResponse(request.getUri());
-		getResponse.prepareResponse(request.getLocation(), server);
+		getResponse.prepareResponse(request.getLocation());
 		_responseMap[clientSocket] = getResponse.generateResponse();
 		break;
 	}
