@@ -3,9 +3,12 @@
 #include "Defines.hpp"
 #include "Utils.hpp"
 
-EpollManager::EpollManager(Logger &logger) : _epoll_fd(-1), _logger(logger) { initialize(); }
+EpollManager::EpollManager(Logger &logger)
+    : _epoll_fd(-1), _logger(logger) { 
+    _initialize(); 
+}
 
-void EpollManager::initialize()
+void EpollManager::_initialize( void )
 {
     _epoll_fd = epoll_create1(0);
     if (_epoll_fd == -1)
