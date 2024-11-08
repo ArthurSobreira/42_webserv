@@ -1,5 +1,4 @@
 #include "Server.hpp"
-#include "Globals.hpp"
 
 Server::Server(ServerConfigs &config, Logger &logger, EpollManager &epoll)
 	: _epoll(epoll), _logger(logger), _config(config)
