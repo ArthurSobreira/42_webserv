@@ -153,7 +153,10 @@ namespace ConfigUtils {
 
 	void	validateFullCGIPath( LocationConfigs &location ) {
 		if (!location.cgiEnabled) { return ; }
-
+	
+		if (location.cgiPath.empty()) {
+			throw std::runtime_error(ERROR_INVALID_CGI_PATH);
+		}
 		std::string cgiPath = location.cgiPath;
 		size_t	lastDot = cgiPath.find_last_of('.');
 		if (cgiPath.substr(lastDot) != location.cgiExtension) {
