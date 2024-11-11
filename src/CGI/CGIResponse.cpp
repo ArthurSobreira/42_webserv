@@ -23,7 +23,7 @@ CGIResponse::CGIResponse( const Request &request, const LocationConfigs &locatio
 			_location.server->limitBodySize) {
 			_handleCGIError(413, ERROR_TOO_LARGE);
 		} else { this->_setEnvironmentVars(); }
-	} // verificar caso o cgi esteja desativado
+	}
 }
 
 /* Destructor Method */
