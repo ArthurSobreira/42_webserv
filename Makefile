@@ -19,13 +19,18 @@ TESTNAME	=	testes
 BUILD		=	./build
 LOG			=	./logs
 BUILD_TEST	=	./build_test
-SRCS		=	src/CGI/CGIResponse.cpp src/CGI/CGIUtils.cpp \
-				src/Config/Config.cpp \
+
+SRCS		=	src/Config/Config.cpp \
 				src/Config/ConfigExtract.cpp \
 				src/Config/ConfigUtils.cpp \
-				src/DeleteResponse.cpp src/EpoolManager.cpp src/Fds.cpp \
-				src/GetResponse.cpp src/Logger.cpp src/PostResponse.cpp \
-				src/Request.cpp src/Response.cpp src/Server.cpp \
+				src/Response/CGIResponse.cpp \
+				src/Response/CGIUtils.cpp \
+				src/Response/DeleteResponse.cpp \
+				src/Response/GetResponse.cpp \
+				src/Response/PostResponse.cpp \
+				src/Response/Response.cpp \
+				src/EpoolManager.cpp src/Fds.cpp src/Logger.cpp \
+				src/Request.cpp src/Server.cpp \
 				src/ServerManager.cpp src/Utils.cpp src/main.cpp
 
 TEST_SRCS	=	test/main.cpp $(filter-out src/main.cpp, $(SRCS)) 
@@ -67,7 +72,7 @@ $(BUILD_TEST)/%.o: src/%.cpp $(INC)
 
 $(BUILD):
 	@mkdir -p $(BUILD)
-	@mkdir -p $(BUILD)/CGI/
+	@mkdir -p $(BUILD)/Response/
 	@mkdir -p $(BUILD)/Config/
 	@mkdir -p $(LOG)
 
