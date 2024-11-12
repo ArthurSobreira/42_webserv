@@ -215,7 +215,6 @@ void ServerManager::handleResponse(Request &request, ServerConfigs &server, int 
 
 		cgi.executeCGI();
 		_clientDataMap[clientSocket].response = cgi.generateResponse();
-		// _logger->logDebug(LOG_DEBUG, "CGI response: [" + _responseMap[clientSocket] + "]", true);
 		return;
 	}
 
@@ -237,10 +236,9 @@ void ServerManager::handleResponse(Request &request, ServerConfigs &server, int 
 	}
 	case DELETE:
 	{
-		DeleteResponse deleteResponse(request.getUri(), server);
+		DeleteResponse deleteResponse(request.getUri(), request.getLocation());
 		deleteResponse.prepareResponse();
 		_clientDataMap[clientSocket].response = deleteResponse.generateResponse();
-		// _connectionMap[clientSocket] = true;
 		break;
 	}
 	default:

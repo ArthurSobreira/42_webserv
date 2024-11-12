@@ -8,12 +8,12 @@
 class DeleteResponse : public Response {
     private:
         std::string _filePath;
-		ServerConfigs _server;
+		LocationConfigs _location;
 
     public:
         /* Constructor Method */
         DeleteResponse( const std::string &filePath, 
-            ServerConfigs &server );
+            LocationConfigs location );
 
         /* Destructor Method */
         ~DeleteResponse( void );
