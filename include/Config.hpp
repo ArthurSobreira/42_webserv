@@ -1,8 +1,8 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#include "Utils.hpp"
 #include "Includes.hpp"
+#include "Utils.hpp"
 #include "Logger.hpp"
 
 typedef enum {
@@ -39,7 +39,7 @@ struct ServerConfigs {
 	std::string host;
 	std::string serverName;
 	size_t limitBodySize;
-	errorMap errorPages;
+	stringMap errorPages;
 	std::vector<LocationConfigs> locations;
 
 	/* Struct Constructor */

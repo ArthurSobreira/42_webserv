@@ -153,7 +153,10 @@ namespace ConfigUtils {
 
 	void	validateFullCGIPath( LocationConfigs &location ) {
 		if (!location.cgiEnabled) { return ; }
-
+	
+		if (location.cgiPath.empty()) {
+			throw std::runtime_error(ERROR_INVALID_CGI_PATH);
+		}
 		std::string cgiPath = location.cgiPath;
 		size_t	lastDot = cgiPath.find_last_of('.');
 		if (cgiPath.substr(lastDot) != location.cgiExtension) {
@@ -186,7 +189,7 @@ namespace ConfigUtils {
 		std::cout << "host: " << server.host << std::endl;
 		std::cout << "server_name: " << server.serverName << std::endl;
 		std::cout << "limit_body_size: " << server.limitBodySize << std::endl;
-		for (errorMap::const_iterator it = server.errorPages.begin(); 
+		for (stringMap::const_iterator it = server.errorPages.begin(); 
 			it != server.errorPages.end(); ++it) {
 			std::cout << "error_pages: " << it->first << " " << it->second << std::endl;
 		}

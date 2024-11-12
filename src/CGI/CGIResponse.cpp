@@ -59,7 +59,7 @@ char	**CGIResponse::_generateEnvp( void ) {
 	char **envp = new char*[_env.size() + 1];
 	int index = 0;
 
-	for (std::map<std::string, std::string>::iterator it = _env.begin(); 
+	for (stringMap::iterator it = _env.begin(); 
 		it != _env.end(); ++it) {
 		std::string envVar = it->first + "=" + it->second;
 		envp[index] = new char[envVar.length() + 1];
@@ -221,9 +221,13 @@ void	CGIResponse::executeCGI( void ) {
 				std::string body = _request.getBody();
 				std::string file = CGIUtils::extractFileName(body);
 
-				if (ConfigUtils::fileExists(uploadPath + "/" + file)) {
-					_statusCode = "201";
-					_reasonPhrase = "Created";
+				if (CGIUtils::isUploadRequest(_request)) {
+					if (ConfigUtils::fileExists(uploadPath + "/" + file)) {
+						_statusCode = "201";
+						_reasonPhrase = "Created";
+					} else {
+						_handleCGIError(500, ERROR_CGI_EXECUTION);
+					}
 				} else {
 					_statusCode = "200";
 					_reasonPhrase = "OK";

@@ -98,6 +98,7 @@
 # define ERROR_INVALID_CGI_EXTENSION "Location: Invalid CGI Extension!"
 
 /* Request Error Macros */
+# define ERROR_INTERNAL_SERVER "Internal Server Error!"
 # define ERROR_METHOD_NOT_ALLOWED "Method Not Allowed!"
 # define ERROR_FORBIDDEN "Forbidden File or Directory!"
 # define ERROR_TOO_LARGE "Request Entity Too Large!"

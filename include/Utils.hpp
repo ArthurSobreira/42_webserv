@@ -6,7 +6,11 @@
 class Logger;
 class Config;
 
-typedef std::map<std::string, std::string> errorMap;
+/* Global Variables */
+extern volatile sig_atomic_t stop;
+
+/* Typedefs */
+typedef std::map<std::string, std::string> stringMap;
 typedef std::vector<std::string> stringVector;
 typedef struct sockaddr_in sockaddrIn;
 typedef struct epoll_event epollEvent;
@@ -15,6 +19,7 @@ typedef struct stat status;
 typedef struct dirent diretory;
 typedef std::ostringstream logStream;
 
+/* Utils Functions */
 bool inetPton(const std::string &ip_str);
 void ft_error(const char *message, const char *function, 
 	const char *file, int line, const std::exception &e);
@@ -30,8 +35,5 @@ void signals(int sig);
 void setupSignalForkHandlers();
 void setupSignalHandlers();
 bool createSocket(int &sockfd, int domain, int type);
-
-
-
 
 #endif

@@ -15,7 +15,7 @@ class CGIResponse : public Response {
 		Request		_request;
 		LocationConfigs	_location;
 		Logger	_logger;
-		std::map<std::string, std::string> _env;
+		stringMap _env;
 		
 		/* Private Methods */
 		void	_setEnvironmentVars( void );

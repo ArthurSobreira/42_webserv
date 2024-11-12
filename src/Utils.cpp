@@ -2,7 +2,7 @@
 #include "Defines.hpp"
 #include "Logger.hpp"
 #include "Config.hpp"
-#include "Globals.hpp"
+#include "Utils.hpp"
 
 bool inetPton(const std::string &ip_str)
 {

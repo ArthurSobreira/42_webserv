@@ -10,7 +10,7 @@ std::string Response::generateResponse() const
 	std::ostringstream response_stream;
 
 	response_stream << "HTTP/1.1 " << _statusCode << " " << _reasonPhrase << "\r\n";
-	for (std::map<std::string, std::string>::const_iterator it = _headers.begin(); it != _headers.end(); ++it)
+	for (stringMap::const_iterator it = _headers.begin(); it != _headers.end(); ++it)
 	{
 		response_stream << it->first << ": " << it->second << "\r\n";
 	}

@@ -1,18 +1,25 @@
 #ifndef GETRESPONSE_HPP
 #define GETRESPONSE_HPP
 
-#include "Response.hpp"
-#include "Logger.hpp"
 #include "Includes.hpp"
+#include "Defines.hpp"
+#include "Response.hpp"
+
 class GetResponse : public Response {
 	private:
 		std::string _filePath;
-		std::map<std::string, std::string> _headers;
+		stringMap _headers;
 
 	public:
-		GetResponse(std::string filePath);
-		void listDirectoryHandler();
-		void prepareResponse(const LocationConfigs &location, const ServerConfigs &respconfig);
+		/* Constructor Method */
+		GetResponse( std::string filePath );
+
+		/* Destructor Method */
+		~GetResponse( void );
+
+		/* Public Methods */
+		void listDirectoryHandler( void );
+		void prepareResponse( const LocationConfigs &location );
 };
 
 #endif // GETRESPONSE_HPP

@@ -1,5 +1,4 @@
 #include "Server.hpp"
-#include "Globals.hpp"
 
 Server::Server(ServerConfigs &config, Logger &logger, EpollManager &epoll)
 	: _epoll(epoll), _logger(logger), _config(config)
@@ -21,7 +20,7 @@ bool Server::initialize() {
 	if (!listenSocket()) return false;
 	if(!_epoll.addToEpoll(_serverSocket, EPOLLIN)) return false;
 	return true;
- }
+}
 
 bool Server::createSocket()
 {
@@ -88,7 +87,3 @@ bool Server::configureSocket()
 	_logger.logDebug(LOG_DEBUG, log.str());
 	return true;
 }
-
-
-
-
