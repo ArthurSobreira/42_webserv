@@ -1,8 +1,9 @@
 #include "Includes.hpp"
 #include "Defines.hpp"
-#include "Logger.hpp"
+#include "Utils.hpp"
 #include "ServerManager.hpp"
 
+Logger logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE);
 volatile sig_atomic_t stop = 0;
 
 int main(int argc, char **argv) {
@@ -10,7 +11,6 @@ int main(int argc, char **argv) {
         std::cerr << "Usage: " << argv[0] << " <config_file_path>" << std::endl;
         return (EXIT_FAILURE);
     }
-    Logger logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE);  // isso vai sumir amanhã, fé
     setupSignalHandlers();
     try {
         ServerManager serverManager(argv[1]);
