@@ -152,18 +152,6 @@ std::string getContentType(const std::string &uri)
 	return "plain/text";
 }
 
-Config *config = NULL;
-
-void setConfig(Config &c)
-{
-	if (!config)
-		config = &c;
-}
-
-Config &getConfig()
-{
-	return *config;
-}
 
 void exitHandler(int sig)
 {
@@ -200,4 +188,10 @@ bool isDirectory(const std::string &path)
 	if (stat(path.c_str(), &statbuf) != 0)
 		return false;
 	return S_ISDIR(statbuf.st_mode);
+}
+
+void ft_usleep(unsigned int microseconds) {
+	clock_t start_time = clock();
+	clock_t end_time = start_time + (microseconds * CLOCKS_PER_SEC) / 1000000;
+	while (clock() < end_time);
 }
