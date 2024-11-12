@@ -61,10 +61,9 @@ void ServerManager::acceptConnection(int serverSocket)
 		return;
 	}
 	_epollManager.addToEpoll(clientSocket, EPOLLIN);
-	_requestMap[clientSocket] = "";
-	_responseMap[clientSocket] = "";
+	_clientDataMap[clientSocket] = clientData("", "", false, true, 0);
 	_clientServerMap[clientSocket] = serverSocket;
-	_connectionMap[clientSocket] = true;
+
 	// _fds.addFdToServer(clientSocket);
 }
 
@@ -104,40 +103,87 @@ void ServerManager::handleEvents()
 	}
 }
 
+void ServerManager::getContentLength(int clientSocket, std::string &buffer)
+{
+	std::string contentLengthHeader = "Content-Length: ";
+	size_t pos = buffer.find(contentLengthHeader);
+
+	if (pos != std::string::npos)
+	{
+		size_t endOfHeader = buffer.find("\r\n", pos);
+		if (endOfHeader != std::string::npos)
+		{
+			std::string contentLengthStr = buffer.substr(pos + contentLengthHeader.size(),
+														 endOfHeader - (pos + contentLengthHeader.size()));
+			std::stringstream ss;
+			ss << contentLengthStr;
+			size_t contentLength;
+			ss >> contentLength;
+			_clientDataMap[clientSocket].contentLength = contentLength;
+			std::cout << "Extracted Content-Length: " << contentLength << std::endl;
+		}
+		else
+		{
+			std::cerr << "Error: End of Content-Length header not found" << std::endl;
+		}
+	}
+	else
+	{
+		std::cerr << "Error: Content-Length header not found" << std::endl;
+	}
+}
+
 void ServerManager::handleRead(int clientSocket)
 {
 	static int counter = 0;
 	std::cout << "Handling read on socket: " << clientSocket << std::endl;
+
 	char buffer[65535];
-	bzero(buffer, sizeof(buffer));
+	memset(buffer, 0, sizeof(buffer));
+
 	int bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
-	std::cout << "loop numero: " << counter++ << std::endl;
-	if (bytesRead == -1)
+	_clientDataMap[clientSocket].bytesRead += bytesRead;
+	std::cout << "Loop número: " << counter++ << std::endl;
+	if (bytesRead <= 0)
 	{
 		_epollManager.removeFromEpoll(clientSocket);
 		close(clientSocket);
 		return;
 	}
-	else if (bytesRead == 0)
+	std::string data(buffer, bytesRead);
+	if (_clientDataMap[clientSocket].completeRequest)
+		_clientDataMap[clientSocket].request += data;
+		
+	if (_clientDataMap[clientSocket].contentLength == 0)
 	{
-		_epollManager.removeFromEpoll(clientSocket);
-		close(clientSocket);
-		return;
-	}
-	else
-	{
-		std::string lenfVerif = std::string(buffer, bytesRead);
-		if (lenfVerif.size() < 65535)
+		getContentLength(clientSocket, data);
+		std::cout << "Content-Length: " << _clientDataMap[clientSocket].contentLength << std::endl;
+		std::cout << "MAX_BODY_SIZE: " << MAX_BODY_SIZE << std::endl;
+		if (_clientDataMap[clientSocket].contentLength >= MAX_BODY_SIZE)
 		{
-			_epollManager.modifyEpoll(clientSocket, EPOLLOUT);
-			_requestMap[clientSocket] += lenfVerif;
+			_clientDataMap[clientSocket].completeRequest = false;
 			return;
 		}
 	}
-
-	std::cout << "debbug 02" << std::endl;
-	_requestMap[clientSocket] += std::string(buffer, bytesRead);
-	std::cout << "read: success" << std::endl;
+	if (_clientDataMap[clientSocket].contentLength > 0)
+	{
+		if (_clientDataMap[clientSocket].bytesRead >= _clientDataMap[clientSocket].contentLength)
+		{
+			_epollManager.modifyEpoll(clientSocket, EPOLLOUT);
+			std::cout << "Complete request1" << std::endl;
+			return;
+		}
+	}
+	else
+	{
+		if (data.find("\r\n\r\n") != std::string::npos)
+		{
+			_epollManager.modifyEpoll(clientSocket, EPOLLOUT);
+			std::cout << "Complete request2" << std::endl;
+			return;
+		}
+	}
+	std::cout << "Read: " << data.size() << " bytes" << std::endl;
 }
 
 void ServerManager::handleError(int clientSocket, Logger *logger, const std::string &errorPage, const std::string &status)
@@ -149,14 +195,15 @@ void ServerManager::handleError(int clientSocket, Logger *logger, const std::str
 	response += "Content-Length: " + ss.str() + "\r\n";
 	response += "Content-Type: text/html\r\n\r\n";
 	response += body;
-	_responseMap[clientSocket] = response;
+	_clientDataMap[clientSocket].response = response;
 	logger->logError(LOG_ERROR, "Error: " + status, true);	
 }
+
 void ServerManager::handleResponse(Request &request, ServerConfigs &server, int clientSocket)
 {
-	std::string status = request.validateRequest(_config, server);
+	std::string status = request.validateRequest(_config, server, _clientDataMap[clientSocket].completeRequest);
 	std::cout << "vazio é o normal [" << status << "]" << std::endl;
-	_connectionMap[clientSocket] = request.connectionClose();
+	_clientDataMap[clientSocket].connection = request.connectionClose();
 	if (status != "")
 	{
 		handleError(clientSocket, _logger, server.errorPages[status], status);
@@ -167,7 +214,7 @@ void ServerManager::handleResponse(Request &request, ServerConfigs &server, int 
 		CGIResponse cgi(request, request.getLocation());
 
 		cgi.executeCGI();
-		_responseMap[clientSocket] = cgi.generateResponse();
+		_clientDataMap[clientSocket].response = cgi.generateResponse();
 		// _logger->logDebug(LOG_DEBUG, "CGI response: [" + _responseMap[clientSocket] + "]", true);
 		return;
 	}
@@ -178,23 +225,21 @@ void ServerManager::handleResponse(Request &request, ServerConfigs &server, int 
 	{
 		GetResponse getResponse(request.getUri());
 		getResponse.prepareResponse(request.getLocation());
-		_responseMap[clientSocket] = getResponse.generateResponse();
+		_clientDataMap[clientSocket].response = getResponse.generateResponse();
 		break;
 	}
 	case POST:
 	{
 		PostResponse postResponse(request.getUri(), request.getBody(), server, request.getLocation(), request.getHeaders());
 		postResponse.prepareResponse();
-		_responseMap[clientSocket] = postResponse.generateResponse();
-		std::cout << "Response: " << _responseMap[clientSocket] << std::endl;
-		// _connectionMap[clientSocket] = true;
+		_clientDataMap[clientSocket].response = postResponse.generateResponse();
 		break;
 	}
 	case DELETE:
 	{
 		DeleteResponse deleteResponse(request.getUri(), server);
 		deleteResponse.prepareResponse();
-		_responseMap[clientSocket] = deleteResponse.generateResponse();
+		_clientDataMap[clientSocket].response = deleteResponse.generateResponse();
 		// _connectionMap[clientSocket] = true;
 		break;
 	}
@@ -206,33 +251,38 @@ void ServerManager::handleResponse(Request &request, ServerConfigs &server, int 
 void ServerManager::closeConnection(int clientSocket)
 {
 	_epollManager.removeFromEpoll(clientSocket);
-	_requestMap.erase(clientSocket);
-	_responseMap.erase(clientSocket);
-	_clientServerMap.erase(clientSocket);
-	_connectionMap.erase(clientSocket);
+	_clientDataMap.erase(clientSocket);
 	close(clientSocket);
+}
+
+void restartStruct(clientData &data)
+{
+	data.request = "";
+	data.response = "";
+	data.connection = false;
+	data.completeRequest = true;
+	data.contentLength = 0;
+	data.bytesRead = 0;
 }
 
 void ServerManager::handleWrite(int clientSocket)
 {
-	if (_responseMap[clientSocket] == "")
+	if (_clientDataMap[clientSocket].response == "")
 	{
-		if (!verifyContentLength(clientSocket, _requestMap[clientSocket]))
-			return;
-		Request request(_requestMap[clientSocket]);
-		for (std::vector<Server *>::iterator it = _servers.begin(); it != _servers.end(); ++it)
-		{
-			if ((*it)->getServerSocket() == _clientServerMap[clientSocket])
+			Request request(_clientDataMap[clientSocket].request, _clientDataMap[clientSocket].completeRequest);
+			for (std::vector<Server *>::iterator it = _servers.begin(); it != _servers.end(); ++it)
 			{
-				handleResponse(request, (*it)->getConfig(), clientSocket);
-				_requestMap[clientSocket] = "";
-				break;
+				if ((*it)->getServerSocket() == _clientServerMap[clientSocket])
+				{
+					handleResponse(request, (*it)->getConfig(), clientSocket);
+					_clientDataMap[clientSocket].request = "";
+					break;
+				}
 			}
-		}
 	}
 	else
 	{
-		int bytesWritten = send(clientSocket, _responseMap[clientSocket].c_str(), _responseMap[clientSocket].size(), 0);
+		int bytesWritten = send(clientSocket, _clientDataMap[clientSocket].response.c_str(), _clientDataMap[clientSocket].response.size(), 0);
 		if (bytesWritten <= 0)
 		{
 			_epollManager.removeFromEpoll(clientSocket);
@@ -240,16 +290,16 @@ void ServerManager::handleWrite(int clientSocket)
 			std::cout << "Connection closed due to send error" << std::endl;
 			return;
 		}
-		else if (bytesWritten < (int)_responseMap[clientSocket].size())
+		else if (bytesWritten < (int)_clientDataMap[clientSocket].response.size())
 		{
-			_responseMap[clientSocket] = _responseMap[clientSocket].substr(bytesWritten);
-			std::cout << "Partial response sent, remaining: " << _responseMap[clientSocket].size() << " bytes" << std::endl;
+			_clientDataMap[clientSocket].response = _clientDataMap[clientSocket].response.substr(bytesWritten);
+			std::cout << "Partial response sent, remaining: " << _clientDataMap[clientSocket].response.size() << " bytes" << std::endl;
 		}
-		else if (bytesWritten == (int)_responseMap[clientSocket].size())
+		else if (bytesWritten == (int)_clientDataMap[clientSocket].response.size())
 		{
-			_responseMap[clientSocket] = "";
+			restartStruct(_clientDataMap[clientSocket]);
 			std::cout << "Full response sent" << std::endl;
-			if (_connectionMap[clientSocket])
+			if (_clientDataMap[clientSocket].connection)
 			{
 				closeConnection(clientSocket);
 				std::cout << "Connection closed after sending response" << std::endl;
@@ -259,31 +309,4 @@ void ServerManager::handleWrite(int clientSocket)
 			std::cout << "Modified epoll to EPOLLIN for client socket: " << clientSocket << std::endl;
 		}
 	}
-}
-
-bool ServerManager::verifyContentLength(int clientSocket, std::string &buffer)
-{
-	std::string contentLengthHeader = "Content-Length: ";
-	size_t pos = buffer.find(contentLengthHeader);
-
-	if (pos != std::string::npos) {
-		size_t endOfHeader = buffer.find("\r\n", pos);
-		std::string contentLengthStr = buffer.substr(pos + contentLengthHeader.size(),
-													 endOfHeader - (pos + contentLengthHeader.size()));		std::stringstream ss;
-		ss << contentLengthStr;
-		size_t contentLength;
-		ss >> contentLength;
-		size_t endOfHeaders = buffer.find("\r\n\r\n");
-		if (endOfHeaders == std::string::npos) {
-			_epollManager.modifyEpoll(clientSocket, EPOLLIN);
-			return false;
-		}
-		if (buffer.size() - endOfHeaders - 4 >= contentLength) {
-			return true;
-		} else {
-			_epollManager.modifyEpoll(clientSocket, EPOLLIN);
-			return false;
-		}
-	}
-	return true;
 }
