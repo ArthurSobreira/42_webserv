@@ -23,6 +23,7 @@
 # define MAX_EVENTS 64
 # define MIN_PORT_NUMBER 0
 # define MAX_PORT_NUMBER 65535
+# define MAX_BODY_SIZE 268435456
 
 /* Logger Macros */
 # define LOG_DEBUG "[DEBUG] "
