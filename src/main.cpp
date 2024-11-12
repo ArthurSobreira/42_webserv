@@ -1,7 +1,7 @@
+#include "ServerManager.hpp"
 #include "Includes.hpp"
 #include "Defines.hpp"
 #include "Logger.hpp"
-#include "ServerManager.hpp"
 
 volatile sig_atomic_t stop = 0;
 
