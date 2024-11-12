@@ -22,7 +22,7 @@ typedef struct clientData {
     size_t contentLength;
     size_t bytesRead;
 
-    clientData(const std::string &req, const std::string &res, bool conn, bool compReq, size_t contentLen, size_t bRead = 0)
+    clientData(const std::string &req, const std::string &res, bool conn, bool compReq, size_t contentLen, size_t bRead)
         : request(req), response(res), connection(conn), completeRequest(compReq), contentLength(contentLen), bytesRead(bRead) {}
     clientData() : request(""), response(""), connection(false), completeRequest(false), contentLength(0), bytesRead(0) {}
 } clientData;
