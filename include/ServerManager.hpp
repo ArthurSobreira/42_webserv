@@ -4,7 +4,7 @@
 #include "Includes.hpp"
 #include "Defines.hpp"
 #include "Config.hpp"
-#include "Logger.hpp"
+#include "Utils.hpp"
 #include "Server.hpp"
 #include "EpollManager.hpp"
 #include "Fds.hpp"
@@ -27,33 +27,37 @@ typedef struct clientData {
     clientData() : request(""), response(""), connection(false), completeRequest(false), contentLength(0), bytesRead(0) {}
 } clientData;
 
-class ServerManager
-{
-public:
-    ServerManager(const std::string &configFilePath);
-    ~ServerManager();
-    void run();
+class ServerManager {
+	private:
+		EpollManager _epollManager;
+		Config _config;
+		Fds _fds;
+		std::vector<Server*> _servers; 
+		std::map<int, int> _clientServerMap;
+		std::map<int, clientData> _clientDataMap;
 
-private:
-    bool initializeServers();
-    void handleEvents();
-    void handleRead(int clientSocket);
-    void handleWrite(int clientSocket);
-    void acceptConnection(int serverSocket);
-    void handleResponse(Request &request, ServerConfigs &server, int clientSocket);
-    void handleError(int clientSocket, Logger *logger, const std::string &errorPage, const std::string &status);
-    void closeConnection(int clientSocket);
-    bool verifyContentLength(int clientSocket, std::string &buffer);
-    void getContentLength(int clientSocket, std::string &buffer);
+	public:
+		/* Constructor Method */
+		ServerManager( const std::string &configFilePath );
 
-private:
-    Logger *_logger;
-    EpollManager _epollManager;
-    Config _config;
-    Fds _fds;
-    std::vector<Server*> _servers;
-    std::map<int, clientData> _clientDataMap;
-    std::map<int, int> _clientServerMap;
+		/* Destructor Method */
+		~ServerManager( void );
+
+		/* Public Method */
+		void	run( void );
+
+	private:
+		bool	_initializeServers( void );
+		void	_handleEvents( void );
+		void	_acceptConnection( int serverSocket );
+		void	_handleRead( int clientSocket );
+		void	_handleWrite (int clientSocket );
+		void	_handleResponse( Request &request, ServerConfigs &server, 
+			int clientSocket );
+		bool	_verifyContentLength( int clientSocket, std::string &buffer );
+		void	_closeConnection( int clientSocket );
+		void	_handleError( int clientSocket, const std::string &errorPage, 
+			const std::string &status );
 };
 
 #endif // SERVERMANAGER_HPP

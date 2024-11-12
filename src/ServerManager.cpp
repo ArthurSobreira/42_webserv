@@ -1,63 +1,84 @@
 #include "ServerManager.hpp"
 
+/* Constructor Method */
 ServerManager::ServerManager(const std::string &configFilePath)
-	: _logger(new Logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE)),
-	  _epollManager(*_logger),
-	  _config(configFilePath, *_logger)
-{
-	if (!initializeServers())
-	{
+	: _epollManager(), _config(configFilePath, logger) {
+	if (!_initializeServers()) {
 		throw std::runtime_error("Failed to initialize servers");
 	}
 }
 
-ServerManager::~ServerManager()
-{
-	delete _logger;
-	for (std::vector<Server *>::iterator it = _servers.begin(); it != _servers.end(); ++it)
-	{
+/* Destructor Method */
+ServerManager::~ServerManager( void ) {
+	for (std::vector<Server *>::iterator it = _servers.begin(); 
+	it != _servers.end(); ++it) {
 		delete *it;
 	}
 }
 
-bool ServerManager::initializeServers()
-{
+/* Public Method */
+void ServerManager::run( void ) {
+	while (!stop) {
+		_handleEvents();
+	}
+}
+
+/* Private Methods */
+bool ServerManager::_initializeServers( void ) {
 	std::vector<ServerConfigs> serverConfigs = _config.getServers();
 
-	for (std::vector<ServerConfigs>::iterator it = serverConfigs.begin(); it != serverConfigs.end(); ++it)
-	{
-		// Alocar dinamicamente as instâncias de Server e armazená-las no vetor _servers
-		Server *server = new Server(*it, *_logger, _epollManager);
+	for (std::vector<ServerConfigs>::iterator it = serverConfigs.begin(); 
+		it != serverConfigs.end(); ++it) {
+		Server *server = new Server(*it, _epollManager);
 		if (!server->initialize())
 		{
 			delete server;
 			return false;
 		}
-		std::cout << server->getServerSocket() << std::endl;
 		_servers.push_back(server);
 		_fds.addFdToServer(server->getServerSocket());
-		std::cout << "Server initialized and added to epoll: " << server->getServerSocket() << std::endl;
+		logger.logDebug(LOG_INFO, "Server initialized on " + 
+			it->host + ":" + CGIUtils::intToString(it->port), true);
 	}
-
 	return true;
 }
 
-void ServerManager::run()
-{
-	while (!stop)
-	{
-		handleEvents();
+void ServerManager::_handleEvents( void ) {
+	epoll_event events[MAX_EVENTS];
+	int nfds = epoll_wait(_epollManager.getEpollFD(), events, MAX_EVENTS, -1);
+	if (nfds == -1) {
+		logger.logError(LOG_ERROR, "Error on epoll_wait", true);
+		return;
+	}
+	for (int i = 0; i < nfds; i++) {
+		if (_fds.isFdInServer(events[i].data.fd)) {
+			if (events[i].events & EPOLLIN) {
+				logger.logAccess(LOG_INFO, "Accepting connection on server socket: " +
+					CGIUtils::intToString(events[i].data.fd), true);
+				_acceptConnection(events[i].data.fd);
+			}
+		}
+		else {
+			if (events[i].events & EPOLLIN) {
+				logger.logDebug(LOG_DEBUG, "Handling read on client socket: " + 
+					CGIUtils::intToString(events[i].data.fd));
+				_handleRead(events[i].data.fd);
+			}
+			if (events[i].events & EPOLLOUT) {
+				logger.logDebug(LOG_DEBUG, "Handling write on client socket: " + 
+					CGIUtils::intToString(events[i].data.fd));
+				_handleWrite(events[i].data.fd);
+			}
+		}
 	}
 }
 
-void ServerManager::acceptConnection(int serverSocket)
-{
+void ServerManager::_acceptConnection( int serverSocket ) {
 	sockaddr_in clientAddr;
 	socklen_t clientAddrLen = sizeof(clientAddr);
 	int clientSocket = accept(serverSocket, (sockaddr *)&clientAddr, &clientAddrLen);
-	if (clientSocket == -1)
-	{
-		_logger->logError(LOG_ERROR, "Error accepting connection", true);
+	if (clientSocket == -1) {
+		logger.logError(LOG_ERROR, "Error accepting connection", true);
 		return;
 	}
 	_epollManager.addToEpoll(clientSocket, EPOLLIN);
@@ -285,7 +306,6 @@ void ServerManager::handleWrite(int clientSocket)
 		{
 			_epollManager.removeFromEpoll(clientSocket);
 			close(clientSocket);
-			std::cout << "Connection closed due to send error" << std::endl;
 			return;
 		}
 		else if (bytesWritten < (int)_clientDataMap[clientSocket].response.size())
@@ -304,7 +324,8 @@ void ServerManager::handleWrite(int clientSocket)
 				return;
 			}
 			_epollManager.modifyEpoll(clientSocket, EPOLLIN);
-			std::cout << "Modified epoll to EPOLLIN for client socket: " << clientSocket << std::endl;
+			logger.logDebug(LOG_DEBUG, "Modified epoll to EPOLLIN for client socket: " + 
+				CGIUtils::intToString(clientSocket));
 		}
 	}
 }

@@ -5,7 +5,7 @@
 
 class Logger {
 	private:
-		std::ofstream _debugLog;
+		std::ofstream _logDebug;
 		std::ofstream _logAccess;
 		std::ofstream _logError;
 

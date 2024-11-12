@@ -6,11 +6,11 @@
 /* Constructor Method */
 Logger::Logger( const std::string &debugLog, const std::string &logAccess, 
 	const std::string &logError )
-	: _debugLog(debugLog.c_str(), std::ios::out | std::ios::app), 
+	: _logDebug(debugLog.c_str(), std::ios::out | std::ios::app), 
 	  _logAccess(logAccess.c_str(), std::ios::out | std::ios::app), 
 	  _logError(logError.c_str(), std::ios::out | std::ios::app)
 {
-	if (!_debugLog.is_open() || !_logAccess.is_open() || !_logError.is_open())
+	if (!_logDebug.is_open() || !_logAccess.is_open() || !_logError.is_open())
 		ft_error(ERROR_OPEN_LOG_FILE, __FUNCTION__, __FILE__, __LINE__, 
 			std::runtime_error(ERROR_OPEN_LOG_FILE));
 
@@ -24,8 +24,8 @@ Logger::Logger( const std::string &debugLog, const std::string &logAccess,
 }
 /* Destructor Method */
 Logger::~Logger( void ) {
-	if (_debugLog.is_open())
-		_debugLog.close();
+	if (_logDebug.is_open())
+		_logDebug.close();
 	if (_logAccess.is_open())
 		_logAccess.close();
 	if (_logError.is_open())
@@ -35,8 +35,8 @@ Logger::~Logger( void ) {
 /* Public Methods */
 void Logger::logDebug( const std::string &severity,
 			const std::string &message, bool tty ) {
-	if (_debugLog.is_open())
-		_debugLog << _currentDateTime() << " - " 
+	if (_logDebug.is_open())
+		_logDebug << _currentDateTime() << " - " 
 				<< severity << message << std::endl;
 	if (tty && _isTerminal(std::cout))
 		std::cout << COLORIZE(GRAY, _currentDateTime()) << " - " 

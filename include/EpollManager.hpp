@@ -4,26 +4,25 @@
 
 #include "Includes.hpp"
 #include "Defines.hpp"
-#include "Logger.hpp"
+#include "Utils.hpp"
 #include "Fds.hpp"
 
 class EpollManager {
 	private:
 		int	_epoll_fd;
-		Logger	&_logger;
 
 	public:
 		/* Constructor Method */
-		EpollManager( Logger &logger );
+		EpollManager( void );
 
 		/* Destructor Method */
 		~EpollManager( void );
 
 		/* Public Methods */
-		bool	addToEpoll( int sockfd, uint32_t events );
-		bool	removeFromEpoll( int sockfd );
-		bool	modifyEpoll( int sockfd, uint32_t events );
 		int	getEpollFD( void ) const;
+		bool	addToEpoll( int sockfd, uint32_t events );
+		bool	modifyEpoll( int sockfd, uint32_t events );
+		bool	removeFromEpoll( int sockfd );
 
 	private:
 		void	_initialize( void );
