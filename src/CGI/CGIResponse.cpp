@@ -2,9 +2,7 @@
 
 /* Constructor Method */
 CGIResponse::CGIResponse( const Request &request, const LocationConfigs &location ) 
-	: Response(), _request(request), _location(location), 
-	_logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE) {
-	
+	: Response(), _request(request), _location(location) {
 	if (_location.cgiEnabled) {
 		_cgiPath = location.root + "/" + location.cgiPath;
 		_cgiExecutable = _getExecutable(location.cgiExtension);
@@ -111,9 +109,9 @@ void	CGIResponse::_handleCGIError( int code, const std::string &message ) {
 	_body.clear();
 	_statusCode = CGIUtils::intToString(code);
 	_reasonPhrase = message;
-	_logger.logError(LOG_ERROR, message, true);
+	logger.logError(LOG_ERROR, message, true);
 	std::string errorPage = _location.server->errorPages[_statusCode];
-	handleError(_statusCode, errorPage, message, _logger);
+	handleError(_statusCode, errorPage, message, logger);
 }
 
 bool	CGIResponse::_waitChild( pid_t pid, int &status, std::clock_t start ) {
@@ -124,7 +122,7 @@ bool	CGIResponse::_waitChild( pid_t pid, int &status, std::clock_t start ) {
 		}
 		if (!waitpid(pid, &status, WNOHANG)) {
 			kill(pid, SIGKILL);
-			_logger.logError(LOG_ERROR, ERROR_CGI_TIMEOUT, true);
+			logger.logError(LOG_ERROR, ERROR_CGI_TIMEOUT, true);
 			status = TIMEOUT_ERROR;
 			return (false);
 		}
@@ -141,7 +139,7 @@ void	CGIResponse::_readReturnBody( int pipefd[2] ) {
 	buffer[bytes_read] = '\0';
 	std::string strBuffer(buffer);
 	if (!strBuffer.empty()) { _body = strBuffer; }
-	handleFileResponse(DEFAULT_EMPTY, _logger);
+	handleFileResponse(DEFAULT_EMPTY, logger);
 	close(pipefd[0]);
 }
 
