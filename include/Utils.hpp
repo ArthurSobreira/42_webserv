@@ -2,12 +2,13 @@
 #define UTILS_HPP
 
 #include "Includes.hpp"
+#include "Logger.hpp"
 
-class Logger;
 class Config;
 
 /* Global Variables */
 extern volatile sig_atomic_t stop;
+extern Logger logger;
 
 /* Typedefs */
 typedef std::map<std::string, std::string> stringMap;
