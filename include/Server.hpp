@@ -5,37 +5,35 @@
 #include "Defines.hpp"
 #include "Utils.hpp"
 #include "Config.hpp"
-#include "Logger.hpp"
+#include "Utils.hpp"
 #include "EpollManager.hpp"
-#include <vector>
-#include <sstream>
 
-class Logger;
+class Server {
+	private:
+		int	_serverSocket;		// Server main socket
+		int	_backlog;			// Maximum number of pending connections
+		sockaddr_in _serv_addr;	// Server address structure
+		EpollManager &_epoll;	// Epoll manager reference
+		ServerConfigs _config;	// Server configurations
 
-class Server
-{
-public:
-	Server(ServerConfigs &config, Logger &logger, EpollManager &epoll);
-	~Server();
-	bool initialize();
-	int getServerSocket() const { return _serverSocket; }
-	ServerConfigs &getConfig() { return _config; }
+	public:
+		/* Constructor Method */
+		Server( ServerConfigs &config, EpollManager &epoll );
 
-private:
-	// Métodos de manipulação de sockets e conexões
-	bool createSocket();
-	bool configureSocket();
-	bool bindSocket();
-	bool listenSocket();
-	bool logErrorAndClose(const std::string &message);
+		/* Destructor Method */
+		~Server( void );
 
-	// Atributos privados
-	int _serverSocket;	   // Socket principal do servidor
-	int _backlog;			// Tamanho da fila de conexões
-	sockaddr_in _serv_addr;   // Estrutura de endereço do servidor
-	EpollManager &_epoll;	 // Instância para gerenciar o epoll
-	Logger &_logger;		  // Logger para debug e logs de erro
-	ServerConfigs _config;   // Configurações específicas do servidor
+		/* Public Methods */
+		bool	initialize( void );
+		int	getServerSocket( void ) const { return _serverSocket; }
+		ServerConfigs	&getConfig( void ) { return _config; }
+
+	private:
+		bool	_createSocket( void );
+		bool	_configureSocket( void );
+		bool	_bindSocket( void );
+		bool	_listenSocket( void );
+		bool	_logErrorAndClose( const std::string &message );
 };
 
-#endif // SERVER_HPP
+#endif
