@@ -162,7 +162,6 @@ void	Config::_parseServerBlock( const std::string &serverBlock ) {
 		} else { throw std::runtime_error(ERROR_INVALID_KEY); }
 	}
 	_servers.push_back(server);
-	ConfigUtils::printServerStruct(server);
 }
 
 void	Config::_parseLocationStream( std::istringstream &serverStream, ServerConfigs &server ) {
