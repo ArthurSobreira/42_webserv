@@ -8,6 +8,7 @@ Request::Request(const std::string &rawRequest, bool completRequest)
 	_method = INVALID;
 	_isCGI = false;
 	_connectionClose = false;
+	_isRedirect = false;
 	if (completRequest)
 		parseRequest();
 }
@@ -234,6 +235,8 @@ std::string Request::validateRequest(Config _config, ServerConfigs server, bool 
 		error = "405";
 	if (_location.cgiEnabled)
 		_isCGI = true;
+	if (_location.redirectSet)
+		_isRedirect = true;	
 	return error;
 }
 
