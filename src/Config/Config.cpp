@@ -37,8 +37,7 @@ ServerConfigs::ServerConfigs( void ) {
 }
 
 /* Constructor Method */
-Config::Config( const std::string &fileName, Logger &logger ) 
-	: _fileName(fileName), _logger(logger) {
+Config::Config( const std::string &fileName ) : _fileName(fileName) {
 	std::ifstream configFile(fileName.c_str());
 
 	if (!configFile.is_open() || configFile.fail()) {
@@ -51,7 +50,7 @@ Config::Config( const std::string &fileName, Logger &logger )
 
 	if (configFile.is_open()) {
 		_serverCount = ConfigUtils::getServerCount(fileName);
-		_logger.logDebug(LOG_DEBUG, "Starting to parse " + fileName, true);
+		logger.logDebug(LOG_INFO, "Starting to parse " + fileName, true);
 		_parseConfigFile(configFile);
 		configFile.close();
 		return ;
@@ -162,7 +161,6 @@ void	Config::_parseServerBlock( const std::string &serverBlock ) {
 		} else { throw std::runtime_error(ERROR_INVALID_KEY); }
 	}
 	_servers.push_back(server);
-	ConfigUtils::printServerStruct(server);
 }
 
 void	Config::_parseLocationStream( std::istringstream &serverStream, ServerConfigs &server ) {

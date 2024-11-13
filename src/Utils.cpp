@@ -2,11 +2,10 @@
 #include "Defines.hpp"
 #include "Logger.hpp"
 #include "Config.hpp"
-#include "Globals.hpp"
+#include "Utils.hpp"
 
 bool inetPton(const std::string &ip_str)
 {
-	Logger logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE);
 	std::istringstream stream(ip_str);
 	std::string segment;
 	std::vector<int> bytes;
@@ -50,15 +49,6 @@ std::string inetNtop(uint32_t binary_ip)
 	return ip_stream.str();
 }
 
-void ft_error(const char *message, const char *function, const char *file, int line, const std::exception &e)
-{
-	std::ostringstream oss;
-	oss << "Erro: " << message << " in function " << function << " at " << file << ":" << line << " Exception: " << e.what();
-	oss << std::endl;
-	std::cerr << oss.str();
-	throw e;
-}
-
 std::string readFile(const std::string &path)
 {
 	std::ifstream file(path.c_str(), std::ios::in | std::ios::binary);
@@ -66,22 +56,6 @@ std::string readFile(const std::string &path)
 		return "";
 	std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 	return content;
-}
-
-std::string removeLastSlashes(const std::string &uri)
-{
-	std::string formatUri = uri;
-	size_t queryPos = formatUri.find("?");
-	if (queryPos != std::string::npos)
-	{
-		formatUri = formatUri.substr(0, queryPos);
-	}
-
-	while (!formatUri.empty() && formatUri[formatUri.length() - 1] == '/')
-	{
-		formatUri = formatUri.substr(0, formatUri.length() - 1);
-	}
-	return (formatUri);
 }
 
 std::string getContentType(const std::string &uri)
@@ -152,39 +126,35 @@ std::string getContentType(const std::string &uri)
 	return "plain/text";
 }
 
-Config *config = NULL;
-
-void setConfig(Config &c)
+std::string removeLastSlashes(const std::string &uri)
 {
-	if (!config)
-		config = &c;
-}
-
-Config &getConfig()
-{
-	return *config;
-}
-
-void exitHandler(int sig)
-{
-	if (sig == SIGINT || sig == SIGQUIT || sig == SIGTERM)
+	std::string formatUri = uri;
+	size_t queryPos = formatUri.find("?");
+	if (queryPos != std::string::npos)
 	{
-		stop = 1;
-		std::cout << "Exiting...👋🚪" << std::endl;
+		formatUri = formatUri.substr(0, queryPos);
 	}
+
+	while (!formatUri.empty() && formatUri[formatUri.length() - 1] == '/')
+	{
+		formatUri = formatUri.substr(0, formatUri.length() - 1);
+	}
+	return (formatUri);
 }
 
-
-void setupSignalHandlers()
-{
-	signal(SIGINT, exitHandler);
-	signal(SIGQUIT, exitHandler);
+std::string getErrorMessage( const std::string &status ) {
+	if (status == "400") { return ERROR_BAD_REQUEST; }
+	if (status == "403") { return ERROR_FORBIDDEN; }
+	if (status == "404") { return ERROR_NOT_FOUND; }
+	if (status == "405") { return ERROR_METHOD_NOT_ALLOWED; }
+	if (status == "413") { return ERROR_TOO_LARGE; }
+	if (status == "415") { return ERROR_UNSUPPORTED_MEDIA_TYPE; }
+	else { return ERROR_INTERNAL_SERVER; }
 }
 
 bool createSocket(int &sockfd, int domain, int type)
 {
 	sockfd = socket(domain, type, 0);
-	Logger logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE);
 	if (sockfd < 0)
 	{
 		logger.logError(LOG_ERROR, "Error opening socket");
@@ -200,4 +170,19 @@ bool isDirectory(const std::string &path)
 	if (stat(path.c_str(), &statbuf) != 0)
 		return false;
 	return S_ISDIR(statbuf.st_mode);
+}
+
+void exitHandler(int sig)
+{
+	if (sig == SIGINT || sig == SIGQUIT || sig == SIGTERM)
+	{
+		stop = 1;
+		logger.logDebug(LOG_INFO, "Exiting WebServ...👋🚪", true);
+	}
+}
+
+void setupSignalHandlers(void)
+{
+	signal(SIGINT, exitHandler);
+	signal(SIGQUIT, exitHandler);
 }

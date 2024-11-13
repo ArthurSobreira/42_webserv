@@ -23,6 +23,7 @@
 # define MAX_EVENTS 64
 # define MIN_PORT_NUMBER 0
 # define MAX_PORT_NUMBER 65535
+# define MAX_BODY_SIZE 268435456
 
 /* Logger Macros */
 # define LOG_DEBUG "[DEBUG] "
@@ -98,10 +99,13 @@
 # define ERROR_INVALID_CGI_EXTENSION "Location: Invalid CGI Extension!"
 
 /* Request Error Macros */
-# define ERROR_METHOD_NOT_ALLOWED "Method Not Allowed!"
+# define ERROR_BAD_REQUEST "Bad Request!"
 # define ERROR_FORBIDDEN "Forbidden File or Directory!"
-# define ERROR_TOO_LARGE "Request Entity Too Large!"
 # define ERROR_NOT_FOUND "File Not Found!"
+# define ERROR_METHOD_NOT_ALLOWED "Method Not Allowed!"
+# define ERROR_TOO_LARGE "Request Entity Too Large!"
+# define ERROR_UNSUPPORTED_MEDIA_TYPE "Unsupported Media Type!"
+# define ERROR_INTERNAL_SERVER "Internal Server Error!"
 # define ERORR_CREATE_PIPE "Error Creating Pipe!"
 # define ERROR_CREATE_FORK "Error Creating Fork!"
 # define ERROR_CGI_EXECUTION "Error Executing CGI Script!"

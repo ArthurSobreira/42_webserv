@@ -1,6 +1,6 @@
 #include "PostResponse.hpp"
 
-PostResponse::PostResponse(std::string filePath, std::string postData, ServerConfigs server, LocationConfigs location, std::map<std::string, std::string> headersRequest) : Response(), _postData(postData), _filePath(filePath), _headersRequest(headersRequest), _server(server), _location(location)
+PostResponse::PostResponse(std::string filePath, std::string postData, ServerConfigs server, LocationConfigs location, stringMap headersRequest) : Response(), _postData(postData), _filePath(filePath), _headersRequest(headersRequest), _server(server), _location(location)
 {
 	_validTypes.insert("image/jpeg");
 	_validTypes.insert("image/png");
@@ -15,7 +15,7 @@ PostResponse::PostResponse(std::string filePath, std::string postData, ServerCon
 	_validTypes.insert("video/mp4");
 }
 
-bool PostResponse::isValidContentTypeAndSetExtension()
+bool PostResponse::_isValidContentTypeAndSetExtension()
 {
 	if (_validTypes.find(_headersRequest["Content-Type"]) == _validTypes.end())
 		return false;
@@ -37,7 +37,7 @@ void PostResponse::prepareResponse()
 		handleError("405", _server.errorPages.at("405"), ERROR_METHOD_NOT_ALLOWED, _logger);
 	else
 	{
-		int valid = createFile();
+		int valid = _createFile();
 		if (valid == SUCCESS)
 		{
 			if (access(_filePath.c_str(), F_OK) != -1)
@@ -51,14 +51,14 @@ void PostResponse::prepareResponse()
 				_headers["Content-Type"] = "text/html";
 			}
 			else
-				handleError("500", _server.errorPages.at("500"), "Internal server error", _logger);
+				handleError("500", _server.errorPages.at("500"), ERROR_INTERNAL_SERVER, _logger);
 		}
 		else if (valid == BAD_REQUEST)
-			handleError("400", _server.errorPages.at("400"), "Bad Request", _logger);
+			handleError("400", _server.errorPages.at("400"), ERROR_BAD_REQUEST, _logger);
 		else if (valid == UNSUPPORTED_MEDIA_TYPE)
-			handleError("415", _server.errorPages.at("415"), "Unsupported Media Type", _logger);
+			handleError("415", _server.errorPages.at("415"), ERROR_UNSUPPORTED_MEDIA_TYPE, _logger);
 		else if (valid == INTERNAL_SERVER_ERROR)
-			handleError("500", _server.errorPages.at("500"), "Internal server error", _logger);
+			handleError("500", _server.errorPages.at("500"), ERROR_INTERNAL_SERVER, _logger);
 	}
 }
 
@@ -72,7 +72,7 @@ static void removeCarriageReturn(std::string &str)
 	}
 }
 
-void PostResponse::removeBoundary()
+void PostResponse::_removeBoundary()
 {
 	removeCarriageReturn(_headersRequest["boundary"]);
 	size_t pos = _postData.find("\r\n\r\n");
@@ -81,7 +81,7 @@ void PostResponse::removeBoundary()
 	_postData = _postData.substr(0, pos - 2);
 }
 
-int PostResponse::createFile()
+int PostResponse::_createFile()
 {
 	static int archivo = 0;
 	if (_postData.empty())
@@ -89,11 +89,11 @@ int PostResponse::createFile()
 	if (!_headersRequest["boundary"].empty())
 	{
 		_fileName = _headersRequest["filename"];
-		removeBoundary();
+		_removeBoundary();
 	}
 	else
 	{
-		if (isValidContentTypeAndSetExtension())
+		if (_isValidContentTypeAndSetExtension())
 		{
 			std::stringstream ss;
 			ss << archivo++;

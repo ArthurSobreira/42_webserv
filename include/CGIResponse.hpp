@@ -7,6 +7,7 @@
 #include "Config.hpp"
 #include "Request.hpp"
 #include "Response.hpp"
+#include "Utils.hpp"
 
 class CGIResponse : public Response {
 	private:
@@ -14,8 +15,7 @@ class CGIResponse : public Response {
 		std::string	_cgiExecutable;
 		Request		_request;
 		LocationConfigs	_location;
-		Logger	_logger;
-		std::map<std::string, std::string> _env;
+		stringMap _env;
 		
 		/* Private Methods */
 		void	_setEnvironmentVars( void );

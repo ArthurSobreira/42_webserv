@@ -5,7 +5,7 @@
 
 class Logger {
 	private:
-		std::ofstream _debugLog;
+		std::ofstream _logDebug;
 		std::ofstream _logAccess;
 		std::ofstream _logError;
 
@@ -16,7 +16,7 @@ class Logger {
 
 	public:
 		/* Constructor Method */
-		Logger( const std::string &log, const std::string &logAccess, 
+		Logger( const std::string &logDebug, const std::string &logAccess, 
 			const std::string &logError );
 
 		/* Destructor Method */

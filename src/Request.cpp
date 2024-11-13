@@ -2,12 +2,14 @@
 #include "Utils.hpp"
 #include "Includes.hpp"
 
-Request::Request(const std::string &rawRequest) : _rawRequest(rawRequest)
+Request::Request(const std::string &rawRequest, bool completRequest)
+	: _rawRequest(rawRequest)
 {
 	_method = INVALID;
 	_isCGI = false;
 	_connectionClose = false;
-	parseRequest();
+	if (completRequest)
+		parseRequest();
 }
 
 httpMethod Request::getMethod() const { return _method; }
@@ -16,7 +18,7 @@ const std::string &Request::getUri() const { return _uri; }
 
 const std::string &Request::getHeader(const std::string &name) const
 {
-	std::map<std::string, std::string>::const_iterator it = _headers.find(name);
+	stringMap::const_iterator it = _headers.find(name);
 	if (it == _headers.end())
 	{
 		static const std::string empty;
@@ -25,7 +27,7 @@ const std::string &Request::getHeader(const std::string &name) const
 	return it->second;
 }
 
-const std::map<std::string, std::string> &Request::getHeaders() const { return _headers; }
+const stringMap	&Request::getHeaders() const { return _headers; }
 
 const std::string &Request::getBody() const { return _body; }
 
@@ -210,15 +212,15 @@ std::string Request::folderPath(const std::string &uri)
 	return folderPath;
 }
 
-std::string Request::validateRequest(Config _config, ServerConfigs server)
+std::string Request::validateRequest(Config _config, ServerConfigs server, bool completRequest)
 {
-	static int counter = 0;
 	std::string error = "";
 	bool locationFound = false;
 	std::string currentUri = _uri;
-
-	std::cout << "passou aki " << counter++ << std::endl;
-
+	if(!completRequest){
+		error = "413";
+		return error;
+	}
 	while (!locationFound && !currentUri.empty())
 	{
 		std::cout << "currentUri: " << currentUri << std::endl;
@@ -237,7 +239,7 @@ std::string Request::validateRequest(Config _config, ServerConfigs server)
 
 void Request::checkConnectionClose()
 {
-	std::map<std::string, std::string>::const_iterator it = _headers.find("Connection");
+	stringMap::const_iterator it = _headers.find("Connection");
 	if (it != _headers.end() && it->second == "close")
 	{
 		_connectionClose = true;
