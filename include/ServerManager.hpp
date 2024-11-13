@@ -64,6 +64,8 @@ class ServerManager {
 		void	_closeConnection( int clientSocket );
 		void	_handleError( int clientSocket, const std::string &errorPage, 
 			const std::string &status, const std::string &error_message );
+		std::string _handleRedirect( const std::string &location );
+
 };
 
 #endif // SERVERMANAGER_HPP
