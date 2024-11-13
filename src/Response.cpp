@@ -37,14 +37,16 @@ void	Response::handleError( std::string status_code, const std::string &error_pa
 void	Response::handleFileResponse( const std::string &path ) {
 	_statusCode = "200";
 	_reasonPhrase = "OK";
-	if (_body.empty())
+	if (_body.empty()) {
 		_body = readFile(path);
+	}
 	std::stringstream ss;
 	ss << _body.size();
 	_headers["Content-Length"] = ss.str();
-	if (path.empty())
+	if (path.empty()) {
 		_headers["Content-Type"] = "text/html";
-	else
+	} else {
 		_headers["Content-Type"] = getContentType(path);
+	}
 	logger.logDebug(LOG_INFO, "Response body: " + _body);
 }

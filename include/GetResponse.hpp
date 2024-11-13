@@ -19,13 +19,15 @@ class GetResponse : public Response {
 		~GetResponse( void );
 
 		/* Public Methods */
-		void listDirectoryHandler( const LocationConfigs &location );
-		void prepareResponse( const LocationConfigs &location );
+		void	prepareResponse( const LocationConfigs &location );
+		void	listDirectoryHandler( const LocationConfigs &location );
+	
 	private:
-		void addHeader(const std::string &title);
-		bool listDirectory(const std::string &dirPath);
-		void addFileEntry(std::vector<std::string> &folders, std::vector<std::string> &files, std::map<std::string, status> &filesDetails);
-		void addFooter();
+		void	_addHeader( const std::string &title );
+		bool	_listDirectory( const std::string &dirPath );
+		void	_addFileEntry( std::vector<std::string> &folders, 
+			std::vector<std::string> &files, std::map<std::string, status> &filesDetails );
+		void	_addFooter( void );
 };
 
 #endif // GETRESPONSE_HPP
