@@ -19,6 +19,7 @@ void DeleteResponse::prepareResponse( void ) {
 		return;
 	}
 	if (remove(_filePath.c_str()) == 0) {
+		logger.logDebug(LOG_INFO, "File Deleted: " + _filePath, true);
 		_statusCode = "204";
 		_reasonPhrase = "No Content";
 	}
