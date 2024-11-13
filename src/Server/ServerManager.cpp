@@ -196,40 +196,6 @@ void	ServerManager::_handleWrite( int clientSocket ) {
 	}
 }
 
-void	ServerManager::_getContentLength( int clientSocket, std::string &buffer ) {
-	std::string contentLengthHeader = "Content-Length: ";
-	size_t pos = buffer.find(contentLengthHeader);
-
-	if (pos != std::string::npos) {
-		size_t endOfHeader = buffer.find("\r\n", pos);
-		if (endOfHeader != std::string::npos) {
-			std::string contentLengthStr = buffer.substr(pos + contentLengthHeader.size(),
-				endOfHeader - (pos + contentLengthHeader.size()));
-			std::stringstream ss;
-
-			ss << contentLengthStr;
-			size_t contentLength;
-			ss >> contentLength;
-			_clientDataMap[clientSocket].contentLength = contentLength;
-			logger.logDebug(LOG_DEBUG, "Extracted Content-Length: " + 
-				CGIUtils::intToString(contentLength));
-		} else {
-			logger.logError(LOG_ERROR, "End of Content-Length header not found", true);
-		}
-	} else {
-		logger.logDebug(LOG_DEBUG, "Content-Length header not found");
-	}
-}
-
-std::string ServerManager::_handleRedirect( const std::string &location ) {
-	std::string response = "HTTP/1.1 301 Moved Permanently\r\n";
-	response += "Location: " + location + "\r\n";
-	response += "Content-Length: 0\r\n";
-	response += "Content-Type: text/html\r\n\r\n";
-	return response;
-}
-
-
 void	ServerManager::_handleResponse( Request &request, ServerConfigs &server,
 	int clientSocket ) {
 	std::string status = request.validateRequest(_config, server, 
@@ -241,7 +207,8 @@ void	ServerManager::_handleResponse( Request &request, ServerConfigs &server,
 		return;
 	}
 	if (request.isRedirect()) {
-		_clientDataMap[clientSocket].response = _handleRedirect(request.getLocation().redirect);
+		_clientDataMap[clientSocket].response = 
+			_handleRedirect(request.getLocation().redirect);
 		return;
 	}
 	if (request.isCGI()) {
@@ -280,6 +247,39 @@ void	ServerManager::_handleResponse( Request &request, ServerConfigs &server,
 		default:
 			break;
 	}
+}
+
+void	ServerManager::_getContentLength( int clientSocket, std::string &buffer ) {
+	std::string contentLengthHeader = "Content-Length: ";
+	size_t pos = buffer.find(contentLengthHeader);
+
+	if (pos != std::string::npos) {
+		size_t endOfHeader = buffer.find("\r\n", pos);
+		if (endOfHeader != std::string::npos) {
+			std::string contentLengthStr = buffer.substr(pos + contentLengthHeader.size(),
+				endOfHeader - (pos + contentLengthHeader.size()));
+			std::stringstream ss;
+
+			ss << contentLengthStr;
+			size_t contentLength;
+			ss >> contentLength;
+			_clientDataMap[clientSocket].contentLength = contentLength;
+			logger.logDebug(LOG_DEBUG, "Extracted Content-Length: " + 
+				CGIUtils::intToString(contentLength));
+		} else {
+			logger.logError(LOG_ERROR, "End of Content-Length header not found", true);
+		}
+	} else {
+		logger.logDebug(LOG_DEBUG, "Content-Length header not found");
+	}
+}
+
+std::string ServerManager::_handleRedirect( const std::string &location ) {
+	std::string response = "HTTP/1.1 301 Moved Permanently\r\n";
+	response += "Location: " + location + "\r\n";
+	response += "Content-Length: 0\r\n";
+	response += "Content-Type: text/html\r\n\r\n";
+	return response;
 }
 
 void	ServerManager::_restartStruct( ClientData &data ) {
