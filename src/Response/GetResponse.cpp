@@ -19,11 +19,10 @@ void	GetResponse::prepareResponse( const LocationConfigs &location ) {
 		_filePath += location.index;
 	}
 	if (stat(_filePath.c_str(), &Status) != 0) {
-		std::cout << "debug 01" << std::endl;
 		handleError("404", location.server->errorPages.at("404"), ERROR_NOT_FOUND);
 		return;
 	} else if (S_ISDIR(Status.st_mode)) {
-		listDirectoryHandler( location );
+		listDirectoryHandler(location);
 		return;
 	} else if (access(_filePath.c_str(), R_OK) != 0) {
 		handleError("403", location.server->errorPages.at("403"), ERROR_FORBIDDEN);
