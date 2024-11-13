@@ -49,6 +49,7 @@ private:
 	void checkConnectionClose();									// Verifica se a conexão deve ser fechada
 	void extractMultipartNamesAndFilenames();									// Extrai os dados de um formulário multipart	
 	void parserQueryString();											// Extrai a query string da requisição
+	bool validateHost(ServerConfigs server); // Valida o host da requisição
 
 	// Funções auxiliares
 	httpMethod parseMethod(const std::string &method); // Converte string para enum Method

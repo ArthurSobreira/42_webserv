@@ -213,6 +213,59 @@ std::string Request::folderPath(const std::string &uri)
 	return folderPath;
 }
 
+
+bool Request::validateHost(ServerConfigs server)
+{
+	std::string host = getHeader("Host");
+	std::cout << "Host: " << host << std::endl;
+	std::cout << "ServerName: " << server.serverName << std::endl;
+	if (host.empty())
+	{
+		return false;
+	}
+	std::string serverName = host;
+	if (serverName.find(':') != std::string::npos)
+	{
+		serverName = serverName.substr(0, serverName.find(':'));
+	}
+	std::cout << RED <<"ServerName: " << serverName << RESET << std::endl;
+	if (server.serverName != serverName && serverName != "localhost" && serverName != "127.0.0.1")
+	{
+		return false;
+	}
+	return true;
+}
+
+
+std::string Request::validateRequest(Config _config, ServerConfigs server, bool completRequest)
+{
+	std::string error = "";
+	bool locationFound = false;
+	std::string currentUri = _uri;
+
+	if (!completRequest) {
+		return "413";
+	}
+	while (!locationFound && !currentUri.empty()) {
+		std::cout << "currentUri: " << currentUri << std::endl;
+		_location = _config.getLocationConfig(server, currentUri, locationFound);
+		if (!locationFound) {
+			currentUri = folderPath(currentUri);
+		}
+	}
+	if (!locationFound) {
+		error = "404";
+	} else if (std::find(_location.methods.begin(), _location.methods.end(), getMethod()) == _location.methods.end()) {
+		error = "405";
+	} else if (!validateHost(server)) {
+		error = "400";
+	}
+	_isRedirect = _location.redirectSet;
+	_isCGI = _location.cgiEnabled;
+	return error;
+}
+
+
 std::string Request::validateRequest(Config _config, ServerConfigs server, bool completRequest)
 {
 	std::string error = "";
