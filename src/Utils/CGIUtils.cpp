@@ -47,6 +47,13 @@ namespace CGIUtils {
 		return (filename);
 	}
 
+	std::string	getStringMethod( httpMethod method ) {
+		if (method == GET) { return "GET"; }
+		else if (method == POST) { return "POST"; }
+		else if (method == DELETE) { return "DELETE"; }
+		else { return DEFAULT_EMPTY; }
+	}
+
 	std::string	intToString( int value ) {
 		std::stringstream ss;
 		ss << value;

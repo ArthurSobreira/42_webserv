@@ -8,7 +8,7 @@
 class DeleteResponse : public Response {
     private:
         std::string _filePath;
-		LocationConfigs _location;
+        LocationConfigs _location;
 
     public:
         /* Constructor Method */
