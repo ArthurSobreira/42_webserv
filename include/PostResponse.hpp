@@ -7,24 +7,31 @@
 
 class PostResponse : public Response {
 	private:
-		std::string _postData;
-		std::string _responseData;
-		std::string _filePath;
-		stringMap _headersRequest;
-		std::string _fileName;
-		ServerConfigs _server;
-		LocationConfigs _location;
-		std::set<std::string> _validTypes;
-		std::string _contentType;
+		std::string	_filePath;
+		std::string	_postData;
+		std::string	_responseData;
+		stringMap	_headersRequest;
+		std::string	_fileName;
+		LocationConfigs	_location;
+		std::set<std::string>	_validTypes;
+		std::string	_contentType;
 
 	public:
-		PostResponse(std::string filePath, std::string postData, ServerConfigs server, LocationConfigs location, stringMap headersRequest);
-		void prepareResponse();
+		/* Constructor Method */
+		PostResponse( std::string filePath, std::string postData, 
+			stringMap headersRequest, LocationConfigs location );
+		
+		/* Destructor Method */
+		~PostResponse( void );
+
+		/* Public Method */
+		void	prepareResponse( void );
 
 	private:
-		int		_createFile();
-		bool	_isValidContentTypeAndSetExtension();
-		void	_removeBoundary();
+		int		_createFile( void );
+		bool	_isValidContentTypeAndSetExtension( void );
+		void	_removeCarriageReturn( void );
+		void	_removeBoundary( void );
 };
 
 #endif // POSTRESPONSE_HPP
