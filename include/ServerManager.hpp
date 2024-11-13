@@ -14,7 +14,7 @@
 #include "DeleteResponse.hpp"
 #include "CGIResponse.hpp"
 
-typedef struct clientData {
+struct ClientData {
     std::string request;
     std::string response;
     bool connection;
@@ -22,10 +22,15 @@ typedef struct clientData {
     size_t contentLength;
     size_t bytesRead;
 
-    clientData(const std::string &req, const std::string &res, bool conn, bool compReq, size_t contentLen, size_t bRead)
-        : request(req), response(res), connection(conn), completeRequest(compReq), contentLength(contentLen), bytesRead(bRead) {}
-    clientData() : request(""), response(""), connection(false), completeRequest(false), contentLength(0), bytesRead(0) {}
-} clientData;
+	/* Default Constructor */
+	ClientData( void ) : request(DEFAULT_EMPTY), 
+		response(DEFAULT_EMPTY), connection(false), 
+		completeRequest(false), contentLength(0), bytesRead(0) {};
+
+	/* Struct Constructor */
+	ClientData( const std::string &req, const std::string &res, 
+		bool conn, bool compReq, size_t contentLen, size_t bRead );
+};
 
 class ServerManager {
 	private:
@@ -34,7 +39,7 @@ class ServerManager {
 		Fds _fds;
 		std::vector<Server*> _servers; 
 		std::map<int, int> _clientServerMap;
-		std::map<int, clientData> _clientDataMap;
+		std::map<int, ClientData> _clientDataMap;
 
 	public:
 		/* Constructor Method */
@@ -54,7 +59,8 @@ class ServerManager {
 		void	_handleWrite (int clientSocket );
 		void	_handleResponse( Request &request, ServerConfigs &server, 
 			int clientSocket );
-		bool	_verifyContentLength( int clientSocket, std::string &buffer );
+		void	_getContentLength( int clientSocket, std::string &buffer );
+		void	_restartStruct( ClientData &data );
 		void	_closeConnection( int clientSocket );
 		void	_handleError( int clientSocket, const std::string &errorPage, 
 			const std::string &status );
