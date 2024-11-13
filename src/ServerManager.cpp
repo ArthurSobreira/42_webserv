@@ -251,8 +251,8 @@ void	ServerManager::_handleResponse( Request &request, ServerConfigs &server,
 		}
 		case POST:
 		{
-			PostResponse postResponse(request.getUri(), request.getBody(), server,
-				request.getLocation(), request.getHeaders());
+			PostResponse postResponse(request.getUri(), request.getBody(),
+				request.getHeaders(), request.getLocation());
 			postResponse.prepareResponse();
 			_clientDataMap[clientSocket].response = postResponse.generateResponse();
 			break;
