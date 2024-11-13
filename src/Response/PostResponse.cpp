@@ -51,14 +51,14 @@ void PostResponse::prepareResponse()
 				_headers["Content-Type"] = "text/html";
 			}
 			else
-				handleError("500", _server.errorPages.at("500"), "Internal server error", _logger);
+				handleError("500", _server.errorPages.at("500"), ERROR_INTERNAL_SERVER, _logger);
 		}
 		else if (valid == BAD_REQUEST)
-			handleError("400", _server.errorPages.at("400"), "Bad Request", _logger);
+			handleError("400", _server.errorPages.at("400"), ERROR_BAD_REQUEST, _logger);
 		else if (valid == UNSUPPORTED_MEDIA_TYPE)
-			handleError("415", _server.errorPages.at("415"), "Unsupported Media Type", _logger);
+			handleError("415", _server.errorPages.at("415"), ERROR_UNSUPPORTED_MEDIA_TYPE, _logger);
 		else if (valid == INTERNAL_SERVER_ERROR)
-			handleError("500", _server.errorPages.at("500"), "Internal server error", _logger);
+			handleError("500", _server.errorPages.at("500"), ERROR_INTERNAL_SERVER, _logger);
 	}
 }
 
