@@ -66,7 +66,7 @@ void	ServerManager::_handleEvents( void ) {
 	epoll_event events[MAX_EVENTS];
 	int nfds = epoll_wait(_epollManager.getEpollFD(), events, MAX_EVENTS, -1);
 	if (nfds == -1) {
-		logger.logError(LOG_ERROR, "Error on epoll_wait", true);
+		logger.logError(LOG_ERROR, "Error on epoll_wait");
 		return;
 	}
 	for (int i = 0; i < nfds; i++) {
@@ -181,7 +181,8 @@ void	ServerManager::_handleWrite( int clientSocket ) {
 			_clientDataMap[clientSocket].response = _clientDataMap[clientSocket].response.substr(bytesWritten);
 		}
 		else if (bytesWritten == (int)_clientDataMap[clientSocket].response.size()) {
-			logger.logDebug(LOG_INFO, "Full response sent", true);
+			logger.logDebug(LOG_INFO, "Full response sent to client socket: " + 
+				CGIUtils::intToString(clientSocket), true);
 			_restartStruct(_clientDataMap[clientSocket]);
 			if (_clientDataMap[clientSocket].connection) {
 				logger.logDebug(LOG_INFO, "Connection closed after sending response", true);
@@ -216,8 +217,7 @@ void	ServerManager::_getContentLength( int clientSocket, std::string &buffer ) {
 			logger.logError(LOG_ERROR, "End of Content-Length header not found", true);
 		}
 	} else {
-		// Não sei se isso deveria ser um erro
-		logger.logError(LOG_ERROR, "Content-Length header not found", true);
+		logger.logDebug(LOG_DEBUG, "Content-Length header not found");
 	}
 }
 
@@ -227,7 +227,8 @@ void	ServerManager::_handleResponse( Request &request, ServerConfigs &server,
 		_clientDataMap[clientSocket].completeRequest);
 	_clientDataMap[clientSocket].connection = request.connectionClose();
 	if (status != DEFAULT_EMPTY) {
-		_handleError(clientSocket, server.errorPages[status], status);
+		_handleError(clientSocket, server.errorPages[status], status,
+			getErrorMessage(status));
 		return;
 	}
 	if (request.isCGI()) {
@@ -287,7 +288,7 @@ void	ServerManager::_closeConnection( int clientSocket ) {
 }
 
 void	ServerManager::_handleError( int clientSocket, const std::string &errorPage,
-	const std::string &status ) {
+	const std::string &status, const std::string &error_message ) {
 	std::string response = "HTTP/1.1 " + status + " " + errorPage + "\r\n";
 	std::stringstream ss;
 	std::string body = readFile(errorPage);
@@ -296,5 +297,5 @@ void	ServerManager::_handleError( int clientSocket, const std::string &errorPage
 	response += "Content-Type: text/html\r\n\r\n";
 	response += body;
 	_clientDataMap[clientSocket].response = response;
-	logger.logError(LOG_ERROR, "Error: " + status, true);	
+	logger.logError(LOG_ERROR, "Error: " + error_message, true);	
 }
