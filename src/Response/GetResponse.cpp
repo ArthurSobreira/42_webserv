@@ -22,45 +22,10 @@ void GetResponse::addHeader(const std::string &title)
 		<< "<th><a href=\"?C=N;O=D\">Name</a></th>"
 		<< "<th><a href=\"?C=M;O=A\">Last modified</a></th>"
 		<< "<th><a href=\"?C=S;O=A\">Size</a></th>"
-		<< "<th><a href=\"?C=D;O=A\">Description</a></th></tr>\n"
 		<< "<tr><th colspan=\"5\"><hr></th></tr>\n";
 	_body = oss.str();
 }
 
-// void addFileEntry(std::ostringstream &oss, const std::string &dirPath, const std::string &name, const std::string &modDate, const std::string &size, std::string icon)
-// {
-// 	// Adicionar o caminho do diretório ao nome do arquivo
-// 	std::string fullPath = dirPath + "/" + name;
-// 	oss << "<tr><td valign=\"top\"><img src=\"" << icon << "\" alt=\"[   ]\"></td>"
-// 		<< "<td><a href=\"" << fullPath << "\">" << name << "</a></td>"
-// 		<< "<td align=\"right\">" << modDate << "</td>"
-// 		<< "<td align=\"right\">" << size << "</td>"
-// 		<< "<td>&nbsp;</td></tr>\n";
-// }
-
-
-// bool isDirectory(const std::string &path)
-// {
-// 	struct stat statbuf;
-// 	if (stat(path.c_str(), &statbuf) != 0)
-// 		return false;
-// 	return S_ISDIR(statbuf.st_mode);
-// }
-
-// std::string findImage(std::string &name)
-// {
-// 	if (isDirectory(name))
-// 	{
-// 		name += "/";
-// 		return "/icons/folder.gif";
-
-// 	}
-// 	if (name.find(".html") != std::string::npos)
-// 		return "/icons/html.gif";
-// 	if (name.find(".png") != std::string::npos || name.find(".jpg") != std::string::npos || name.find(".jpeg") != std::string::npos)
-// 		return "/icons/image.png";
-// 	return "/icons/unknown.gif";
-// }
 void GetResponse::addFooter()
 {
 	std::ostringstream oss;
@@ -137,7 +102,6 @@ bool GetResponse::listDirectory(const std::string &dirPath)
 		stat((dirPath + "/" + name).c_str(), &fileStatus);
 		filesDetails[name] = fileStatus;
 	}
-	// Ordenar os vetores
 	std::sort(folders.begin(), folders.end());
 	std::sort(files.begin(), files.end());
 	closedir(dir);
