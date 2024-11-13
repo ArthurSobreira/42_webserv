@@ -142,7 +142,16 @@ std::string removeLastSlashes(const std::string &uri)
 	return (formatUri);
 }
 
-std::string getErrorMessage( const std::string &status ) {
+std::string	getStringMethod(httpMethod method)
+{
+	if (method == GET) { return "GET"; }
+	else if (method == POST) { return "POST"; }
+	else if (method == DELETE) { return "DELETE"; }
+	else { return DEFAULT_EMPTY; }
+}
+
+std::string getErrorMessage(const std::string &status)
+{
 	if (status == "400") { return ERROR_BAD_REQUEST; }
 	if (status == "403") { return ERROR_FORBIDDEN; }
 	if (status == "404") { return ERROR_NOT_FOUND; }
@@ -150,6 +159,20 @@ std::string getErrorMessage( const std::string &status ) {
 	if (status == "413") { return ERROR_TOO_LARGE; }
 	if (status == "415") { return ERROR_UNSUPPORTED_MEDIA_TYPE; }
 	else { return ERROR_INTERNAL_SERVER; }
+}
+
+bool	counterOneSlash(const std::string &uri)
+{
+	int counter = 0;
+	for (size_t i = 0; i < uri.size(); i++) {
+		if (uri[i] == '/') {
+			counter++;
+		}
+	}
+	if (counter == 1 && uri[0] == '/') {
+		return true;
+	}
+	return false;
 }
 
 bool createSocket(int &sockfd, int domain, int type)
@@ -170,6 +193,13 @@ bool isDirectory(const std::string &path)
 	if (stat(path.c_str(), &statbuf) != 0)
 		return false;
 	return S_ISDIR(statbuf.st_mode);
+}
+
+std::string	intToString(int value)
+{
+	std::stringstream ss;
+	ss << value;
+	return ss.str();
 }
 
 void exitHandler(int sig)

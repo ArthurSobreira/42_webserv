@@ -101,7 +101,6 @@ void	GetResponse::_addFileEntry( std::vector<std::string> &folders,
 			_uri = DEFAULT_EMPTY;
 		}
 		std::string ref = _uri + "/" + name;
-		std::cout << GREEN << ref << RESET << std::endl;
 		if (name == "..") {
 			if (_uri.size() > 1)
 				ref = _uri.substr(0, _uri.find_last_of('/') + 1);

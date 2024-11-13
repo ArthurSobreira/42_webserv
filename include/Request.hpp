@@ -5,55 +5,57 @@
 #include "Defines.hpp"
 #include "Config.hpp"
 
-class Request
-{
+class Request {
+	private:
+		httpMethod	_method;
+		std::string	_uri;
+		std::string	_version;
+		std::string	_body;
+		std::string	_rawRequest;
+		stringMap	_headers;
+		LocationConfigs _location;
+		bool _isCGI;
+		bool _isRedirect;
+		bool _connectionClose;
+		std::string	_boundary;
+		std::string	_queryString;
 
-private:
-	httpMethod _method;								 // Método HTTP (GET, POST, DELETE)
-	std::string _uri;							 // URI da requisição
-	std::string _version;						 // Versão do protocolo HTTP
-	stringMap _headers; 						// Cabeçalhos HTTP
-	std::string _body;							 // Corpo da requisição, se houver
-	std::string _rawRequest;					 // Requisição bruta para parseamento
-	bool _isCGI;								 // Indica se a requisição é para um script CGI
-	LocationConfigs _location;					 // Configurações da localização
-	bool _connectionClose;						 // Indica se a conexão deve ser fechada
-	std::string _boundary;						 // Boundary da requisição
-	std::string _queryString;					 // Query string da requisição
-	bool _isRedirect;							 // Indica se a requisição é um redirecionamento
+	public:
+		/* Constructor Method */
+		Request( const std::string &rawRequest, 
+			bool completeRequest );
 
-public:
-	// Construtor que recebe a requisição bruta
-	Request(const std::string &rawRequest, bool completRequest);
+		/* Destructor Method */
+		~Request( void );
 
-	// Métodos para acessar os dados da requisição
-	httpMethod getMethod() const;									  // Retorna o método da requisição
-	const std::string &getUri() const;							  // Retorna a URI
-	const std::string &getVersion() const { return _version; }	  // Retorna a versão do protocolo
-	const std::string &getHeader(const std::string &name) const;  // Retorna o valor de um cabeçalho específico
-	std::string	getQueryString() const; 						  // Extrai a query string da URI
-	const stringMap &getHeaders() const; // Retorna todos os cabeçalhos
-	const std::string &getBody() const;							  // Retorna o corpo da requisição
-	bool isCGI() const { return _isCGI; }						  // Retorna se a requisição é para um script CGI
-	LocationConfigs getLocation() const { return _location; }
-	std::string validateRequest(Config _config, ServerConfigs server, bool completRequest); // Valida a requisição
-	bool connectionClose() const { return _connectionClose; }
-	bool isRedirect() const { return _isRedirect; } 				// Retorna se a requisição é um redirecionamento
-private:
-	// Método privado para fazer o parsing da requisição
-	void parseRequest();
-	void parseMethodAndUri(const std::string &line);				// Extrai o método e a URI da linha inicial
-	void parseHeaders(const std::vector<std::string> &headerLines); // Extrai os cabeçalhos
-	void parseBody();						// Extrai o corpo da requisição, se houver
-	std::string folderPath(const std::string &uri);										// Retorna o caminho do diretório da URI
-	void checkConnectionClose();									// Verifica se a conexão deve ser fechada
-	void extractMultipartNamesAndFilenames();									// Extrai os dados de um formulário multipart	
-	void parserQueryString();											// Extrai a query string da requisição
-	bool validateHost(ServerConfigs server); // Valida o host da requisição
+		/* Getter Methods */
+		httpMethod	getMethod( void ) const { return _method; }
+		const std::string	&getUri( void ) const { return _uri; }
+		const std::string	&getVersion( void ) const { return _version; }
+		const std::string	&getBody( void ) const { return _body; }
+		const stringMap		&getHeaders( void ) const { return _headers; }
+		LocationConfigs		getLocation( void ) const { return _location; }
+		bool isCGI( void ) const { return _isCGI; }
+		bool isRedirect( void ) const { return _isRedirect; } 
+		bool connectionClose( void ) const { return _connectionClose; }
+		std::string	getQueryString( void ) const { return _queryString; }
+		const std::string &getHeader( const std::string &name ) const;
 
-	// Funções auxiliares
-	httpMethod parseMethod(const std::string &method); // Converte string para enum Method
+		/* Public Method */
+		std::string validateRequest( Config _config, ServerConfigs server, 
+			bool completeRequest );
+	
+	private:
+		void	_parseRequest( void );
+		void	_parseMethodAndUri ( const std::string &line );
+		void	_parserQueryString( void );
+		void	_parseHeaders( const std::vector<std::string> &headerLines );
+		void	_parseBody( void );
+		void	_extractMultipartNamesAndFilenames( void );
+		std::string	_folderPath( const std::string &uri );
+		bool	_validateHost( ServerConfigs server );
+		void	_checkConnectionClose( void );
+		httpMethod	_parseMethod( const std::string &method );
 };
 
 #endif // REQUEST_HPP
-
