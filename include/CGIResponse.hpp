@@ -46,8 +46,6 @@ namespace CGIUtils {
 		httpMethod method );
 	bool	isUploadRequest(const Request &request);
 	std::string extractFileName( const std::string &body );
-	std::string	getStringMethod( httpMethod method );
-	std::string	intToString( int value );
 	void	deleteEnvp( char **envp );
 }
 
