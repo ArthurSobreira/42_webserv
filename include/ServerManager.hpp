@@ -63,7 +63,7 @@ class ServerManager {
 		void	_restartStruct( ClientData &data );
 		void	_closeConnection( int clientSocket );
 		void	_handleError( int clientSocket, const std::string &errorPage, 
-			const std::string &status );
+			const std::string &status, const std::string &error_message );
 };
 
 #endif // SERVERMANAGER_HPP
