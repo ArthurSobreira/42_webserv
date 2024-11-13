@@ -96,12 +96,12 @@ re: fclean all
 run: all
 	@echo $(CYAN)[Running $(NAME) executable...]$(LIMITER)
 	@echo $(GREEN)[Server is running...]$(LIMITER)
-	@./$(NAME) config/CGI/pythonCGI.conf
+	@./$(NAME) config/testLocation.conf
 
 tests: $(TESTNAME)
 	@echo $(CYAN)[Running tests...]$(LIMITER)
-	./$(TESTNAME) config/CGI/pythonCGI.conf
+	./$(TESTNAME) config/testLocation.conf
 
 valgrind: all
 	@echo $(CYAN)[Running valgrind...]$(LIMITER)
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(NAME) config/CGI/pythonCGI.conf
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(NAME) config/testLocation.conf
