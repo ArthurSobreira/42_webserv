@@ -98,8 +98,8 @@ void	Request::_parseMethodAndUri( const std::string &line ) {
 	if (_uri != "/") {
 		_uri = removeLastSlashes(_uri);
 	}
-	logger.logDebug(LOG_INFO, "Request: " + getStringMethod(getMethod())
-	+ " " + getUri() + " " + getVersion(), true);
+	logger.logDebug(LOG_INFO, "Request: " + getStringMethod(getMethod()) + 
+	" " + getUri() + " " + getVersion(), true);
 }
 
 void	Request::_parserQueryString( void ) {
