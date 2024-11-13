@@ -57,7 +57,7 @@ bool	ServerManager::_initializeServers( void ) {
 		_servers.push_back(server);
 		_fds.addFdToServer(server->getServerSocket());
 		logger.logDebug(LOG_INFO, "Server initialized on " + 
-			it->host + ":" + CGIUtils::intToString(it->port), true);
+			it->host + ":" + intToString(it->port), true);
 	}
 	return true;
 }
@@ -73,19 +73,19 @@ void	ServerManager::_handleEvents( void ) {
 		if (_fds.isFdInServer(events[i].data.fd)) {
 			if (events[i].events & EPOLLIN) {
 				logger.logAccess(LOG_INFO, "Accepting connection on server socket: " +
-					CGIUtils::intToString(events[i].data.fd), true);
+					intToString(events[i].data.fd));
 				_acceptConnection(events[i].data.fd);
 			}
 		}
 		else {
 			if (events[i].events & EPOLLIN) {
 				logger.logDebug(LOG_DEBUG, "Handling read on client socket: " + 
-					CGIUtils::intToString(events[i].data.fd));
+					intToString(events[i].data.fd));
 				_handleRead(events[i].data.fd);
 			}
 			if (events[i].events & EPOLLOUT) {
 				logger.logDebug(LOG_DEBUG, "Handling write on client socket: " + 
-					CGIUtils::intToString(events[i].data.fd));
+					intToString(events[i].data.fd));
 				_handleWrite(events[i].data.fd);
 			}
 		}
@@ -105,7 +105,7 @@ void	ServerManager::_acceptConnection( int serverSocket ) {
 	_clientServerMap[clientSocket] = serverSocket;
 	logger.logAccess(LOG_INFO, "Accepted connection on IP: " + 
 		inetNtop(clientAddr.sin_addr.s_addr) + " and Port: " +
-		CGIUtils::intToString(ntohs(clientAddr.sin_port)), true);
+		intToString(ntohs(clientAddr.sin_port)), true);
 }
 
 void	ServerManager::_handleRead( int clientSocket ) {
@@ -144,7 +144,7 @@ void	ServerManager::_handleRead( int clientSocket ) {
 			return;
 		}
 	}
-	std::string size = CGIUtils::intToString(data.size());
+	std::string size = intToString(data.size());
 	logger.logDebug(LOG_DEBUG, "Request received: " + data);
 	logger.logDebug(LOG_DEBUG, "Read: " + size + " bytes");
 }
@@ -158,7 +158,7 @@ void	ServerManager::_handleWrite( int clientSocket ) {
 			if ((*it)->getServerSocket() == _clientServerMap[clientSocket])
 			{
 				logger.logDebug(LOG_INFO, "Handling response for client socket: " + 
-					CGIUtils::intToString(clientSocket), true);
+					intToString(clientSocket));
 				_handleResponse(request, (*it)->getConfig(), clientSocket);
 				_clientDataMap[clientSocket].request = DEFAULT_EMPTY;
 				break;
@@ -177,12 +177,12 @@ void	ServerManager::_handleWrite( int clientSocket ) {
 		}
 		else if (bytesWritten < (int)_clientDataMap[clientSocket].response.size()) {
 			logger.logDebug(LOG_INFO, "Partial response sent, remaining: " + 
-				CGIUtils::intToString(_clientDataMap[clientSocket].response.size()) + " bytes", true);
+				intToString(_clientDataMap[clientSocket].response.size()) + " bytes", true);
 			_clientDataMap[clientSocket].response = _clientDataMap[clientSocket].response.substr(bytesWritten);
 		}
 		else if (bytesWritten == (int)_clientDataMap[clientSocket].response.size()) {
 			logger.logDebug(LOG_INFO, "Full response sent to client socket: " + 
-				CGIUtils::intToString(clientSocket), true);
+				intToString(clientSocket), true);
 			_restartStruct(_clientDataMap[clientSocket]);
 			if (_clientDataMap[clientSocket].connection) {
 				logger.logDebug(LOG_INFO, "Connection closed after sending response", true);
@@ -191,7 +191,7 @@ void	ServerManager::_handleWrite( int clientSocket ) {
 			}
 			_epollManager.modifyEpoll(clientSocket, EPOLLIN);
 			logger.logDebug(LOG_DEBUG, "Modified epoll to EPOLLIN for client socket: " + 
-				CGIUtils::intToString(clientSocket));
+				intToString(clientSocket));
 		}
 	}
 }
@@ -265,7 +265,7 @@ void	ServerManager::_getContentLength( int clientSocket, std::string &buffer ) {
 			ss >> contentLength;
 			_clientDataMap[clientSocket].contentLength = contentLength;
 			logger.logDebug(LOG_DEBUG, "Extracted Content-Length: " + 
-				CGIUtils::intToString(contentLength));
+				intToString(contentLength));
 		} else {
 			logger.logError(LOG_ERROR, "End of Content-Length header not found", true);
 		}
