@@ -1,18 +1,19 @@
 #include "Fds.hpp"
 
-Fds::Fds() {}
+/* Constructor Method */
+Fds::Fds( void ) {};
 
-Fds::~Fds() {}
+/* Destructor Method */
+Fds::~Fds( void ) {};
 
-void Fds::addFdToServer(int fd)
-{
+/* Public Methods */
+void	Fds::addFdToServer( int fd ) {
 	_serverFds.push_back(fd);
 }
 
-bool Fds::isFdInServer(int fd)
-{
-	for (std::vector<int>::iterator it = _serverFds.begin(); it != _serverFds.end(); ++it)
-	{
+bool	Fds::isFdInServer( int fd ) {
+	for (std::vector<int>::iterator it = _serverFds.begin(); 
+		it != _serverFds.end(); ++it) {
 		if (*it == fd)
 			return true;
 	}
