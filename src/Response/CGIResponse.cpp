@@ -29,7 +29,7 @@ CGIResponse::~CGIResponse( void ) {};
 
 /* Private Methods */
 void	CGIResponse::_setEnvironmentVars( void ) {
-	std::string method = CGIUtils::getStringMethod(_request.getMethod());
+	std::string method = getStringMethod(_request.getMethod());
 	_env["SERVER_PROTOCOL"] = _request.getVersion();
 	_env["QUERY_STRING"] = _request.getQueryString();
 	_env["REQUEST_URI"] = _getCompleteUri();
@@ -101,7 +101,7 @@ std::string	CGIResponse::_getExecutable( const std::string &extension ) {
 
 void	CGIResponse::_handleCGIError( int code, const std::string &message ) {
 	_body.clear();
-	_statusCode = CGIUtils::intToString(code);
+	_statusCode = intToString(code);
 	_reasonPhrase = message;
 	logger.logError(LOG_ERROR, message, true);
 	std::string errorPage = _location.server->errorPages[_statusCode];
