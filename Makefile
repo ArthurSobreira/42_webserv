@@ -19,19 +19,28 @@ TESTNAME	=	testes
 BUILD		=	./build
 LOG			=	./logs
 BUILD_TEST	=	./build_test
+CONFIG_PATH = 	src/Config/
+RESP_PATH	=	src/Response/
+SERVER_PATH =	src/Server/
+UTILS_PATH	=	src/Utils/
 
-SRCS		=	src/CGI/CGIResponse.cpp \
-				src/CGI/CGIUtils.cpp \
-				src/Config/Config.cpp \
-				src/Config/ConfigExtract.cpp \
-				src/Config/ConfigUtils.cpp \
-				src/Response/DeleteResponse.cpp \
-				src/Response/GetResponse.cpp \
-				src/Response/PostResponse.cpp \
-				src/Response/Response.cpp \
-				src/EpoolManager.cpp src/Fds.cpp src/Logger.cpp \
-				src/Request.cpp src/Server.cpp \
-				src/ServerManager.cpp src/Utils.cpp src/main.cpp
+SRCS		=	$(CONFIG_PATH)Config.cpp \
+				$(CONFIG_PATH)ConfigExtract.cpp \
+				$(RESP_PATH)CGIResponse.cpp \
+				$(RESP_PATH)DeleteResponse.cpp \
+				$(RESP_PATH)GetResponse.cpp \
+				$(RESP_PATH)PostResponse.cpp \
+				$(SERVER_PATH)EpoolManager.cpp \
+				$(SERVER_PATH)Fds.cpp \
+				$(SERVER_PATH)Server.cpp \
+				$(SERVER_PATH)ServerManager.cpp \
+				$(UTILS_PATH)CGIUtils.cpp \
+				$(UTILS_PATH)ConfigUtils.cpp \
+				$(UTILS_PATH)Logger.cpp \
+				$(UTILS_PATH)Utils.cpp \
+				src/Request.cpp \
+				src/Response.cpp \
+				src/main.cpp
 
 TEST_SRCS	=	test/main.cpp $(filter-out src/main.cpp, $(SRCS)) 
 OBJS		=	$(addprefix $(BUILD)/, $(patsubst src/%, %, $(SRCS:.cpp=.o)))
@@ -72,9 +81,10 @@ $(BUILD_TEST)/%.o: src/%.cpp $(INC)
 
 $(BUILD):
 	@mkdir -p $(BUILD)
-	@mkdir -p $(BUILD)/CGI/
 	@mkdir -p $(BUILD)/Config/
 	@mkdir -p $(BUILD)/Response/
+	@mkdir -p $(BUILD)/Server/
+	@mkdir -p $(BUILD)/Utils/
 	@mkdir -p $(LOG)
 
 $(BUILD_TEST):
