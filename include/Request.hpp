@@ -20,6 +20,8 @@ private:
 	bool _connectionClose;						 // Indica se a conexão deve ser fechada
 	std::string _boundary;						 // Boundary da requisição
 	std::string _queryString;					 // Query string da requisição
+	bool _isRedirect;							 // Indica se a requisição é um redirecionamento
+
 public:
 	// Construtor que recebe a requisição bruta
 	Request(const std::string &rawRequest, bool completRequest);
@@ -34,8 +36,9 @@ public:
 	const std::string &getBody() const;							  // Retorna o corpo da requisição
 	bool isCGI() const { return _isCGI; }						  // Retorna se a requisição é para um script CGI
 	LocationConfigs getLocation() const { return _location; }
-	std::string validateRequest(Config _config, ServerConfigs server, bool completRequest);
+	std::string validateRequest(Config _config, ServerConfigs server, bool completRequest); // Valida a requisição
 	bool connectionClose() const { return _connectionClose; }
+	bool isRedirect() const { return _isRedirect; } 				// Retorna se a requisição é um redirecionamento
 private:
 	// Método privado para fazer o parsing da requisição
 	void parseRequest();
