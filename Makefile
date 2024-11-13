@@ -19,13 +19,18 @@ TESTNAME	=	testes
 BUILD		=	./build
 LOG			=	./logs
 BUILD_TEST	=	./build_test
-SRCS		=	src/CGI/CGIResponse.cpp src/CGI/CGIUtils.cpp \
+
+SRCS		=	src/CGI/CGIResponse.cpp \
+				src/CGI/CGIUtils.cpp \
 				src/Config/Config.cpp \
 				src/Config/ConfigExtract.cpp \
 				src/Config/ConfigUtils.cpp \
-				src/DeleteResponse.cpp src/EpoolManager.cpp src/Fds.cpp \
-				src/GetResponse.cpp src/Logger.cpp src/PostResponse.cpp \
-				src/Request.cpp src/Response.cpp src/Server.cpp \
+				src/Response/DeleteResponse.cpp \
+				src/Response/GetResponse.cpp \
+				src/Response/PostResponse.cpp \
+				src/Response/Response.cpp \
+				src/EpoolManager.cpp src/Fds.cpp src/Logger.cpp \
+				src/Request.cpp src/Server.cpp \
 				src/ServerManager.cpp src/Utils.cpp src/main.cpp
 
 TEST_SRCS	=	test/main.cpp $(filter-out src/main.cpp, $(SRCS)) 
@@ -69,6 +74,7 @@ $(BUILD):
 	@mkdir -p $(BUILD)
 	@mkdir -p $(BUILD)/CGI/
 	@mkdir -p $(BUILD)/Config/
+	@mkdir -p $(BUILD)/Response/
 	@mkdir -p $(LOG)
 
 $(BUILD_TEST):
@@ -90,12 +96,12 @@ re: fclean all
 run: all
 	@echo $(CYAN)[Running $(NAME) executable...]$(LIMITER)
 	@echo $(GREEN)[Server is running...]$(LIMITER)
-	@./$(NAME) config/CGI/pythonCGI.conf
+	@./$(NAME) config/testLocation.conf
 
 tests: $(TESTNAME)
 	@echo $(CYAN)[Running tests...]$(LIMITER)
-	./$(TESTNAME) config/CGI/pythonCGI.conf
+	./$(TESTNAME) config/testLocation.conf
 
 valgrind: all
 	@echo $(CYAN)[Running valgrind...]$(LIMITER)
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(NAME) config/CGI/pythonCGI.conf
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(NAME) config/testLocation.conf

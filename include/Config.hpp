@@ -1,8 +1,8 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#include "Utils.hpp"
 #include "Includes.hpp"
+#include "Utils.hpp"
 #include "Logger.hpp"
 
 typedef enum {
@@ -39,7 +39,7 @@ struct ServerConfigs {
 	std::string host;
 	std::string serverName;
 	size_t limitBodySize;
-	errorMap errorPages;
+	stringMap errorPages;
 	std::vector<LocationConfigs> locations;
 
 	/* Struct Constructor */
@@ -51,7 +51,6 @@ class Config {
 		const std::string _fileName;
 		std::vector<ServerConfigs> _servers;
 		short _serverCount;
-		Logger &_logger;
 		std::map<int, const ServerConfigs*> _socketConfigMap;
 		std::map<int, int> _socketServerMap;
 
@@ -65,7 +64,7 @@ class Config {
 
 	public:
 		/* Constructor Method */
-		Config( const std::string &fileName, Logger &logger );
+		Config( const std::string &fileName );
 
 		/* Destructor Method */
 		~Config( void );
@@ -94,7 +93,6 @@ namespace ConfigUtils {
 	void	validateFullLocationPath( LocationConfigs &location );
 	void	validateFullCGIPath( LocationConfigs &location );
 	void	createUploadFolder( std::string &uploadPath );
-	void	printServerStruct( const ServerConfigs &server );
 }
 
 /* Server Extraction Functions */

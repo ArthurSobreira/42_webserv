@@ -2,9 +2,7 @@
 
 /* Constructor Method */
 CGIResponse::CGIResponse( const Request &request, const LocationConfigs &location ) 
-	: Response(), _request(request), _location(location), 
-	_logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE) {
-	
+	: Response(), _request(request), _location(location) {
 	if (_location.cgiEnabled) {
 		_cgiPath = location.root + "/" + location.cgiPath;
 		_cgiExecutable = _getExecutable(location.cgiExtension);
@@ -59,7 +57,7 @@ char	**CGIResponse::_generateEnvp( void ) {
 	char **envp = new char*[_env.size() + 1];
 	int index = 0;
 
-	for (std::map<std::string, std::string>::iterator it = _env.begin(); 
+	for (stringMap::iterator it = _env.begin(); 
 		it != _env.end(); ++it) {
 		std::string envVar = it->first + "=" + it->second;
 		envp[index] = new char[envVar.length() + 1];
@@ -111,9 +109,9 @@ void	CGIResponse::_handleCGIError( int code, const std::string &message ) {
 	_body.clear();
 	_statusCode = CGIUtils::intToString(code);
 	_reasonPhrase = message;
-	_logger.logError(LOG_ERROR, message, true);
+	logger.logError(LOG_ERROR, message, true);
 	std::string errorPage = _location.server->errorPages[_statusCode];
-	handleError(_statusCode, errorPage, message, _logger);
+	handleError(_statusCode, errorPage, message);
 }
 
 bool	CGIResponse::_waitChild( pid_t pid, int &status, std::clock_t start ) {
@@ -124,32 +122,12 @@ bool	CGIResponse::_waitChild( pid_t pid, int &status, std::clock_t start ) {
 		}
 		if (!waitpid(pid, &status, WNOHANG)) {
 			kill(pid, SIGKILL);
-			_logger.logError(LOG_ERROR, ERROR_CGI_TIMEOUT, true);
+			logger.logError(LOG_ERROR, ERROR_CGI_TIMEOUT, true);
 			status = TIMEOUT_ERROR;
 			return (false);
 		}
 	}
 	return (true);
-}
-
-void	CGIResponse::_sendBodyToCGI( const std::string &body ) {
-	if (!body.empty()) {
-		int pipefd[2];
-		if (pipe(pipefd) == -1) {
-			exit(EXIT_FAILURE);
-		}
-		dup2(pipefd[0], STDIN_FILENO);
-		close(pipefd[0]);
-
-		size_t bytes_written = write(pipefd[1], body.c_str(), body.length());
-
-		_logger.logDebug(LOG_INFO, "bytes written to CGI: " + 
-			CGIUtils::intToString(bytes_written), true);
-		_logger.logDebug(LOG_INFO, "Body length: " + 
-			CGIUtils::intToString(body.length()), true);
-		_logger.logDebug(LOG_INFO, "Body sent to CGI ", true);
-		close(pipefd[1]);
-	}
 }
 
 void	CGIResponse::_readReturnBody( int pipefd[2] ) {
@@ -161,8 +139,37 @@ void	CGIResponse::_readReturnBody( int pipefd[2] ) {
 	buffer[bytes_read] = '\0';
 	std::string strBuffer(buffer);
 	if (!strBuffer.empty()) { _body = strBuffer; }
-	handleFileResponse(DEFAULT_EMPTY, _logger);
+	handleFileResponse(DEFAULT_EMPTY);
 	close(pipefd[0]);
+}
+
+void	CGIResponse::_sendBodyToCGI( const std::string &body ) {
+	if (body.empty()) { return; }
+
+	char tempFileName[] = CGI_TEMP_FILE;
+	int tempFileFd = mkstemp(tempFileName);
+	if (tempFileFd == -1) { exit(EXIT_FAILURE); }
+
+	const size_t chunkSize = 4096;
+	size_t bytesRemaining = body.length();
+	size_t bytesSent = 0;
+	while (bytesRemaining > 0) {
+		size_t toWrite = std::min(chunkSize, bytesRemaining);
+		ssize_t bytesWritten = write(tempFileFd, body.c_str() + 
+			bytesSent, toWrite);
+
+		if (bytesWritten == -1) {
+			close(tempFileFd);
+			unlink(tempFileName);
+			exit(EXIT_FAILURE);
+		}
+		bytesSent += bytesWritten;
+		bytesRemaining -= bytesWritten;
+	}
+	lseek(tempFileFd, 0, SEEK_SET);
+	dup2(tempFileFd, STDIN_FILENO);
+	close(tempFileFd);
+	unlink(tempFileName);
 }
 
 /* Public Method */
@@ -212,9 +219,13 @@ void	CGIResponse::executeCGI( void ) {
 				std::string body = _request.getBody();
 				std::string file = CGIUtils::extractFileName(body);
 
-				if (ConfigUtils::fileExists(uploadPath + "/" + file)) {
-					_statusCode = "201";
-					_reasonPhrase = "Created";
+				if (CGIUtils::isUploadRequest(_request)) {
+					if (ConfigUtils::fileExists(uploadPath + "/" + file)) {
+						_statusCode = "201";
+						_reasonPhrase = "Created";
+					} else {
+						_handleCGIError(500, ERROR_CGI_EXECUTION);
+					}
 				} else {
 					_statusCode = "200";
 					_reasonPhrase = "OK";

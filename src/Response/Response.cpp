@@ -1,28 +1,29 @@
 #include "Response.hpp"
 
-Response::Response( void ) : _body(DEFAULT_EMPTY), _statusCode("200"), 
-	_reasonPhrase("OK"), _logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE) {}
+/* Constructor Method */
+Response::Response( void ) : _body(DEFAULT_EMPTY), 
+	_statusCode("200"), _reasonPhrase("OK") {};
 
-Response::~Response( void ) {}
+/* Destructor Method */
+Response::~Response( void ) {};
 
-std::string Response::generateResponse() const
-{
+/* Public Methods */
+std::string Response::generateResponse( void ) const {
 	std::ostringstream response_stream;
 
 	response_stream << "HTTP/1.1 " << _statusCode << " " << _reasonPhrase << "\r\n";
-	for (std::map<std::string, std::string>::const_iterator it = _headers.begin(); it != _headers.end(); ++it)
+	for (stringMap::const_iterator it = _headers.begin(); it != _headers.end(); ++it)
 	{
 		response_stream << it->first << ": " << it->second << "\r\n";
 	}
 	response_stream << "\r\n";
 	response_stream << _body;
 
-
 	return response_stream.str();
 }
 
-void Response::handleError(std::string status_code, const std::string &error_page, const std::string &error_message, Logger &logger)
-{
+void	Response::handleError( std::string status_code, const std::string &error_page, 
+	const std::string &error_message ) {
 	_statusCode = status_code;
 	_reasonPhrase = error_message;
 	_body = readFile(error_page);
@@ -30,11 +31,10 @@ void Response::handleError(std::string status_code, const std::string &error_pag
 	ss << _body.size();
 	_headers["Content-Length"] = ss.str();
 	_headers["Content-Type"] = "text/html";
-	logger.logError(LOG_ERROR, "Error: " + error_message);
+	logger.logError(LOG_ERROR, "Error: " + error_message, true);
 }
 
-void Response::handleFileResponse(const std::string &path, Logger &logger)
-{
+void	Response::handleFileResponse( const std::string &path ) {
 	_statusCode = "200";
 	_reasonPhrase = "OK";
 	if (_body.empty())
