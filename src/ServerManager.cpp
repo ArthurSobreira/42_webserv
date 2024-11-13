@@ -245,16 +245,14 @@ void	ServerManager::_handleResponse( Request &request, ServerConfigs &server,
 		case GET:
 		{
 			GetResponse getResponse(request.getUri());
-
 			getResponse.prepareResponse(request.getLocation());
 			_clientDataMap[clientSocket].response = getResponse.generateResponse();
 			break;
 		}
 		case POST:
 		{
-			PostResponse postResponse(request.getUri(), request.getBody(), server,
-				request.getLocation(), request.getHeaders());
-
+			PostResponse postResponse(request.getUri(), request.getBody(),
+				request.getHeaders(), request.getLocation());
 			postResponse.prepareResponse();
 			_clientDataMap[clientSocket].response = postResponse.generateResponse();
 			break;
@@ -262,7 +260,6 @@ void	ServerManager::_handleResponse( Request &request, ServerConfigs &server,
 		case DELETE:
 		{
 			DeleteResponse deleteResponse(request.getUri(), request.getLocation());
-			
 			deleteResponse.prepareResponse();
 			_clientDataMap[clientSocket].response = deleteResponse.generateResponse();
 			break;
