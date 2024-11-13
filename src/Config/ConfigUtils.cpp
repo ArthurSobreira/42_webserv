@@ -75,7 +75,6 @@ namespace ConfigUtils {
 	}
 
 	bool hostIsValid( ServerConfigs &server ) {
-		Logger logger(LOG_FILE, LOG_ACCESS_FILE, LOG_ERROR_FILE);
 		std::istringstream stream(server.host);
 		std::vector<int> bytes;
 		std::string segment;
