@@ -29,10 +29,11 @@ CGIResponse::~CGIResponse( void ) {};
 
 /* Private Methods */
 void	CGIResponse::_setEnvironmentVars( void ) {
+	std::string method = CGIUtils::getStringMethod(_request.getMethod());
 	_env["SERVER_PROTOCOL"] = _request.getVersion();
 	_env["QUERY_STRING"] = _request.getQueryString();
 	_env["REQUEST_URI"] = _getCompleteUri();
-	_env["REQUEST_METHOD"] = _getStringMethod();
+	_env["REQUEST_METHOD"] = method;
 	_env["SCRIPT_FILENAME"] = _cgiPath;
 	_env["SCRIPT_NAME"] = _location.cgiPath;
 	_env["PATH_INFO"] = _getPathInfo(_request.getUri());
@@ -74,13 +75,6 @@ std::string	CGIResponse::_getCompleteUri( void ) const {
 
 	if (!queryString.empty()) { return (uri + "?" + queryString); }
 	else { return uri; }
-}
-
-std::string	CGIResponse::_getStringMethod( void ) const {
-	if (_request.getMethod() == GET) { return "GET"; }
-	else if (_request.getMethod() == POST) { return "POST"; }
-	else if (_request.getMethod() == DELETE) { return "DELETE"; }
-	else { return DEFAULT_EMPTY; }
 }
 
 std::string	CGIResponse::_getPathInfo( const std::string &uri ) const {
@@ -220,7 +214,10 @@ void	CGIResponse::executeCGI( void ) {
 				std::string file = CGIUtils::extractFileName(body);
 
 				if (CGIUtils::isUploadRequest(_request)) {
-					if (ConfigUtils::fileExists(uploadPath + "/" + file)) {
+					std::string	fullFilePath = uploadPath + "/" + file;
+					if (ConfigUtils::fileExists(fullFilePath)) {
+						logger.logDebug(LOG_INFO, "File Created: " + 
+							fullFilePath, true);
 						_statusCode = "201";
 						_reasonPhrase = "Created";
 					} else {
