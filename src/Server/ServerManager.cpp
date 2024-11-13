@@ -221,6 +221,15 @@ void	ServerManager::_getContentLength( int clientSocket, std::string &buffer ) {
 	}
 }
 
+std::string ServerManager::_handleRedirect( const std::string &location ) {
+	std::string response = "HTTP/1.1 301 Moved Permanently\r\n";
+	response += "Location: " + location + "\r\n";
+	response += "Content-Length: 0\r\n";
+	response += "Content-Type: text/html\r\n\r\n";
+	return response;
+}
+
+
 void	ServerManager::_handleResponse( Request &request, ServerConfigs &server,
 	int clientSocket ) {
 	std::string status = request.validateRequest(_config, server, 
@@ -229,6 +238,10 @@ void	ServerManager::_handleResponse( Request &request, ServerConfigs &server,
 	if (status != DEFAULT_EMPTY) {
 		_handleError(clientSocket, server.errorPages[status], status,
 			getErrorMessage(status));
+		return;
+	}
+	if (request.isRedirect()) {
+		_clientDataMap[clientSocket].response = _handleRedirect(request.getLocation().redirect);
 		return;
 	}
 	if (request.isCGI()) {
