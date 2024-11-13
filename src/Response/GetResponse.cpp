@@ -2,10 +2,10 @@
 
 /* Constructor Method */
 GetResponse::GetResponse( std::string filePath )
-	: Response(), _filePath(filePath) {}
+	: Response(), _filePath(filePath) {};
 
 /* Destructor Method */
-GetResponse::~GetResponse( void ) {}
+GetResponse::~GetResponse( void ) {};
 
 /* Public Methods */
 void GetResponse::listDirectoryHandler( void ) {
@@ -23,33 +23,21 @@ void GetResponse::listDirectoryHandler( void ) {
 
 void GetResponse::prepareResponse( const LocationConfigs &location ) {
 	status Status;
-	std::cout << RED << "prepareResponse [" <<_filePath << "]"<< RESET << std::endl;
 	_filePath = location.root + _filePath;
-	std::cout << _filePath << std::endl;
-	if (_filePath[_filePath.size() - 1] == '/' && !location.autoindex)
-	{
-		std::cout << "debbug response 4" << std::endl;
+	if (_filePath[_filePath.size() - 1] == '/' && !location.autoindex) {
 		_filePath += location.index;
 	}
-	if (stat(_filePath.c_str(), &Status) != 0)
-	{
-		std::cout << "debbug response 5" << std::endl;
-		handleError("404", location.server->errorPages.at("404"), 
-			"File not found", _logger);
+	if (stat(_filePath.c_str(), &Status) != 0) {
+		handleError("404", location.server->errorPages.at("404"), ERROR_NOT_FOUND);
 		return;
 	}
-	if (S_ISDIR(Status.st_mode))
-	{
+	if (S_ISDIR(Status.st_mode)) {
 		listDirectoryHandler();
 		return;
 	}
-	if (access(_filePath.c_str(), R_OK) != 0)
-	{
-		std::cout << "debbug response 7" << std::endl;
-		handleError("403", location.server->errorPages.at("403"), 
-			"File not readable", _logger);
+	if (access(_filePath.c_str(), R_OK) != 0) {
+		handleError("403", location.server->errorPages.at("403"), ERROR_FORBIDDEN);
 		return;
 	}
-	std::cout << "debbug response 8" << std::endl;
-	handleFileResponse(_filePath, _logger);
+	handleFileResponse(_filePath);
 }
