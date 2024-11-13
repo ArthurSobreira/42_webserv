@@ -30,7 +30,7 @@ void Response::handleError(std::string status_code, const std::string &error_pag
 	ss << _body.size();
 	_headers["Content-Length"] = ss.str();
 	_headers["Content-Type"] = "text/html";
-	logger.logError(LOG_ERROR, "Error: " + error_message);
+	logger.logError(LOG_ERROR, "Error: " + error_message, true);
 }
 
 void Response::handleFileResponse(const std::string &path, Logger &logger)
