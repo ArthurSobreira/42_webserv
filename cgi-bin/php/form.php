@@ -4,7 +4,7 @@
 	$request_method = getenv("REQUEST_METHOD");
 
 	echo "<html><body>";
-	echo "<h1>Php CGI Form</h1>";
+	echo "<h1>PHP CGI Form</h1>";
 	if ($request_method === 'POST') {
 		$input = stream_get_contents(STDIN);
 		parse_str($input, $query_params);
