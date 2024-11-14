@@ -24,6 +24,7 @@ void DeleteResponse::prepareResponse( void ) {
 		_reasonPhrase = "No Content";
 	}
 	else {
+		logger.logDebug(LOG_ERROR, "Error Deleting File: " + _filePath, true);
 		handleError("500", _location.server->errorPages.at("500"), ERROR_INTERNAL_SERVER);
 	}
 }

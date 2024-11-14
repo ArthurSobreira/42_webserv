@@ -21,7 +21,6 @@ class CGIResponse : public Response {
 		void	_setEnvironmentVars( void );
 		char	**_generateEnvp( void );
 		std::string	_getCompleteUri( void ) const;
-		std::string	_getStringMethod( void ) const;
 		std::string	_getPathInfo( const std::string &uri ) const;
 		std::string	_getExecutable( const std::string &extension );
 		void	_handleCGIError( int code, const std::string &message );
@@ -47,7 +46,6 @@ namespace CGIUtils {
 		httpMethod method );
 	bool	isUploadRequest(const Request &request);
 	std::string extractFileName( const std::string &body );
-	std::string	intToString( int value );
 	void	deleteEnvp( char **envp );
 }
 

@@ -2,22 +2,26 @@
 #include "Utils.hpp"
 #include "Includes.hpp"
 
-Request::Request(const std::string &rawRequest, bool completRequest)
-	: _rawRequest(rawRequest)
+/* Constructor Method */
+Request::Request( const std::string &rawRequest, 
+	bool completeRequest) : _rawRequest(rawRequest)
 {
 	_method = INVALID;
 	_isCGI = false;
+	_isRedirect = false;
 	_connectionClose = false;
-	if (completRequest)
-		parseRequest();
+	_incorrectRequest = false;
+	if (completeRequest) {
+		_parseRequest();
+		_checkConnectionClose();
+	}
 }
 
-httpMethod Request::getMethod() const { return _method; }
+/* Destructor Method */
+Request::~Request( void ) {};
 
-const std::string &Request::getUri() const { return _uri; }
-
-const std::string &Request::getHeader(const std::string &name) const
-{
+/* Getter Method */
+const std::string	&Request::getHeader( const std::string &name ) const {
 	stringMap::const_iterator it = _headers.find(name);
 	if (it == _headers.end())
 	{
@@ -27,70 +31,97 @@ const std::string &Request::getHeader(const std::string &name) const
 	return it->second;
 }
 
-const stringMap	&Request::getHeaders() const { return _headers; }
+/* Public Method */
+std::string	Request::validateRequest( Config _config, ServerConfigs server, 
+	bool completeRequest ) {
+	std::string error = DEFAULT_EMPTY;
+	bool locationFound = false;
+	std::string currentUri = _uri;
+	_validateHost(server);
 
-const std::string &Request::getBody() const { return _body; }
+	if (!completeRequest) {
+		return "413";
+	} else if(_incorrectRequest) {
+		_connectionClose = true;
+		return "400";
+	}
+	while (!locationFound && !currentUri.empty()) {
+		_location = _config.getLocationConfig(server, currentUri, locationFound);
+		if (!locationFound) {
+			currentUri = _folderPath(currentUri);
+		}
+	}
+	if (!locationFound) {
+		error = "404";
+	} else if (std::find(_location.methods.begin(), _location.methods.end(), 
+		getMethod()) == _location.methods.end()) {
+		error = "405";
+	}
+	_isRedirect = _location.redirectSet;
+	_isCGI = _location.cgiEnabled;
+	return error;
+}
 
-void Request::parseRequest()
-{
+/* Private Methods */
+void	Request::_parseRequest( void ) {
 	std::istringstream requestStream(_rawRequest);
 	std::string line;
 	std::vector<std::string> headerLines;
 
 	size_t pos = _rawRequest.find("\r\n\r\n");
-	if (pos != std::string::npos)
-	{
-		// Separar cabeçalhos e corpo
+	if (pos != std::string::npos) {
 		std::string headersPart = _rawRequest.substr(0, pos);
+		if (headersPart.empty()) {
+			_incorrectRequest = true;
+			return;
+		}
 		_body = _rawRequest.substr(pos + 4);
-		// Processar cabeçalhos linha por linha
 		std::istringstream headersStream(headersPart);
 		bool isFirstLine = true;
-		while (std::getline(headersStream, line))
-		{
-			if (line.empty() || line == "\r")
+		while (std::getline(headersStream, line)) {
+			if (line.empty() || line == "\r") {
 				continue;
-
-			if (isFirstLine)
-			{
-				parseMethodAndUri(line);
-				isFirstLine = false;
 			}
-			else
-			{
+			if (isFirstLine) {
+				_parseMethodAndUri(line);
+				isFirstLine = false;
+			} else {
 				headerLines.push_back(line);
 			}
 		}
-		parseHeaders(headerLines);
+		_parseHeaders(headerLines);
 	}
-
-	parseBody(); // Verifica o Content-Length e exibe informações de tamanho
+	_parseBody();
 }
 
-void Request::parseMethodAndUri(const std::string &line)
-{
+void	Request::_parseMethodAndUri( const std::string &line ) {
 	std::istringstream lineStream(line);
 	std::string method;
-
 	lineStream >> method >> _uri >> _version;
-
-	parserQueryString();
-	_method = parseMethod(method);
-	if (_uri != "/")
-	{
+	if (method.empty() || _uri.empty() || _version.empty()) {
+		_incorrectRequest = true;
+		return;
+	}
+	_parserQueryString();
+	_method = _parseMethod(method);
+	if (_uri != "/") {
 		_uri = removeLastSlashes(_uri);
 	}
-
-	std::cout << "Method: " << _method << std::endl;
-	std::cout << "URI: " << _uri << std::endl;
-	std::cout << "Version: " << _version << std::endl;
-	std::cout << "Query string: " << _queryString << std::endl;
+	logger.logDebug(LOG_INFO, "Request: " + getStringMethod(getMethod()) + 
+	" " + getUri() + " " + getVersion(), true);
 }
 
-void Request::parseHeaders(const std::vector<std::string> &headerLines)
-{
-	for (std::vector<std::string>::const_iterator it = headerLines.begin(); it != headerLines.end(); ++it)
-	{
+void	Request::_parserQueryString( void ) {
+	size_t pos = _uri.find("?");
+	if (pos != std::string::npos) {
+		_queryString = _uri.substr(pos + 1);
+		_uri = _uri.substr(0, pos);
+	}
+}
+
+void	Request::_parseHeaders( const std::vector<std::string> &headerLines ) {
+	for (std::vector<std::string>::const_iterator it = headerLines.begin(); 
+		it != headerLines.end(); ++it) {
 		size_t colonPos = it->find(':');
 		if (colonPos != std::string::npos)
 		{
@@ -101,8 +132,26 @@ void Request::parseHeaders(const std::vector<std::string> &headerLines)
 	}
 }
 
-void Request::extractMultipartNamesAndFilenames()
-{
+void	Request::_parseBody( void ) {
+	if (_headers.find("Content-Length") == _headers.end()) {
+		return;
+	}
+	logger.logDebug(LOG_DEBUG, "Content-Length: " + _headers["Content-Length"]);
+	logger.logDebug(LOG_DEBUG, "Body size: " + intToString(_body.size()));
+	if (_headers.find("Content-Type") != _headers.end()) {
+		std::string contentType = _headers["Content-Type"];
+		if (contentType.find("multipart/form-data") != std::string::npos) {
+			size_t pos = contentType.find("boundary=");
+			if (pos != std::string::npos)
+			{
+				_headers["boundary"] = contentType.substr(pos + 9);
+				_extractMultipartNamesAndFilenames();
+			}
+		}
+	}
+}
+
+void	Request::_extractMultipartNamesAndFilenames( void ) {
 	std::string boundary = "--" + _headers["boundary"];
 	std::string endBoundary = boundary + "--";
 	size_t pos = _body.find(boundary);
@@ -124,139 +173,58 @@ void Request::extractMultipartNamesAndFilenames()
 		}
 		pos = _body.find(boundary, pos + 1);
 	}
-	std::cout << "name: " << _headers["name"] << std::endl;
-	std::cout << "filename: " << _headers["filename"] << std::endl;
+	logger.logDebug(LOG_DEBUG, "Name: " + _headers["name"]);
+	logger.logDebug(LOG_DEBUG, "Filename: " + _headers["filename"]);
 }
 
-void Request::parseBody()
-{
-	if (_headers.find("Content-Length") == _headers.end())
-	{
-		return;
-	}
-	std::cout << RED << "Content-Length: " << _headers["Content-Length"] << RESET << std::endl;
-	std::cout << "Body size: " << _body.size() << std::endl;
-	if (_headers.find("Content-Type") != _headers.end())
-	{
-		std::string contentType = _headers["Content-Type"];
-		if (contentType.find("multipart/form-data") != std::string::npos)
-		{
-			size_t pos = contentType.find("boundary=");
-			if (pos != std::string::npos)
-			{
-				_headers["boundary"] = contentType.substr(pos + 9);
-				extractMultipartNamesAndFilenames();
-				std::cout << YELLOW << "parseada" << RESET << std::endl;
-			}
-		}
-	}
-}
-
-httpMethod Request::parseMethod(const std::string &method)
-{
-	if (method == "GET")
-	{
-		return GET;
-	}
-	else if (method == "POST")
-	{
-		return POST;
-	}
-	else if (method == "DELETE")
-	{
-		return DELETE;
-	}
-	return INVALID;
-}
-
-bool counterOneSlash(const std::string &uri)
-{
-	int counter = 0;
-	for (size_t i = 0; i < uri.size(); i++)
-	{
-		if (uri[i] == '/')
-		{
-			counter++;
-		}
-	}
-	if (counter == 1 && uri[0] == '/')
-	{
-		return true;
-	}
-	return false;
-}
-
-std::string Request::folderPath(const std::string &uri)
-{
-	if (uri == "/")
+std::string	Request::_folderPath( const std::string &uri ) {
+	if (uri == "/") {
 		return uri;
+	}
 	std::string folderPath = uri;
-	if (isDirectory(folderPath) && folderPath[folderPath.size() - 1] != '/')
-	{
+	if (isDirectory(folderPath) && folderPath[folderPath.size() - 1] != '/') {
 		folderPath += "/";
 	}
-	if (counterOneSlash(folderPath))
-	{
+	if (counterOneSlash(folderPath)) {
 		folderPath = "/";
 		return folderPath;
 	}
-	if (folderPath[folderPath.size() - 1] == '/')
-	{
+	if (folderPath[folderPath.size() - 1] == '/') {
 		folderPath = folderPath.substr(0, folderPath.size() - 1);
 	}
 	size_t pos = folderPath.find_last_of('/');
-	if (pos != std::string::npos)
-	{
+	if (pos != std::string::npos) {
 		folderPath = folderPath.substr(0, pos);
 	}
 	return folderPath;
 }
 
-std::string Request::validateRequest(Config _config, ServerConfigs server, bool completRequest)
-{
-	std::string error = "";
-	bool locationFound = false;
-	std::string currentUri = _uri;
-	if(!completRequest){
-		error = "413";
-		return error;
+void	Request::_validateHost( ServerConfigs server ) {
+	std::string host = getHeader("Host");
+	if (host.empty()) {
+		_incorrectRequest = true;
 	}
-	while (!locationFound && !currentUri.empty())
-	{
-		std::cout << "currentUri: " << currentUri << std::endl;
-		_location = _config.getLocationConfig(server, currentUri, locationFound);
-		if (!locationFound)
-			currentUri = folderPath(currentUri);
+	std::string serverName = host;
+	if (serverName.find(':') != std::string::npos) {
+		serverName = serverName.substr(0, serverName.find(':'));
 	}
-	if (!locationFound)
-		error = "404";
-	if (std::find(_location.methods.begin(), _location.methods.end(), getMethod()) == _location.methods.end())
-		error = "405";
-	if (_location.cgiEnabled)
-		_isCGI = true;
-	return error;
-}
-
-void Request::checkConnectionClose()
-{
-	stringMap::const_iterator it = _headers.find("Connection");
-	if (it != _headers.end() && it->second == "close")
-	{
-		_connectionClose = true;
+	if (server.serverName != serverName && 
+		serverName != DEFAULT_SERVER_NAME && 
+		serverName != DEFAULT_HOST && serverName != "0.0.0.0") {
+		_incorrectRequest = true;
 	}
 }
 
-void Request::parserQueryString()
-{
-	size_t pos = _uri.find("?");
-	if (pos != std::string::npos)
-	{
-		_queryString = _uri.substr(pos + 1);
-		_uri = _uri.substr(0, pos);
-	}
+void	Request::_checkConnectionClose( void ) {
+    stringMap::const_iterator it = _headers.find("Connection");
+    if (it == _headers.end() || it->second == "close") {
+        _connectionClose = true;
+    }
 }
 
-std::string Request::getQueryString() const
-{
-	return _queryString;
+httpMethod	Request::_parseMethod( const std::string &method ) {
+	if (method == "GET") { return GET; }
+	else if (method == "POST") { return POST; }
+	else if (method == "DELETE") { return DELETE; }
+	return INVALID;
 }

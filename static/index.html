@@ -1,26 +1,62 @@
-<!-- pagina de exemplo -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Document</title>
+	<title>WebServ</title>
+	<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-	<h1>Olá Mundo</h1>
-	<p>Este é um exemplo de página estática</p>
-	<p>Para acessar a página de arquivos, <a href="/f">clique aqui</a></p>
-	<p>Para askldjaskld, <a href="f/oi/404.html">clique aqui</a></p>
-	<p>Para acessar a página de erro, <a href="errors/404.html">clique aqui</a></p>
-	<p>Para acessar a página de erro 403, <a href="errors/403.html">clique aqui</a></p>
-	<p>Para acessar a página de erro 405, <a href="errors/405.html">clique aqui</a></p>
-	<p>Para acessar a página calculadora CGI, <a href="cgi/CGIcalculator.html">clique aqui</a></p>
-	<p>Para acessar a página de upload CGI, <a href="cgi/CGIupload.html">clique aqui</a></p>
-	<p>Para acessar a página de formulário CGI, <a href="cgi/CGIform.html">clique aqui</a></p>
-	<p>Para acessar a página de POST normal, <a href="uploadPOST.html">clique aqui</a></p>
-	<h1>My Video</h1>
-	<!-- <video width="640" height="360" controls>
-		<source src="img/video.mp4" type="video/mp4">
-	</video> -->
+	<header>
+		<div class="logo">
+			<h1>WebServ</h1>
+		</div>
+		<nav>
+			<ul>
+				<li><a href="#">Home</a></li>
+				<li><a href="#">Contact</a></li>
+				<li><a href="#">About</a></li>
+			</ul>
+		</nav>
+	</header>
+
+	<main>
+		<section class="intro">
+			<h2>Welcome to WebServ</h2>
+			<p>Explore our services and Test our Features.</p>
+		</section>
+
+		<section class="features">
+			<div class="feature">
+				<h3>CGI Calculator</h3>
+				<p>Make calculations with our CGI calculator.</p>
+				<a href="cgi/CGIcalculator.html" class="button">Access</a>
+			</div>
+
+			<div class="feature">
+				<h3>CGI Upload</h3>
+				<p>Send files to our server with CGI upload.</p>
+				<a href="cgi/CGIupload.html" class="button">Access</a>
+			</div>
+
+			<div class="feature">
+				<h3>CGI Form</h3>
+				<p>Send a form to our server with CGI form.</p>
+				<a href="cgi/CGIform.html" class="button">Access</a>
+			</div>
+
+			<div class="feature">
+				<h3>Normal POST</h3>
+				<p>Test the normal POST method.</p>
+				<a href="post/upload.html" class="button">Access</a>
+			</div>
+		</section>
+	</main>
+
+	<footer>
+		<p>&copy; 2024 WebServ - by Arthur & Pedro</p>
+	</footer>
+
+	<script src="scripts.js"></script>
 </body>
 </html>
