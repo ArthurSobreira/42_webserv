@@ -78,6 +78,7 @@ clean:
 fclean: clean
 	@echo $(RED)[Cleaning executables...]$(LIMITER)
 	@echo $(RED)[Cleaning logs files...]$(LIMITER)
+	@$(RM) $(NAME)
 	@$(RM) $(LOG)
 
 re: fclean all
