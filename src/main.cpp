@@ -8,7 +8,8 @@ volatile sig_atomic_t stop = 0;
 
 int main(int argc, char **argv) {
     if (argc != 2) {
-        std::cerr << "Usage: " << argv[0] << " <config_file_path>" << std::endl;
+        logger.logError(LOG_ERROR, "Usage: " + std::string(argv[0]) + 
+            " <config_file_path>", true);
         return (EXIT_FAILURE);
     }
     setupSignalHandlers();
