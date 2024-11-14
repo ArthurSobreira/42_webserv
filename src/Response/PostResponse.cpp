@@ -48,8 +48,10 @@ void	PostResponse::prepareResponse( void ) {
 			handleError("400", _location.server->errorPages.at("400"), ERROR_BAD_REQUEST);
 		else if (valid == UNSUPPORTED_MEDIA_TYPE)
 			handleError("415", _location.server->errorPages.at("415"), ERROR_UNSUPPORTED_MEDIA_TYPE);
-		else if (valid == INTERNAL_SERVER_ERROR)
+		else if (valid == INTERNAL_SERVER_ERROR) {
+			logger.logError(LOG_ERROR, "Error creating file: " + _filePath, true);
 			handleError("500", _location.server->errorPages.at("500"), ERROR_INTERNAL_SERVER);
+		}
 	}
 }
 
