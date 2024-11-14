@@ -4,7 +4,7 @@
     $request_method = getenv("REQUEST_METHOD");
 
     echo "<html><body>";
-    echo "<h1>Php CGI Calculator</h1>";
+    echo "<h1>PHP CGI Calculator</h1>";
     if ($request_method === 'GET') {
         parse_str(getenv("QUERY_STRING"), $query_params);
 
