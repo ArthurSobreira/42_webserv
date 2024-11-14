@@ -103,7 +103,6 @@ void	CGIResponse::_handleCGIError( int code, const std::string &message ) {
 	_body.clear();
 	_statusCode = intToString(code);
 	_reasonPhrase = message;
-	logger.logError(LOG_ERROR, message, true);
 	std::string errorPage = _location.server->errorPages[_statusCode];
 	handleError(_statusCode, errorPage, message);
 }
@@ -221,6 +220,8 @@ void	CGIResponse::executeCGI( void ) {
 						_statusCode = "201";
 						_reasonPhrase = "Created";
 					} else {
+						logger.logError(LOG_ERROR, "Error creating file: " +
+							fullFilePath, true);
 						_handleCGIError(500, ERROR_CGI_EXECUTION);
 					}
 				} else {

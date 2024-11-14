@@ -124,6 +124,7 @@ void	Config::_parseServerBlock( const std::string &serverBlock ) {
 	while (std::getline(serverStream, line)) {
 		if ((line[line.size() - 1] != '[' && line[line.size() - 1] != ']') &&
 			(line.empty() || line[line.size() - 1] != ';')) {
+			logger.logError(LOG_ERROR, "Invalid Line: " + line, true);
 			throw std::runtime_error(ERROR_INVALID_LINE);
 		}
 		std::istringstream tokenStream(line);
@@ -209,6 +210,7 @@ void	Config::_parseLocationBlock( const std::string &locationBlock, LocationConf
 
 	while (std::getline(locationStream, line)) {
 		if (line.empty() || line[line.size() - 1] != ';') {
+			logger.logError(LOG_ERROR, "Invalid Line: " + line, true);
 			throw std::runtime_error(ERROR_INVALID_LINE);
 		}
 		std::istringstream tokenStream(line);
