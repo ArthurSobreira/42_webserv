@@ -27,7 +27,7 @@
                     if ($num2 != 0) {
                         $result = $num1 / $num2;
                     } else {
-                        $result = 'Error: Division by zero';
+                        $result = 'Division by zero';
                     }
                     break;
                 default:
