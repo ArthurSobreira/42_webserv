@@ -74,14 +74,14 @@ namespace ConfigUtils {
 		return (timmedServerBlock.str());
 	}
 
-	bool hostIsValid( ServerConfigs &server ) {
-		std::istringstream stream(server.host);
+	bool hostIsValid( const std::string &host ) {
+		std::istringstream stream(host);
 		std::vector<int> bytes;
 		std::string segment;
 		int fd = -1;
 		uint32_t ip;
 
-		if (!inetPton(server.host)) { return false; }
+		if (!inetPton(host)) { return false; }
 
 		while (std::getline(stream, segment, '.')) {
 			int byte;
