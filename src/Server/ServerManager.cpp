@@ -279,6 +279,8 @@ std::string ServerManager::_handleRedirect( const std::string &location ) {
 	response += "Location: " + location + "\r\n";
 	response += "Content-Length: 0\r\n";
 	response += "Content-Type: text/html\r\n\r\n";
+
+	logger.logDebug(LOG_INFO, "Redirecting to: " + location, true);
 	return response;
 }
 

@@ -15,10 +15,8 @@ CFLAGS	=	-Wall -Werror -Wextra -std=c++98 -g3 -I includes/
 RM		=	rm -rf
 
 NAME		=	webserv
-TESTNAME	=	testes  
 BUILD		=	./build
 LOG			=	./logs
-BUILD_TEST	=	./build_test
 CONFIG_PATH = 	src/Config/
 RESP_PATH	=	src/Response/
 SERVER_PATH =	src/Server/
@@ -42,9 +40,7 @@ SRCS		=	$(CONFIG_PATH)Config.cpp \
 				src/Response.cpp \
 				src/main.cpp
 
-TEST_SRCS	=	test/main.cpp $(filter-out src/main.cpp, $(SRCS)) 
 OBJS		=	$(addprefix $(BUILD)/, $(patsubst src/%, %, $(SRCS:.cpp=.o)))
-OBJSTESTS	=	$(addprefix $(BUILD_TEST)/, $(patsubst src/%, %, $(TEST_SRCS:.cpp=.o)))
 INC			=	$(wildcard include/*.hpp)
 
 GREEN	=	"\033[32;1m"
@@ -63,20 +59,8 @@ $(NAME): $(OBJS)
 	@echo $(CYAN)[$(NAME) executable created successfully...]$(LIMITER)
 	@$(CC) $(CFLAGS) $(OBJS) -o $@ -I include/
 
-$(TESTNAME): $(BUILD_TEST) $(OBJSTESTS)
-	@echo $(CYAN)[$(TESTNAME) test executable created successfully...]$(LIMITER)
-	@$(CC) $(CFLAGS) $(OBJSTESTS) -o $@ -I include/
-
 $(BUILD)/%.o: src/%.cpp $(INC)
 	@echo $(GREEN)[Compiling]$(LIMITER) $(WHITE_U)$(notdir $<)...$(LIMITER)
-	$(CC) $(CFLAGS) -c $< -o $@ -I include/
-
-$(BUILD_TEST)/%.o: test/%.cpp $(INC)
-	@echo $(GREEN)[Compiling Test]$(LIMITER) $(WHITE_U)$(notdir $<)...$(LIMITER)
-	$(CC) $(CFLAGS) -c $< -o $@ -I include/
-
-$(BUILD_TEST)/%.o: src/%.cpp $(INC)
-	@echo $(GREEN)[Compiling Test Dependencies]$(LIMITER) $(WHITE_U)$(notdir $<)...$(LIMITER)
 	$(CC) $(CFLAGS) -c $< -o $@ -I include/
 
 $(BUILD):
@@ -87,18 +71,13 @@ $(BUILD):
 	@mkdir -p $(BUILD)/Utils/
 	@mkdir -p $(LOG)
 
-$(BUILD_TEST):
-	@mkdir -p $(BUILD_TEST)
-
 clean:
 	@echo $(RED)[Cleaning object files...]$(LIMITER)
 	@if [ -d $(BUILD) ]; then $(RM) $(BUILD); fi
-	@if [ -d $(BUILD_TEST) ]; then $(RM) $(BUILD_TEST); fi
 
 fclean: clean
 	@echo $(RED)[Cleaning executables...]$(LIMITER)
 	@echo $(RED)[Cleaning logs files...]$(LIMITER)
-	@$(RM) $(NAME) $(TESTNAME)
 	@$(RM) $(LOG)
 
 re: fclean all
@@ -108,10 +87,7 @@ run: all
 	@echo $(GREEN)[Server is running...]$(LIMITER)
 	@./$(NAME) config/testLocation.conf
 
-tests: $(TESTNAME)
-	@echo $(CYAN)[Running tests...]$(LIMITER)
-	./$(TESTNAME) config/testLocation.conf
-
 valgrind: all
 	@echo $(CYAN)[Running valgrind...]$(LIMITER)
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(NAME) config/testLocation.conf
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes \
+	./$(NAME) config/testLocation.conf
