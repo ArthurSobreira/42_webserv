@@ -28,4 +28,4 @@ def main() -> None:
 if __name__ == "__main__":
 	main()
 
-# curl -X GET "http://localhost:4002/calculator?num1=10&num2=5&operation=div"
+# curl -X GET "http://localhost:4000/calculator?num1=10&num2=5&operation=div"

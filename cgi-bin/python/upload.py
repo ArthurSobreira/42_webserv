@@ -32,4 +32,4 @@ def	main() -> None:
 if __name__ == "__main__":
 	main()
 
-# curl -X POST -F "file=@/etc/passwd" http://localhost:4002/upload
+# curl -X POST -F "file=@/etc/passwd" http://localhost:4000/upload
