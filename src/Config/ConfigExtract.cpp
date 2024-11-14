@@ -30,7 +30,7 @@ namespace ServerExtraction {
 		} else if (tokens.size() > 2) {
 			throw std::runtime_error(ERROR_EXTRA_VALUE);
 		}
-		if (!ConfigUtils::hostIsValid(server)) {
+		if (!ConfigUtils::hostIsValid(tokens[1])) {
 			throw std::runtime_error(ERROR_INVALID_HOST);
 		} else { server.host = tokens[1]; }
 	}
