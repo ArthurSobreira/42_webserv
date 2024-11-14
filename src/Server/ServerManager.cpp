@@ -138,7 +138,7 @@ void	ServerManager::_handleRead( int clientSocket ) {
 		}
 	}
 	else {
-		if (data.find("\r\n\r\n") != std::string::npos) {
+		if (_clientDataMap[clientSocket].request.find("\r\n\r\n") != std::string::npos) {
 			_epollManager.modifyEpoll(clientSocket, EPOLLOUT);
 			logger.logDebug(LOG_DEBUG, "Complete request case 2");
 			return;
@@ -183,12 +183,12 @@ void	ServerManager::_handleWrite( int clientSocket ) {
 		else if (bytesWritten == (int)_clientDataMap[clientSocket].response.size()) {
 			logger.logDebug(LOG_INFO, "Full response sent to client socket: " + 
 				intToString(clientSocket), true);
-			_restartStruct(_clientDataMap[clientSocket]);
 			if (_clientDataMap[clientSocket].connection) {
 				logger.logDebug(LOG_INFO, "Connection closed after sending response", true);
 				_closeConnection(clientSocket);
 				return;
 			}
+			_restartStruct(_clientDataMap[clientSocket]);
 			_epollManager.modifyEpoll(clientSocket, EPOLLIN);
 			logger.logDebug(LOG_DEBUG, "Modified epoll to EPOLLIN for client socket: " + 
 				intToString(clientSocket));

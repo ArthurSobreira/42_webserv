@@ -17,8 +17,10 @@ class Request {
 		bool _isCGI;
 		bool _isRedirect;
 		bool _connectionClose;
+		bool _incorrectRequest;
 		std::string	_boundary;
 		std::string	_queryString;
+
 
 	public:
 		/* Constructor Method */
@@ -53,7 +55,7 @@ class Request {
 		void	_parseBody( void );
 		void	_extractMultipartNamesAndFilenames( void );
 		std::string	_folderPath( const std::string &uri );
-		bool	_validateHost( ServerConfigs server );
+		void	_validateHost( ServerConfigs server );
 		void	_checkConnectionClose( void );
 		httpMethod	_parseMethod( const std::string &method );
 };

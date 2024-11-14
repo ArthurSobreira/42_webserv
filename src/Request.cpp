@@ -10,6 +10,7 @@ Request::Request( const std::string &rawRequest,
 	_isCGI = false;
 	_isRedirect = false;
 	_connectionClose = false;
+	_incorrectRequest = false;
 	if (completeRequest) {
 		_parseRequest();
 		_checkConnectionClose();
@@ -36,9 +37,13 @@ std::string	Request::validateRequest( Config _config, ServerConfigs server,
 	std::string error = DEFAULT_EMPTY;
 	bool locationFound = false;
 	std::string currentUri = _uri;
+	_validateHost(server);
 
 	if (!completeRequest) {
 		return "413";
+	} else if(_incorrectRequest) {
+		_connectionClose = true;
+		return "400";
 	}
 	while (!locationFound && !currentUri.empty()) {
 		_location = _config.getLocationConfig(server, currentUri, locationFound);
@@ -51,8 +56,6 @@ std::string	Request::validateRequest( Config _config, ServerConfigs server,
 	} else if (std::find(_location.methods.begin(), _location.methods.end(), 
 		getMethod()) == _location.methods.end()) {
 		error = "405";
-	} else if (!_validateHost(server)) {
-		error = "400";
 	}
 	_isRedirect = _location.redirectSet;
 	_isCGI = _location.cgiEnabled;
@@ -68,6 +71,10 @@ void	Request::_parseRequest( void ) {
 	size_t pos = _rawRequest.find("\r\n\r\n");
 	if (pos != std::string::npos) {
 		std::string headersPart = _rawRequest.substr(0, pos);
+		if (headersPart.empty()) {
+			_incorrectRequest = true;
+			return;
+		}
 		_body = _rawRequest.substr(pos + 4);
 		std::istringstream headersStream(headersPart);
 		bool isFirstLine = true;
@@ -90,9 +97,11 @@ void	Request::_parseRequest( void ) {
 void	Request::_parseMethodAndUri( const std::string &line ) {
 	std::istringstream lineStream(line);
 	std::string method;
-
 	lineStream >> method >> _uri >> _version;
-
+	if (method.empty() || _uri.empty() || _version.empty()) {
+		_incorrectRequest = true;
+		return;
+	}
 	_parserQueryString();
 	_method = _parseMethod(method);
 	if (_uri != "/") {
@@ -190,10 +199,10 @@ std::string	Request::_folderPath( const std::string &uri ) {
 	return folderPath;
 }
 
-bool	Request::_validateHost( ServerConfigs server ) {
+void	Request::_validateHost( ServerConfigs server ) {
 	std::string host = getHeader("Host");
 	if (host.empty()) {
-		return false;
+		_incorrectRequest = true;
 	}
 	std::string serverName = host;
 	if (serverName.find(':') != std::string::npos) {
@@ -201,17 +210,16 @@ bool	Request::_validateHost( ServerConfigs server ) {
 	}
 	if (server.serverName != serverName && 
 		serverName != DEFAULT_SERVER_NAME && 
-		serverName != DEFAULT_HOST) {
-		return false;
+		serverName != DEFAULT_HOST && serverName != "0.0.0.0") {
+		_incorrectRequest = true;
 	}
-	return true;
 }
 
 void	Request::_checkConnectionClose( void ) {
-	stringMap::const_iterator it = _headers.find("Connection");
-	if (it != _headers.end() && it->second == "close") {
-		_connectionClose = true;
-	}
+    stringMap::const_iterator it = _headers.find("Connection");
+    if (it == _headers.end() || it->second == "close") {
+        _connectionClose = true;
+    }
 }
 
 httpMethod	Request::_parseMethod( const std::string &method ) {
