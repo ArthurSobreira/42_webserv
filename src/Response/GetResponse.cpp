@@ -50,7 +50,7 @@ void	GetResponse::_addHeader( const std::string &title ) {
 		<< "</head>\n<body>\n"
 		<< "<h1>Index of " << title << "</h1>\n"
 		<< "<table>\n"
-		<< "<tr><th valign=\"top\"><img src=\"/icons/blank.gif\" alt=\"[ICO]\"></th>"
+		<< "<tr><th valign=\"top\"><img src=\"/icons/blank.png\" alt=\"[ICO]\"></th>"
 		<< "<th><a href=\"?C=N;O=D\">Name</a></th>"
 		<< "<th><a href=\"?C=M;O=A\">Last modified</a></th>"
 		<< "<th><a href=\"?C=S;O=A\">Size</a></th>"
@@ -107,7 +107,7 @@ void	GetResponse::_addFileEntry( std::vector<std::string> &folders,
 			else
 				ref = _uri;
 		}
-		oss << "<tr><td valign=\"top\"><img src=\"/icons/folder.gif\" alt=\"[   ]\"></td>"
+		oss << "<tr><td valign=\"top\"><img src=\"/icons/folder.png\" alt=\"[   ]\"></td>"
 			<< "<td><a href=\"" << ref << "\">" << name << "</a></td>"
 			<< "<td align=\"right\">" << modDate << "</td>"
 			<< "<td align=\"right\">" << size << "</td>"
@@ -121,7 +121,17 @@ void	GetResponse::_addFileEntry( std::vector<std::string> &folders,
 		modDate = modDate.substr(0, modDate.size() - 1);
 		sizeConverter << filesDetails[name].st_size;
 		std::string size = sizeConverter.str();
-		oss << "<tr><td valign=\"top\"><img src=\"/icons/unknown.gif\" alt=\"[   ]\"></td>"
+
+		std::string icon = "/icons/unknown.png";
+		std::string extension = name.substr(name.find_last_of('.') + 1);
+		if (extension == "txt" || extension == "html") {
+			icon = "/icons/text.png";
+		} else if (extension == "jpg" || extension == "jpeg" || 
+			extension == "png") {
+			icon = "/icons/image.png";
+		}
+
+		oss << "<tr><td valign=\"top\"><img src=\"" << icon << "\" alt=\"[   ]\"></td>"
 			<< "<td><a href=\"" << _uri + "/" + name << "\">" << name << "</a></td>"
 			<< "<td align=\"right\">" << modDate << "</td>"
 			<< "<td align=\"right\">" << size << "</td>"
