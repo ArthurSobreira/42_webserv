@@ -103,7 +103,6 @@ void	CGIResponse::_handleCGIError( int code, const std::string &message ) {
 	_body.clear();
 	_statusCode = intToString(code);
 	_reasonPhrase = message;
-	logger.logError(LOG_ERROR, message, true);
 	std::string errorPage = _location.server->errorPages[_statusCode];
 	handleError(_statusCode, errorPage, message);
 }
