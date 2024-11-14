@@ -77,7 +77,7 @@ class Config {
 namespace ConfigUtils {
 	short	getServerCount( const std::string &fileName );
 	std::string	trimServerBlock( const std::string &serverBlock );
-	bool	hostIsValid( ServerConfigs &server );
+	bool	hostIsValid( const std::string &host  );
 	bool	isRepeatedMethod( std::vector<httpMethod> &methodsVector, 
 		httpMethod method );
 	bool	directoryExists( const std::string &path );
