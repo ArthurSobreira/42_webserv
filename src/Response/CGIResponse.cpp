@@ -220,6 +220,8 @@ void	CGIResponse::executeCGI( void ) {
 						_statusCode = "201";
 						_reasonPhrase = "Created";
 					} else {
+						logger.logError(LOG_ERROR, "Error creating file: " +
+							fullFilePath, true);
 						_handleCGIError(500, ERROR_CGI_EXECUTION);
 					}
 				} else {
