@@ -33,7 +33,6 @@ ServerConfigs::ServerConfigs( void ) {
 	errorPages["413"] = DEFAULT_ERROR_413;
 	errorPages["415"] = DEFAULT_ERROR_415;
 	errorPages["500"] = DEFAULT_ERROR_500;
-	errorPages["999"] = DEFAULT_ERROR_999;
 }
 
 /* Constructor Method */
