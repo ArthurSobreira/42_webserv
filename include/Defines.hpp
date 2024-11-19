@@ -66,7 +66,6 @@
 # define DEFAULT_ERROR_413 "./static/errors/413.html"
 # define DEFAULT_ERROR_415 "./static/errors/415.html"
 # define DEFAULT_ERROR_500 "./static/errors/500.html"
-# define DEFAULT_ERROR_999 "./static/errors/999.html"
 
 /* File Error Macros */
 # define ERROR_OPEN_LOG_FILE "Could Not Open Log File!"
