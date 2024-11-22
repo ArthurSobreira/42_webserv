@@ -25,5 +25,3 @@
 	// curl -X GET "http://localhost:5000/form?name=John&age=30"
 	// curl -X POST -d "name=John&age=30" http://localhost:5000/form
 ?>
-
-
