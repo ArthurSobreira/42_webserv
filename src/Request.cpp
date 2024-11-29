@@ -2,12 +2,14 @@
 #include "Utils.hpp"
 #include "Includes.hpp"
 
-Request::Request(const std::string &rawRequest) : _rawRequest(rawRequest)
+Request::Request(const std::string &rawRequest, bool completRequest)
+	: _rawRequest(rawRequest)
 {
 	_method = INVALID;
 	_isCGI = false;
 	_connectionClose = false;
-	parseRequest();
+	if (completRequest)
+		parseRequest();
 }
 
 httpMethod Request::getMethod() const { return _method; }
@@ -210,15 +212,15 @@ std::string Request::folderPath(const std::string &uri)
 	return folderPath;
 }
 
-std::string Request::validateRequest(Config _config, ServerConfigs server)
+std::string Request::validateRequest(Config _config, ServerConfigs server, bool completRequest)
 {
-	static int counter = 0;
 	std::string error = "";
 	bool locationFound = false;
 	std::string currentUri = _uri;
-
-	std::cout << "passou aki " << counter++ << std::endl;
-
+	if(!completRequest){
+		error = "413";
+		return error;
+	}
 	while (!locationFound && !currentUri.empty())
 	{
 		std::cout << "currentUri: " << currentUri << std::endl;

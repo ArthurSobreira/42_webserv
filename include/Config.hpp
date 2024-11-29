@@ -51,7 +51,6 @@ class Config {
 		const std::string _fileName;
 		std::vector<ServerConfigs> _servers;
 		short _serverCount;
-		Logger &_logger;
 		std::map<int, const ServerConfigs*> _socketConfigMap;
 		std::map<int, int> _socketServerMap;
 
@@ -65,7 +64,7 @@ class Config {
 
 	public:
 		/* Constructor Method */
-		Config( const std::string &fileName, Logger &logger );
+		Config( const std::string &fileName );
 
 		/* Destructor Method */
 		~Config( void );
@@ -94,7 +93,6 @@ namespace ConfigUtils {
 	void	validateFullLocationPath( LocationConfigs &location );
 	void	validateFullCGIPath( LocationConfigs &location );
 	void	createUploadFolder( std::string &uploadPath );
-	void	printServerStruct( const ServerConfigs &server );
 }
 
 /* Server Extraction Functions */

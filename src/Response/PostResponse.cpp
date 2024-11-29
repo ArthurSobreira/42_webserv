@@ -1,7 +1,10 @@
 #include "PostResponse.hpp"
 
-PostResponse::PostResponse(std::string filePath, std::string postData, ServerConfigs server, LocationConfigs location, stringMap headersRequest) : Response(), _postData(postData), _filePath(filePath), _headersRequest(headersRequest), _server(server), _location(location)
-{
+/* Constructor Method */
+PostResponse::PostResponse( std::string filePath, std::string postData, 
+	stringMap headersRequest, LocationConfigs location )
+	: Response(), _filePath(filePath), _postData(postData), 
+	_headersRequest(headersRequest), _location(location) {
 	_validTypes.insert("image/jpeg");
 	_validTypes.insert("image/png");
 	_validTypes.insert("image/gif");
@@ -15,33 +18,21 @@ PostResponse::PostResponse(std::string filePath, std::string postData, ServerCon
 	_validTypes.insert("video/mp4");
 }
 
-bool PostResponse::_isValidContentTypeAndSetExtension()
-{
-	if (_validTypes.find(_headersRequest["Content-Type"]) == _validTypes.end())
-		return false;
-	_contentType = _headersRequest["Content-Type"];
-	_contentType = _contentType.substr(_contentType.find("/") + 1);
-	if (_contentType == "plain")
-		_contentType = "txt";
-	if (_contentType == "javascript")
-		_contentType = "js";
-	return true;
-}
+/* Destructor Method */
+PostResponse::~PostResponse( void ) {};
 
-void PostResponse::prepareResponse()
-{
+/* Public Method */
+void	PostResponse::prepareResponse( void ) {
 	_filePath = _location.uploadPath + "/" + _filePath;
-	if (_postData.size() > _server.limitBodySize)
-		handleError("413", _server.errorPages.at("413"), ERROR_TOO_LARGE, _logger);
+	if (_postData.size() > _location.server->limitBodySize)
+		handleError("413", _location.server->errorPages.at("413"), ERROR_TOO_LARGE);
 	else if (!_location.uploadEnabled)
-		handleError("405", _server.errorPages.at("405"), ERROR_METHOD_NOT_ALLOWED, _logger);
-	else
-	{
+		handleError("405", _location.server->errorPages.at("405"), ERROR_METHOD_NOT_ALLOWED);
+	else {
 		int valid = _createFile();
-		if (valid == SUCCESS)
-		{
-			if (access(_filePath.c_str(), F_OK) != -1)
-			{
+		if (valid == SUCCESS) {
+			if (access(_filePath.c_str(), F_OK) != -1) {
+				logger.logDebug(LOG_INFO, "File Created: " + _filePath, true);
 				_statusCode = "201";
 				_reasonPhrase = "Created";
 				_body = "<html><head><title>Created</title></head><body><h1>Created</h1></body></html>";
@@ -51,62 +42,73 @@ void PostResponse::prepareResponse()
 				_headers["Content-Type"] = "text/html";
 			}
 			else
-				handleError("500", _server.errorPages.at("500"), "Internal server error", _logger);
+				handleError("500", _location.server->errorPages.at("500"), ERROR_INTERNAL_SERVER);
 		}
 		else if (valid == BAD_REQUEST)
-			handleError("400", _server.errorPages.at("400"), "Bad Request", _logger);
+			handleError("400", _location.server->errorPages.at("400"), ERROR_BAD_REQUEST);
 		else if (valid == UNSUPPORTED_MEDIA_TYPE)
-			handleError("415", _server.errorPages.at("415"), "Unsupported Media Type", _logger);
+			handleError("415", _location.server->errorPages.at("415"), ERROR_UNSUPPORTED_MEDIA_TYPE);
 		else if (valid == INTERNAL_SERVER_ERROR)
-			handleError("500", _server.errorPages.at("500"), "Internal server error", _logger);
+			handleError("500", _location.server->errorPages.at("500"), ERROR_INTERNAL_SERVER);
 	}
 }
 
-static void removeCarriageReturn(std::string &str)
-{
+/* Private Methods */
+int	PostResponse::_createFile( void ) {
+	static int archivo = 0;
+	if (_postData.empty()) {
+		return BAD_REQUEST;
+	}
+	if (!_headersRequest["boundary"].empty()) {
+		_fileName = _headersRequest["filename"];
+		_removeBoundary();
+	}
+	else {
+		if (_isValidContentTypeAndSetExtension()) {
+			std::stringstream ss;
+			ss << archivo++;
+			_fileName = "file" + ss.str() + "." + _contentType;
+		}
+		else {
+			return UNSUPPORTED_MEDIA_TYPE;
+		}
+	}
+	_filePath = _location.uploadPath + "/" + _fileName;
+	std::ofstream file(_filePath.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
+	if (!file.is_open()) {
+		return INTERNAL_SERVER_ERROR;
+	}
+	file.write(_postData.c_str(), _postData.size());
+	file.close();
+	return SUCCESS;
+}
+
+bool PostResponse::_isValidContentTypeAndSetExtension( void ) {
+	if (_validTypes.find(_headersRequest["Content-Type"]) == _validTypes.end()) {
+		return false;
+	}
+	_contentType = _headersRequest["Content-Type"];
+	_contentType = _contentType.substr(_contentType.find("/") + 1);
+	if (_contentType == "plain")
+		_contentType = "txt";
+	if (_contentType == "javascript")
+		_contentType = "js";
+	return true;
+}
+
+void	PostResponse::_removeCarriageReturn( void ) {
+	std::string str = _headersRequest["boundary"];
 	size_t pos = str.find("\r");
-	while (pos != std::string::npos)
-	{
+	while (pos != std::string::npos) {
 		str.erase(pos, 1);
 		pos = str.find("\r");
 	}
 }
 
-void PostResponse::_removeBoundary()
-{
-	removeCarriageReturn(_headersRequest["boundary"]);
+void PostResponse::_removeBoundary( void ) {
+	_removeCarriageReturn();
 	size_t pos = _postData.find("\r\n\r\n");
 	_postData = _postData.substr(pos + 4);
 	pos = _postData.find(_headersRequest["boundary"]);
 	_postData = _postData.substr(0, pos - 2);
-}
-
-int PostResponse::_createFile()
-{
-	static int archivo = 0;
-	if (_postData.empty())
-		return BAD_REQUEST;
-	if (!_headersRequest["boundary"].empty())
-	{
-		_fileName = _headersRequest["filename"];
-		_removeBoundary();
-	}
-	else
-	{
-		if (_isValidContentTypeAndSetExtension())
-		{
-			std::stringstream ss;
-			ss << archivo++;
-			_fileName = "file" + ss.str() + "." + _contentType;
-		}
-		else
-			return UNSUPPORTED_MEDIA_TYPE;
-	}
-	_filePath = _location.uploadPath + "/" + _fileName;
-	std::ofstream file(_filePath.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
-	if (!file.is_open())
-		return INTERNAL_SERVER_ERROR;
-	file.write(_postData.c_str(), _postData.size());
-	file.close();
-	return SUCCESS;
 }

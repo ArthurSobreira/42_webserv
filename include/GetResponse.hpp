@@ -8,6 +8,7 @@
 class GetResponse : public Response {
 	private:
 		std::string _filePath;
+		std::string _uri;
 		stringMap _headers;
 
 	public:
@@ -18,8 +19,13 @@ class GetResponse : public Response {
 		~GetResponse( void );
 
 		/* Public Methods */
-		void listDirectoryHandler( void );
+		void listDirectoryHandler( const LocationConfigs &location );
 		void prepareResponse( const LocationConfigs &location );
+	private:
+		void addHeader(const std::string &title);
+		bool listDirectory(const std::string &dirPath);
+		void addFileEntry(std::vector<std::string> &folders, std::vector<std::string> &files, std::map<std::string, status> &filesDetails);
+		void addFooter();
 };
 
 #endif // GETRESPONSE_HPP

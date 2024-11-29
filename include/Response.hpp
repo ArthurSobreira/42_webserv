@@ -3,7 +3,6 @@
 
 #include "Includes.hpp"
 #include "Defines.hpp"
-#include "Logger.hpp"
 #include "Server.hpp"
 
 class Response {
@@ -12,16 +11,19 @@ class Response {
 		std::string _body;
 		std::string _statusCode;
 		std::string _reasonPhrase;
-		Logger	_logger;
 
 	public:
+		/* Constructor Method */
 		Response( void );
-		virtual ~Response( void );
-		std::string generateResponse( void ) const;
 
-		// utility functions
-		void handleError(std::string _statusCode, const std::string &error_page, const std::string &error_message, Logger &logger);
-		void handleFileResponse(const std::string &path, Logger &logger);
+		/* Destructor Method */
+		virtual ~Response( void );
+
+		/* Public Methods */
+		std::string	generateResponse( void ) const;
+		void	handleError( std::string _statusCode, 
+			const std::string &error_page, const std::string &error_message);
+		void	handleFileResponse( const std::string &path );
 };
 
 #endif // RESPONSE_HPP

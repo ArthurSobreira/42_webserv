@@ -4,15 +4,15 @@
 #include "Logger.hpp"
 
 /* Constructor Method */
-Logger::Logger( const std::string &debugLog, const std::string &logAccess, 
+Logger::Logger( const std::string &logDebug, const std::string &logAccess, 
 	const std::string &logError )
-	: _logDebug(debugLog.c_str(), std::ios::out | std::ios::app), 
+	: _logDebug(logDebug.c_str(), std::ios::out | std::ios::app), 
 	  _logAccess(logAccess.c_str(), std::ios::out | std::ios::app), 
 	  _logError(logError.c_str(), std::ios::out | std::ios::app)
 {
-	if (!_logDebug.is_open() || !_logAccess.is_open() || !_logError.is_open())
-		ft_error(ERROR_OPEN_LOG_FILE, __FUNCTION__, __FILE__, __LINE__, 
-			std::runtime_error(ERROR_OPEN_LOG_FILE));
+	if (!_logDebug.is_open() || !_logAccess.is_open() || !_logError.is_open()) {
+		std::runtime_error(ERROR_OPEN_LOG_FILE);
+	}
 
 	static short start = 0;
 

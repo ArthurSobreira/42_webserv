@@ -16,7 +16,7 @@ class Logger {
 
 	public:
 		/* Constructor Method */
-		Logger( const std::string &log, const std::string &logAccess, 
+		Logger( const std::string &logDebug, const std::string &logAccess, 
 			const std::string &logError );
 
 		/* Destructor Method */

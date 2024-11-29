@@ -111,7 +111,7 @@ void	CGIResponse::_handleCGIError( int code, const std::string &message ) {
 	_reasonPhrase = message;
 	logger.logError(LOG_ERROR, message, true);
 	std::string errorPage = _location.server->errorPages[_statusCode];
-	handleError(_statusCode, errorPage, message, logger);
+	handleError(_statusCode, errorPage, message);
 }
 
 bool	CGIResponse::_waitChild( pid_t pid, int &status, std::clock_t start ) {
@@ -139,7 +139,7 @@ void	CGIResponse::_readReturnBody( int pipefd[2] ) {
 	buffer[bytes_read] = '\0';
 	std::string strBuffer(buffer);
 	if (!strBuffer.empty()) { _body = strBuffer; }
-	handleFileResponse(DEFAULT_EMPTY, logger);
+	handleFileResponse(DEFAULT_EMPTY);
 	close(pipefd[0]);
 }
 
